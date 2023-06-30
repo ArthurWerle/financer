@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model income {
+  id           Int      @id @default(autoincrement()) @db.UnsignedInt
+  amount       Float
+  periodId     Int      @db.UnsignedInt
+  date         DateTime @db.Date
+  recursiveFor Int?
+  period       period   @relation(fields: [periodId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "income_ibfk_1")
+
+  @@index([periodId], map: "periodId")
+}
+
+model outcome {
+  id           Int      @id @default(autoincrement()) @db.UnsignedInt
+  amount       Float
+  periodId     Int      @db.UnsignedInt
+  date         DateTime @db.Date
+  recursiveFor Int?
+  period       period   @relation(fields: [periodId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "outcome_ibfk_1")
+
+  @@index([periodId], map: "periodId")
+}
+
+model period {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  title     String    @db.VarChar(150)
+  startDate DateTime  @db.Date
+  endDate   DateTime? @db.Date
+  income    income[]
+  outcome   outcome[]
+}
