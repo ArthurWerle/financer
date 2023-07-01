@@ -12,10 +12,10 @@ type RegisterListProps = {
 }
 
 export default function RegisterList({ title, registers = [] }: RegisterListProps) {
-  // const [showAddNewForm, setShowAddNewForm] = useState(false)
+  const [showAddNewForm, setShowAddNewForm] = useState(false)
 
   function handleAddClick() {
-    // setShowAddNewForm(true)
+    setShowAddNewForm(true)
   }
 
   return (
@@ -23,16 +23,18 @@ export default function RegisterList({ title, registers = [] }: RegisterListProp
       <div className='flex gap-4 mb-2'>
         <p className='italic text-xl'>{title}</p>
       </div>
-      {registers?.map((register) => (
-        <Register key={register.id} amount={register.amount} description={register.description} />
-      ))}
-      {/* {showAddNewForm 
+      <div className="flex flex-col gap-3">
+        {registers?.map((register) => (
+          <Register key={register.id} amount={register.amount} description={register.description} />
+        ))}
+      </div>
+      {showAddNewForm 
         ? <AddNewRegister /> 
         : (
         <button className="mx-[20px] my-[10px]" onClick={handleAddClick}>
           <AiFillPlusCircle className="hover:fill-blue-500"/>
         </button>
-      )} */}
+      )}
     </div>
   )
 }

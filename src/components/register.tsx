@@ -9,7 +9,7 @@ export default function Register({ amount, description }: RegisterProps) {
   const formattedAmount = amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
   return (
-    <div className="flex group cursor-pointer gap-4">
+    <div className="flex w-fit group cursor-pointer gap-4">
       <div>
         <p className="group-hover:text-blue-500">R${formattedAmount}</p>
         <p className="text-sm leading-none group-hover:text-blue-500">{description}</p>

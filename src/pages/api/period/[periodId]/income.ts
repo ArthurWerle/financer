@@ -10,10 +10,24 @@ export default async function handler(
 ) {
   const { periodId } = req.query
 
-  const incomes = await prisma.income.findMany({
-    where: {
-      periodId: Number(periodId),
-    }
-  })
-  res.status(200).json(incomes)
+  if (req.method === 'GET') {
+    const incomes = await prisma.income.findMany({
+      where: {
+        periodId: Number(periodId),
+      }
+    })
+  
+    res.status(200).json(incomes)
+    return
+  }
+
+  if (req.method === 'POST') {
+    await prisma.income.create({
+      data: req.body
+    })
+  
+    res.status(200).json('ok')
+    return
+  }
+
 }

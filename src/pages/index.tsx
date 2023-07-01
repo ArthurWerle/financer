@@ -1,7 +1,10 @@
+import { periodAtom } from '@/atoms/period'
 import Header from '@/components/header'
 import RegisterList from '@/components/register-list'
 import { Period } from '@/types'
+import { atom, useAtom } from 'jotai'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import { useEffect } from 'react'
 
 export const getServerSideProps: GetServerSideProps<{ period: Period }> = async () => {
   const periodResponse = await fetch(process.env.NEXT_PUBLIC_REQUEST_URL + '/api/period')
@@ -17,6 +20,10 @@ export const getServerSideProps: GetServerSideProps<{ period: Period }> = async 
 }
 
 export default function Page({ period }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [value, setValue] = useAtom(periodAtom);
+
+  useEffect(() => setValue(period), [period.id])
+
   return ( 
     <main>
       <Header />
