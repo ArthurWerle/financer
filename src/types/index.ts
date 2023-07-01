@@ -13,6 +13,7 @@ export type Income = {
   date: Date
   periodId: number
   recursiveFor: number
+  description?: string
 }
 
 export type Outcome = Income

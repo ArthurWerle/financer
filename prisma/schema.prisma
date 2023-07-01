@@ -10,6 +10,7 @@ datasource db {
 model income {
   id           Int      @id @default(autoincrement()) @db.UnsignedInt
   amount       Float
+  description  String?  @db.VarChar(150)
   periodId     Int      @db.UnsignedInt
   date         DateTime @db.Date
   recursiveFor Int?
@@ -21,6 +22,7 @@ model income {
 model outcome {
   id           Int      @id @default(autoincrement()) @db.UnsignedInt
   amount       Float
+  description  String?  @db.VarChar(150)
   periodId     Int      @db.UnsignedInt
   date         DateTime @db.Date
   recursiveFor Int?

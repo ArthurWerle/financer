@@ -1,3 +1,5 @@
+import Header from '@/components/header'
+import RegisterList from '@/components/register-list'
 import { Period } from '@/types'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 
@@ -17,30 +19,15 @@ export const getServerSideProps: GetServerSideProps<{ period: Period }> = async 
 export default function Page({ period }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return ( 
     <main>
-      <header className='my-6'>
-        <h1 className='font-bold text-4xl'>Financer</h1>
-      </header>
-      <h2 className='font-bold italic text-3xl mb-2'>{period?.title}</h2>
+      <Header />
+      <div className='flex gap-4 mb-4'>
+        <h2 className='font-bold italic text-3xl'>{period?.title}</h2>
+        <button>start new</button>
+      </div>
       <div className='flex justify-between'>
-        <div>
-          <div className='flex gap-4'>
-            <p className='italic text-xl'>Incomes</p>
-            <button>add</button>
-          </div>
-          {period.incomes?.map((income) => (
-            <div key={income.id}>{income.amount}</div>
-          ))}
-        </div>
-        <div>
-          <div className='flex gap-4'>
-            <p className='italic text-xl'>Outcomes</p>
-            <button>add</button>
-          </div>
-          {period.outcomes?.map((outcome) => (
-            <div key={outcome.id}>{outcome.amount}</div>
-          ))}
-        </div>
-        <div className='flex gap-4'>
+        <RegisterList title="Incomes" registers={period.incomes}/>
+        <RegisterList title="Outcomes" registers={period.outcomes}/>
+        <div className='flex flex-1 gap-4'>
           <p className='italic text-xl'>Insights</p>
         </div>
       </div>
