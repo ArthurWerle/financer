@@ -1,8 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import prisma from '../../../../../lib/prisma'
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,24 +8,41 @@ export default async function handler(
 ) {
   const { periodId } = req.query
 
-  if (req.method === 'GET') {
-    const incomes = await prisma.income.findMany({
-      where: {
-        periodId: Number(periodId),
-      }
-    })
-  
-    res.status(200).json(incomes)
-    return
-  }
+  try {
+    if (req.method === 'GET') {
+      const incomes = await prisma.income.findMany({
+        where: {
+          periodId: Number(periodId),
+        }
+      })
+    
+      res.status(200).json(incomes)
+      return
+    }
 
-  if (req.method === 'POST') {
-    await prisma.income.create({
-      data: req.body
-    })
-  
-    res.status(200).json('ok')
-    return
+    if (req.method === 'POST') {
+      const { amount, description, recursiveFor } = req.body
+
+      const result = await prisma.income.create({
+        data: {
+          periodId: Number(periodId), 
+          amount: parseFloat(amount),
+          description,
+          date: new Date(),
+          recursiveFor: Number(recursiveFor)
+        }
+      })
+    
+      return res.status(200).json(result)
+    }
+  } catch (e) {
+    const errorResponse = {
+      message: 'Error on income.tsx',
+      error: `Error: ${e}`,
+      hasError: true
+    }
+
+    res.status(500).json(errorResponse)
   }
 
 }

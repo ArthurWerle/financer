@@ -4,14 +4,15 @@ import { periodAtom } from "@/atoms/period";
 import { useAtom } from "jotai";
 import { FormEvent } from "react"
 import { toast } from "react-toastify";
+import RegisterForm from "./register-form";
 
 export default function AddNewRegister() {
-  const [period] = useAtom(periodAtom);
+  const [period] = useAtom(periodAtom)
+
+  console.log('period id', period?.id)
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-
-    toast("Wow so easy!")
 
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -20,22 +21,31 @@ export default function AddNewRegister() {
     const description = formData.get('description') as string;
     const recursiveFor = formData.get('recursiveFor') as string;
 
+    const body = { amount, description, recursiveFor }
+
     if (!period) return
 
-    await fetch(`${process.env.NEXT_PUBLIC_REQUEST_URL}/api/period/${period.id}/outcome`)
+    const response = await fetch(`${process.env.NEXT_PUBLIC_REQUEST_URL}/api/period/${period.id}/income`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    })
+
+    const { hasError = false, message, error } = await response.json()
+
+    if (hasError) {
+      toast.error('Error creating register')
+      console.error(message, error)
+      return
+    }
+
+    toast.success("Register added")
   }
 
   return (
     <div className="mt-3"> 
       <div className="flex group cursor-pointer gap-4">
-      <form onSubmit={onSubmit}>
-        <input name="amount" className="p-1 bg-transparent border-b w-[100px] placeholder:italic placeholder:text-slate-600 placeholder:text-[12px]" placeholder="amount"/>
-        <div className="flex gap-3 mt-1">
-          <input name="description" className="p-1 text-sm leading-none bg-transparent border-b w-[120px] placeholder:italic placeholder:text-slate-600 placeholder:text-[12px]" placeholder="description"/>
-          <input name="recursiveFor" placeholder="X" className="p-1 bg-transparent border-b w-[25px] text-sm placeholder:italic placeholder:text-slate-600 placeholder:text-[12px]" />
-        </div>
-        <button className="none"></button>
-      </form>
+      <RegisterForm onSubmit={onSubmit} />
     </div>
     </div>
   )

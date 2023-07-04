@@ -25,7 +25,7 @@ export default function RegisterList({ title, registers = [] }: RegisterListProp
       </div>
       <div className="flex flex-col gap-3">
         {registers?.map((register) => (
-          <Register key={register.id} amount={register.amount} description={register.description} />
+          <Register key={register.id} amount={register.amount} description={register.description} recursiveFor={register.recursiveFor} />
         ))}
       </div>
       {showAddNewForm 
