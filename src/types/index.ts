@@ -3,17 +3,16 @@ export type Period = {
   title: string
   startDate: Date
   endDate: Date | null
-  incomes?: Income[]
-  outcomes?: Outcome[]
+  incomes?: Register[]
+  outcomes?: Register[]
 }
 
-export type Income = {
+export type Register = {
   id: number
   amount: number
   date: Date
   periodId: number
   recursiveFor: number
   description?: string
+  type: string
 }
-
-export type Outcome = Income

@@ -32,8 +32,8 @@ export default function Page({ period }: InferGetServerSidePropsType<typeof getS
         <button>start new</button>
       </div>
       <div className='flex justify-between'>
-        <RegisterList title="Incomes" registers={period.incomes}/>
-        <RegisterList title="Outcomes" registers={period.outcomes}/>
+        <RegisterList title="Incomes" registers={period.incomes} type='income' />
+        <RegisterList title="Outcomes" registers={period.outcomes} type='outcome' />
         <div className='flex flex-1 gap-4'>
           <p className='italic text-xl'>Insights</p>
         </div>

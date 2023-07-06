@@ -6,10 +6,8 @@ import { FormEvent } from "react"
 import { toast } from "react-toastify";
 import RegisterForm from "./register-form";
 
-export default function AddNewRegister() {
+export default function AddNewRegister({ type }: { type: string }) {
   const [period] = useAtom(periodAtom)
-
-  console.log('period id', period?.id)
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -23,9 +21,13 @@ export default function AddNewRegister() {
 
     const body = { amount, description, recursiveFor }
 
-    if (!period) return
+    if (!period) {
+      toast.error('Error creating register')
+      console.error('Couldnt find period')
+      return
+    }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_REQUEST_URL}/api/period/${period.id}/income`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_REQUEST_URL}/api/period/${period.id}/${type}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)

@@ -7,35 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model income {
-  id           Int      @id @default(autoincrement()) @db.UnsignedInt
-  amount       Float
-  description  String?  @db.VarChar(150)
-  periodId     Int      @db.UnsignedInt
-  date         DateTime @db.Date
-  recursiveFor Int?
-  period       period   @relation(fields: [periodId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "income_ibfk_1")
-
-  @@index([periodId], map: "periodId")
-}
-
-model outcome {
-  id           Int      @id @default(autoincrement()) @db.UnsignedInt
-  amount       Float
-  description  String?  @db.VarChar(150)
-  periodId     Int      @db.UnsignedInt
-  date         DateTime @db.Date
-  recursiveFor Int?
-  period       period   @relation(fields: [periodId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "outcome_ibfk_1")
-
-  @@index([periodId], map: "periodId")
-}
-
 model period {
-  id        Int       @id @default(autoincrement()) @db.UnsignedInt
-  title     String    @db.VarChar(150)
-  startDate DateTime  @db.Date
-  endDate   DateTime? @db.Date
-  income    income[]
-  outcome   outcome[]
+  id        Int        @id @default(autoincrement()) @db.UnsignedInt
+  title     String     @db.VarChar(150)
+  startDate DateTime   @db.Date
+  endDate   DateTime?  @db.Date
+  register  register[]
+}
+
+model register {
+  id           Int      @id @default(autoincrement()) @db.UnsignedInt
+  amount       Float
+  description  String?  @db.VarChar(150)
+  periodId     Int      @db.UnsignedInt
+  date         DateTime @db.Date
+  recursiveFor Int?
+  type         String   @db.VarChar(50)
+  period       period   @relation(fields: [periodId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "register_ibfk_1")
+
+  @@index([periodId], map: "periodId")
 }

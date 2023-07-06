@@ -1,18 +1,19 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import prisma from '../../../../../lib/prisma'
+import prisma from '../../../../../../lib/prisma'
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
-  const { periodId } = req.query
+  const { periodId, type } = req.query
 
   try {
     if (req.method === 'GET') {
-      const incomes = await prisma.income.findMany({
+      const incomes = await prisma.register.findMany({
         where: {
           periodId: Number(periodId),
+          type: type as string
         }
       })
     
@@ -23,21 +24,43 @@ export default async function handler(
     if (req.method === 'POST') {
       const { amount, description, recursiveFor } = req.body
 
-      const result = await prisma.income.create({
+      const result = await prisma.register.create({
         data: {
           periodId: Number(periodId), 
           amount: parseFloat(amount),
           description,
           date: new Date(),
+          type: type as string,
           recursiveFor: Number(recursiveFor)
         }
       })
     
       return res.status(200).json(result)
     }
+
+    if (req.method === 'PUT') {
+      const { amount, description, recursiveFor, id } = req.body
+
+      const result = await prisma.register.update({
+        where: {
+          id: Number(id),
+        },
+        data: {
+          periodId: Number(periodId), 
+          amount: parseFloat(amount),
+          description,
+          date: new Date(),
+          recursiveFor: Number(recursiveFor)
+        },
+      })
+    
+      return res.status(200).json(result)
+    }
+
+    throw Error('Method not allowed')
   } catch (e) {
     const errorResponse = {
-      message: 'Error on income.tsx',
+      message: 'Error on [periodId]/index.ts',
       error: `Error: ${e}`,
       hasError: true
     }

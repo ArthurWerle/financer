@@ -1,17 +1,18 @@
 "use client"
 
-import { Income } from "@/types"
+import { Register as RegisterType } from "@/types"
 import Register from "./register"
 import { AiFillPlusCircle } from "react-icons/ai"
 import React, { useState } from 'react'
 import AddNewRegister from "./add-new-register"
 
 type RegisterListProps = {
-  registers?: Income[]
+  registers?: RegisterType[]
   title: string
+  type: string
 }
 
-export default function RegisterList({ title, registers = [] }: RegisterListProps) {
+export default function RegisterList({ title, registers = [], type }: RegisterListProps) {
   const [showAddNewForm, setShowAddNewForm] = useState(false)
 
   function handleAddClick() {
@@ -25,11 +26,18 @@ export default function RegisterList({ title, registers = [] }: RegisterListProp
       </div>
       <div className="flex flex-col gap-3">
         {registers?.map((register) => (
-          <Register key={register.id} amount={register.amount} description={register.description} recursiveFor={register.recursiveFor} />
+          <Register 
+            key={register.id} 
+            id={register.id} 
+            amount={register.amount} 
+            description={register.description} 
+            recursiveFor={register.recursiveFor}
+            type={register.type}
+          />
         ))}
       </div>
       {showAddNewForm 
-        ? <AddNewRegister /> 
+        ? <AddNewRegister type={type} /> 
         : (
         <button className="mx-[20px] my-[10px]" onClick={handleAddClick}>
           <AiFillPlusCircle className="hover:fill-blue-500"/>
