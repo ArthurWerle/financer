@@ -3,8 +3,7 @@ export type Period = {
   title: string
   startDate: Date
   endDate: Date | null
-  incomes?: Register[]
-  outcomes?: Register[]
+  register?: Register[]
 }
 
 export type Register = {

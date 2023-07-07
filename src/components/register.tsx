@@ -7,9 +7,12 @@ import RegisterForm from "./register-form"
 import { useAtom } from "jotai"
 import { periodAtom } from "@/atoms/period"
 import { toast } from "react-toastify"
+import Modal from "./modal"
+import EditRegisterModal from "./edit-register-modal"
 
 export default function Register({ id, amount, description, recursiveFor, type }: Omit<RegisterType, "date" | "periodId">) {
   const [isEditing, setIsEditing] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [period] = useAtom(periodAtom)
 
   const formattedAmount = amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -90,18 +93,21 @@ export default function Register({ id, amount, description, recursiveFor, type }
     )
 
     return (
-      <div className="flex w-fit group cursor-pointer gap-4">
-        <div>
-          <p className="group-hover:text-blue-500">R${formattedAmount}</p>
-          <p className="text-sm leading-none group-hover:text-blue-500">{description}</p>
+      <>
+        <EditRegisterModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        <div className="flex w-fit group cursor-pointer gap-4">
+          <div onClick={() => setIsModalOpen(true)}>
+            <p className="group-hover:text-blue-500">R${formattedAmount}</p>
+            <p className="text-sm leading-none group-hover:text-blue-500">{description}</p>
+          </div>
+          <button className="invisible group-hover:visible" onClick={() => setIsEditing(true)}>
+            <AiOutlineEdit className="fill-blue-500" />
+          </button>
+          <button className="invisible group-hover:visible" onClick={remove}>
+            <AiOutlineClose className="fill-red-500" />
+          </button>
         </div>
-        <button className="invisible group-hover:visible" onClick={() => setIsEditing(true)}>
-          <AiOutlineEdit className="fill-blue-500" />
-        </button>
-        <button className="invisible group-hover:visible" onClick={remove}>
-          <AiOutlineClose className="fill-red-500" />
-        </button>
-      </div>
+      </>
     )
   }
 

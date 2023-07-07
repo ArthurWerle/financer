@@ -16,14 +16,24 @@ model period {
 }
 
 model register {
-  id           Int      @id @default(autoincrement()) @db.UnsignedInt
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
   amount       Float
-  description  String?  @db.VarChar(150)
-  periodId     Int      @db.UnsignedInt
-  date         DateTime @db.Date
+  description  String?   @db.VarChar(150)
+  periodId     Int       @db.UnsignedInt
+  date         DateTime  @db.Date
   recursiveFor Int?
-  type         String   @db.VarChar(50)
-  period       period   @relation(fields: [periodId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "register_ibfk_1")
+  type         String    @db.VarChar(50)
+  categoryId   Int?      @db.UnsignedInt
+  category     category? @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_categoryId")
+  period       period    @relation(fields: [periodId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "register_ibfk_1")
 
   @@index([periodId], map: "periodId")
+  @@index([categoryId], map: "fk_categoryId")
+}
+
+model category {
+  id       Int        @id @default(autoincrement()) @db.UnsignedInt
+  name     String     @db.VarChar(150)
+  color    String?    @db.VarChar(150)
+  register register[]
 }
