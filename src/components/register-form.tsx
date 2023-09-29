@@ -17,7 +17,7 @@ export default function RegisterForm({ onSubmit, defaultValues }: RegisterFormPr
         <input name="description" defaultValue={defaultValues?.description} className="p-1 text-sm leading-none bg-transparent border-b w-[120px] placeholder:italic placeholder:text-slate-600 placeholder:text-[12px]" placeholder="description"/>
         <input name="recursiveFor" defaultValue={defaultValues?.recursiveFor || ''} placeholder="X" className="p-1 bg-transparent border-b w-[25px] text-sm placeholder:italic placeholder:text-slate-600 placeholder:text-[12px]" />
       </div>
-      <button className="none"></button>
+      <button className="none hidden"></button>
     </form>
   )
 }

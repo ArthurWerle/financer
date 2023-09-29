@@ -54,7 +54,10 @@ export default async function handler(
         },
       })
     
-      return res.status(200).json(result)
+      return res.status(200).json({
+        register: result,
+        hasError: false,
+      })
     }
 
     throw Error('Method not allowed')

@@ -7,19 +7,20 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { useEffect } from 'react'
 import { AiOutlineArrowRight } from 'react-icons/ai'
 
-export const getServerSideProps: GetServerSideProps<{ period: Period }> = async () => {
+export const getServerSideProps: GetServerSideProps<{ rawPeriod: Period }> = async () => {
   const periodResponse = await fetch(process.env.NEXT_PUBLIC_REQUEST_URL + '/api/period')
   const period = await periodResponse.json() as Period
 
-  return { props: { period } }
+  return { props: { rawPeriod: period } }
 }
 
-export default function Page({ period }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const [value, setValue] = useAtom(periodAtom);
-  const incomes = period.register?.filter(register => register.type === 'income')
-  const outcomes = period.register?.filter(register => register.type === 'outcome')
+export default function Page({ rawPeriod }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [period, setPeriod] = useAtom(periodAtom)
 
-  useEffect(() => setValue(period), [period.id])
+  const incomes = period?.register?.filter(register => register.type === 'income')
+  const outcomes = period?.register?.filter(register => register.type === 'outcome')
+
+  useEffect(() => setPeriod(rawPeriod), [rawPeriod.id])
 
   return ( 
     <main>

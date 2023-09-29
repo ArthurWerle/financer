@@ -7,13 +7,10 @@ import RegisterForm from "./register-form"
 import { useAtom } from "jotai"
 import { periodAtom } from "@/atoms/period"
 import { toast } from "react-toastify"
-import Modal from "./modal"
-import EditRegisterModal from "./edit-register-modal"
 
 export default function Register({ id, amount, description, recursiveFor, type }: Omit<RegisterType, "date" | "periodId">) {
   const [isEditing, setIsEditing] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [period] = useAtom(periodAtom)
+  const [period, setPeriod] = useAtom(periodAtom)
 
   const formattedAmount = amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
@@ -41,7 +38,10 @@ export default function Register({ id, amount, description, recursiveFor, type }
       body: JSON.stringify(body)
     })
 
-    const { hasError = false, message, error } = await response.json()
+    const result = await response.json()
+
+    console.log('response', result)
+    const { hasError = false, message, error, register } = result
 
     if (hasError) {
       toast.error('Error editing register')
@@ -49,6 +49,16 @@ export default function Register({ id, amount, description, recursiveFor, type }
       return
     }
 
+    setPeriod({
+      ...period,
+      register: period?.register?.map((r: RegisterType) => {
+        if (r.id === register.id) return register
+
+        return r
+      })
+    })
+
+    setIsEditing(false)
     toast.success("Register edited")
   }
 
@@ -94,13 +104,12 @@ export default function Register({ id, amount, description, recursiveFor, type }
 
     return (
       <>
-        <EditRegisterModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-        <div className="flex w-fit group cursor-pointer gap-4">
-          <div onClick={() => setIsModalOpen(true)}>
+        <div className="flex w-fit group cursor-pointer gap-4" onClick={() => setIsEditing(true)}>
+          <div>
             <p className="group-hover:text-blue-500">R${formattedAmount}</p>
             <p className="text-sm leading-none group-hover:text-blue-500">{description}</p>
           </div>
-          <button className="invisible group-hover:visible" onClick={() => setIsEditing(true)}>
+          <button className="invisible group-hover:visible">
             <AiOutlineEdit className="fill-blue-500" />
           </button>
           <button className="invisible group-hover:visible" onClick={remove}>
