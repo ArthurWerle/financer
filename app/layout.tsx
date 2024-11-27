@@ -5,7 +5,7 @@ import Header from './components/Header'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'FinanceFlow',
+  title: 'Financer',
   description: 'Manage your personal finances with ease',
 }
 
