@@ -50,7 +50,7 @@ const Header = () => {
           {/* Right Section */}
           <div className="flex items-center space-x-4">
             <Button variant="default" className="hidden md:flex">
-              Add Transaction
+              <Link href="/add-transaction">Add Transaction</Link>
             </Button>
             <Avatar>
               <AvatarImage src="/placeholder.svg" alt="User" />

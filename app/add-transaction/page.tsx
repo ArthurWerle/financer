@@ -6,9 +6,11 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useCategories } from '../queries/categories/useCategories'
 
 export default function AddTransaction() {
   const [transactionType, setTransactionType] = useState('expense')
+  const { data: categories } = useCategories()
 
   return (
     <div className="p-8">
@@ -59,10 +61,11 @@ export default function AddTransaction() {
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="food">Food</SelectItem>
-                <SelectItem value="transport">Transport</SelectItem>
-                <SelectItem value="utilities">Utilities</SelectItem>
-                <SelectItem value="entertainment">Entertainment</SelectItem>
+                {categories?.map((category) => (
+                  <SelectItem key={category.ID} value={String(category.ID)}>
+                    {category.Name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </motion.div>
