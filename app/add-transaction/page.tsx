@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useCategories } from '../queries/categories/useCategories'
+import { useCategories } from '../../src/queries/categories/useCategories'
 
 export default function AddTransaction() {
   const [transactionType, setTransactionType] = useState('expense')

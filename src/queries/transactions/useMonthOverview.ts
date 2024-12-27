@@ -1,5 +1,5 @@
-import { BFF_BASE_URL } from "@/app/constants"
-import api from "@/app/utils/api"
+import { BFF_BASE_URL } from "@/src/constants"
+import api from "@/src/utils/api"
 import { useQuery } from "@tanstack/react-query"
 
 type MonthOverviewResponse = {

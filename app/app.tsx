@@ -1,9 +1,9 @@
 "use client"
 
-import { Statistics } from "./components/Statistics"
+import { Statistics } from "../src/components/Statistics"
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useMonthOverview } from "./queries/transactions/useMonthOverview"
+import { useMonthOverview } from "../src/queries/transactions/useMonthOverview"
 
 
 export default function App() {

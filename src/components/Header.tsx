@@ -14,15 +14,15 @@ const Header = () => {
 
   const menuItems = [
     { href: '/', label: 'Dashboard' },
+    { href: '/transactions', label: 'Transactions' },
+    { href: '/categories', label: 'Categories' },
     { href: '/analytics', label: 'Analytics' },
-    { href: '/settings', label: 'Settings' },
   ]
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md z-50">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between py-4 px-6">
-          {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
               <span className="text-white font-bold">F$</span>
@@ -46,8 +46,7 @@ const Header = () => {
               </Link>
             ))}
           </nav>
-
-          {/* Right Section */}
+          
           <div className="flex items-center space-x-4">
             <Button variant="default" className="hidden md:flex">
               <Link href="/add-transaction">Add Transaction</Link>

@@ -1,6 +1,6 @@
-import { CATEGORY_SERVICE_BASE_URL } from "@/app/constants"
-import { Category } from "@/app/types/category"
-import api from "@/app/utils/api"
+import { CATEGORY_SERVICE_BASE_URL } from "@/src/constants"
+import { Category } from "@/src/types/category"
+import api from "@/src/utils/api"
 import { useQuery } from "@tanstack/react-query"
 
 export const useCategories = () => {
