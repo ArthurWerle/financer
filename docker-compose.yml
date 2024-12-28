@@ -1,0 +1,12 @@
+services:
+  nextjs:
+    image: nextjs-app:latest
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - '3000:3000'
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    pull_policy: build
