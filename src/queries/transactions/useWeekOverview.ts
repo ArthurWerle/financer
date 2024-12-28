@@ -2,6 +2,8 @@ import { BFF_BASE_URL } from "@/src/constants"
 import api from "@/src/utils/api"
 import { useQuery } from "@tanstack/react-query"
 
+export const KEY = '/overview/by-week'
+
 type WeekOverview = {
   income: {
     currentWeek: number
@@ -17,7 +19,7 @@ type WeekOverview = {
 
 export const useWeekOverview = () => {
   return useQuery({
-    queryKey: ['/overview/by-week'],
+    queryKey: [KEY],
     queryFn: () => api.get<WeekOverview>(`${BFF_BASE_URL}/overview/by-week`).then((res) => res.data),
   })
 }

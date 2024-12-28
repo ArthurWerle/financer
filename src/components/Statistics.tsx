@@ -8,6 +8,7 @@ import { useMonthOverview } from "../queries/transactions/useMonthOverview"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useWeekOverview } from "../queries/transactions/useWeekOverview"
 import { ExpenseComparsionHistory } from "./ExpenseComparsionHistory"
+import { ExpenseCategories } from "./ExpenseCategories"
 
 export function MonthlyTab() {
   const { data: monthOverview, isLoading } = useMonthOverview()
@@ -145,10 +146,8 @@ export function Statistics() {
           </TabsContent>
         </Tabs>
       </Card>
-
       <ExpenseComparsionHistory />
-
-      <h1>expense categories</h1>
+      <ExpenseCategories />
     </div>
   )
 }
