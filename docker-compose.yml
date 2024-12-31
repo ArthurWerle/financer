@@ -8,3 +8,5 @@ services:
       context: .
       dockerfile: ./Dockerfile
     pull_policy: build
+    env_file:
+      - stack.env
