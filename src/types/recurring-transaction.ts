@@ -1,6 +1,7 @@
 export interface RecurringTransaction {
   id: number
   categoryId: number
+  categoryName: string
   amount: number
   typeId: number
   typeName: 'income' | 'expense'

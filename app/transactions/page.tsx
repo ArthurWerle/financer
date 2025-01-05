@@ -21,13 +21,29 @@ export default function Transactions() {
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium">{transaction.description}</span>
-                  <span className="font-medium">{
-                    new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
+                  <div>
+                    <p className="font-medium">{transaction.description}</p>
+                    <p className="text-sm text-gray-500">{transaction.categoryName}</p>
+                  </div>
+                  <div className='flex gap-2'>
+                    {
+                      transaction.typeName === 'expense' ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )
+                    }
+                    <span className="font-medium">{
+                      new Intl.NumberFormat("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
                       }).format(transaction.amount)}
-                  </span>
+                    </span>
+                  </div>
                 </div>
               </motion.div>
             ))}

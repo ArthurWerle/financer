@@ -26,7 +26,8 @@ export function ExpenseCategories() {
                   </div>
                   <div className="h-2 rounded-full bg-gray-100">
                     <div
-                      className={`h-full rounded-full w-[${categoryPercentage}%] bg-[#2563eb]`}
+                      className={`h-full rounded-full bg-[#2563eb]`}
+                      style={{width: `${categoryPercentage}%`}}
                     />
                   </div>
                 </div>
