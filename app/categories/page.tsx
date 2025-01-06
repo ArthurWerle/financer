@@ -27,12 +27,11 @@ export default function Categories() {
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium">{category.Name}</span>
+                  <div>
+                    <p className="font-medium">{category.Name}</p>
+                    <p className="text-sm text-gray-500">{category.Description}</p>
+                  </div>
                 </div>
-                {/* <Progress
-                  value={(category.amount / totalExpenses) * 100}
-                  className={`h-2`}
-                /> */}
               </motion.div>
             ))}
           </div>

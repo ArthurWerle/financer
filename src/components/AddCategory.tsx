@@ -22,7 +22,6 @@ export const AddCategory = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: any) => {
-    e.preventDefault()
     setIsLoading(true)
 
     await addCategory(formData)
