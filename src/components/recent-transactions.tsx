@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card } from "@/components/ui/card"
 import { ShoppingCart, ArrowDownRight, Coffee, Smartphone } from 'lucide-react'
-import { TransactionFilter, FilterState } from './TransactionFilter'
+import { TransactionFilter, FilterState } from './transaction-filter'
 
 interface Transaction {
   id: number;

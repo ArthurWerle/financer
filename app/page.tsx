@@ -1,6 +1,6 @@
 "use client"
 
-import { Statistics } from "../src/components/Statistics"
+import { Statistics } from "../src/components/statistics"
 // import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMonthOverview } from "../src/queries/transactions/useMonthOverview"

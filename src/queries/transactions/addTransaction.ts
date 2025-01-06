@@ -4,12 +4,12 @@ import { Transaction } from "@/src/types/transaction"
 import api from "@/src/utils/api"
 
 
-type PostTransactionType = 
+type PostTransactionType = Partial<
   Omit<Transaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt'> &
-  Omit<RecurringTransaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt' | 'lastOccurrence'>
+  Omit<RecurringTransaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt' | 'lastOccurrence'>>
 
 export const addTransaction = async (transaction: PostTransactionType) => {
-  const isRecurring = transaction.frequency?.length > 0
+  const isRecurring = transaction?.frequency?.length ?? 0 > 0
 
   if (isRecurring) {
     return await api.post(`${TRANSACTION_SERVICE_BASE_URL}/recurring-transactions`, transaction)

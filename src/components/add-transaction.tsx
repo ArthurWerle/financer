@@ -17,18 +17,15 @@ import { KEY as EXPENSE_COMPARSION_HISTORY_QUERY_KEY } from '@/src/queries/trans
 import { KEY as TRANSACTIONS_QUERY_KEY } from '@/src/queries/transactions/useTransactions'
 import { KEY as CATEGORIES_MONTHLY_EXPENSE_QUERY_KEY } from '@/src/queries/categories/useCategoriesMonthlyExpense'
 import { useQueryClient } from '@tanstack/react-query'
+import { Transaction } from '../types/transaction'
+import { RecurringTransaction } from '../types/recurring-transaction'
 
-type FormData = {
-  amount: number | undefined
-  categoryId: number | undefined
-  typeId: number | undefined
-  description: string
-  date: Date
-  frequency: string
-  startDate: Date
-  endDate: Date | undefined
-  lastOccurrence: Date | undefined
-}
+type FormData = Partial<
+  Omit<Transaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt' | 'date'> &
+  Omit<RecurringTransaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt' | 'startDate'>> & {
+    date: Date
+    startDate: Date
+  }
 
 export const AddTransaction = () => {
   const today = new Date()
@@ -50,7 +47,6 @@ export const AddTransaction = () => {
   const { data: types, isLoading: isLoadingTypes } = useTypes()
 
   const handleSubmit = async (e: any) => {
-    e.preventDefault()
     setIsLoading(true)
 
     await addTransaction(formData)

@@ -7,8 +7,8 @@ import { ArrowUp, ArrowDown } from 'lucide-react'
 import { useMonthOverview } from "../queries/transactions/useMonthOverview"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useWeekOverview } from "../queries/transactions/useWeekOverview"
-import { ExpenseComparsionHistory } from "./ExpenseComparsionHistory"
-import { ExpenseCategories } from "./ExpenseCategories"
+import { ExpenseComparsionHistory } from "./expense-comparsion-history"
+import { ExpenseCategories } from "./expense-categories"
 
 export function MonthlyTab() {
   const { data: monthOverview, isLoading } = useMonthOverview()

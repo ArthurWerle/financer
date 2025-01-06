@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Card } from "@/components/ui/card"
 // import { Progress } from "@/components/ui/progress"
 import { useCategories } from '@/src/queries/categories/useCategories'
-import { AddCategory } from '@/src/components/AddCategory'
+import { AddCategory } from '@/src/components/add-category'
 
 export default function Categories() {
   const { data: categories = [], isLoading } = useCategories()

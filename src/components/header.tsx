@@ -7,7 +7,7 @@ import { Menu, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { usePathname } from 'next/navigation'
-import { AddTransaction } from './AddTransaction'
+import { AddTransaction } from './add-transaction'
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
