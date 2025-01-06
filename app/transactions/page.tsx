@@ -14,7 +14,7 @@ export default function Transactions() {
         {isLoading ? "...Loading" : (
           <div className="space-y-6">
             {transactions.map((transaction, index) => (
-              <Transaction key={transaction.id} transaction={transaction} index={index} />
+              <Transaction key={transaction.id + index} transaction={transaction} index={index} />
             ))}
           </div>
         )}

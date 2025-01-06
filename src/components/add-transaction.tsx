@@ -85,7 +85,9 @@ export const AddTransaction = () => {
             
             <div className="grid gap-2">
               <Label htmlFor="category">Category</Label>
-              <Select onValueChange={(value) => setFormData({ ...formData, categoryId: Number(value) })}>
+              <Select 
+                onValueChange={(value) => setFormData({ ...formData, categoryId: Number(value) })} 
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
@@ -105,7 +107,10 @@ export const AddTransaction = () => {
 
             <div className="grid gap-2">
               <Label htmlFor="type">Type</Label>
-              <Select onValueChange={(value) => setFormData({ ...formData, typeId: Number(value) })}>
+              <Select 
+                onValueChange={(value) => setFormData({ ...formData, typeId: Number(value) })}
+                defaultValue={String(types?.find((type) => type.Name === 'expense')?.ID)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
