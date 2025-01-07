@@ -5,7 +5,7 @@ export interface Transaction {
   amount: number
   typeId: number
   typeName: 'income' | 'expense'
-  date: string | null
+  date: string
   description: string
   createdAt: string
   updatedAt: string

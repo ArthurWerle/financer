@@ -22,7 +22,7 @@ export function ExpenseCategories() {
                 <div key={key} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-gray-700">{key}</span>
-                    <span className="font-bold text-gray-900">${expenseCategories[key].toFixed(2)}</span>
+                    <span className="font-bold text-gray-900">R$ {expenseCategories[key].toFixed(2)}</span>
                   </div>
                   <div className="h-2 rounded-full bg-gray-100">
                     <div

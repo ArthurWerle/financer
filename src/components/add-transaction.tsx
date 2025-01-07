@@ -12,7 +12,6 @@ import { useCategories } from '../queries/categories/useCategories'
 import { useTypes } from '../queries/types/useTypes'
 import { addTransaction } from '../queries/transactions/addTransaction'
 import { KEY as MONTH_OVERVIEW_QUERY_KEY } from '@/src/queries/transactions/useMonthOverview'
-import { KEY as WEEK_OVERVIEW_QUERY_KEY } from '@/src/queries/transactions/useWeekOverview'
 import { KEY as EXPENSE_COMPARSION_HISTORY_QUERY_KEY } from '@/src/queries/transactions/useExpenseComparsionHistory'
 import { KEY as TRANSACTIONS_QUERY_KEY } from '@/src/queries/transactions/useTransactions'
 import { KEY as CATEGORIES_MONTHLY_EXPENSE_QUERY_KEY } from '@/src/queries/categories/useCategoriesMonthlyExpense'
@@ -53,7 +52,6 @@ export const AddTransaction = () => {
       .catch((error) => console.error(error))
       .finally(() => {
         queryClient.invalidateQueries({ queryKey: MONTH_OVERVIEW_QUERY_KEY })
-        queryClient.invalidateQueries({ queryKey: WEEK_OVERVIEW_QUERY_KEY })
         queryClient.invalidateQueries({ queryKey: EXPENSE_COMPARSION_HISTORY_QUERY_KEY })
         queryClient.invalidateQueries({ queryKey: TRANSACTIONS_QUERY_KEY })
         queryClient.invalidateQueries({ queryKey: CATEGORIES_MONTHLY_EXPENSE_QUERY_KEY })

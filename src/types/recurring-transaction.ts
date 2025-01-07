@@ -6,6 +6,7 @@ export interface RecurringTransaction {
   typeId: number
   typeName: 'income' | 'expense'
   description: string
+  date: string
   frequency: 'daily' | 'weekly' | 'monthly' | 'yearly'
   startDate: string
   endDate: string

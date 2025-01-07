@@ -3,12 +3,15 @@ import { Transaction as TransactionType } from "../types/transaction"
 import { RecurringTransaction } from "../types/recurring-transaction"
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react"
 import { getLeftPayments } from "../utils/get-left-payments"
+import { humanReadableDate, validDate } from "../utils/format-date"
 
 type TransactionProps = TransactionType & RecurringTransaction
 
 export function Transaction({  transaction, index }: { transaction: TransactionProps, index?: number }) {
-  const { description, categoryName, amount, endDate, frequency } = transaction
+  const { description, categoryName, amount, endDate, frequency, date } = transaction
   const isRecurringTransaction = !!endDate
+
+  console.log({ date })
 
   return (
     <motion.div
@@ -23,7 +26,7 @@ export function Transaction({  transaction, index }: { transaction: TransactionP
           <p className="text-sm text-gray-500">{categoryName}</p>
         </div>
         <div>
-          <div className='flex gap-2'>
+          <div className='flex gap-2 justify-end'>
             {
               transaction.typeName === 'expense' ? (
                 <ArrowUpRight className="h-5 w-5 text-red-400"/>
@@ -38,13 +41,20 @@ export function Transaction({  transaction, index }: { transaction: TransactionP
               }).format(amount)}
             </span>
           </div>
-          {
-            isRecurringTransaction && (
-              <p className="text-sm text-gray-500">{
-                getLeftPayments(new Date(endDate), frequency)
-              }</p>
-            )
-          }
+          <div className="flex gap-2">
+            {date?.length > 0 && (
+              <p className="text-xs text-gray-500">
+                {`${humanReadableDate(date)}`}
+              </p>
+            )}
+            {
+              isRecurringTransaction && (
+                <p className="text-sm text-gray-500">{
+                  getLeftPayments(new Date(endDate), frequency)
+                }</p>
+              )
+            }
+          </div>
         </div>
       </div>
     </motion.div>

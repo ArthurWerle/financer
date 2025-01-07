@@ -24,15 +24,6 @@ export default function Home() {
         </div>
         <div className="flex gap-12">
           <div className="text-right">
-            <p className="text-sm text-muted-foreground">Total Expense</p>
-            <p className="text-3xl font-bold">
-                {new Intl.NumberFormat("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-                }).format(expense?.currentMonth || 0)}
-            </p>
-          </div>
-          <div className="text-right">
             <p className="text-sm text-muted-foreground">Total Balance</p>
             <p className="text-3xl font-bold">
                 {new Intl.NumberFormat("pt-BR", {
