@@ -62,7 +62,7 @@ export const AddTransaction = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default">Add Transaction</Button>
+        <Button variant="default" id="add-transaction-button">Add Transaction</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

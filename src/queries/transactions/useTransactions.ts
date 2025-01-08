@@ -12,5 +12,6 @@ export const useTransactions = () => {
   return useQuery({
     queryKey: [KEY],
     queryFn: () => api.get<TransactionResponseType[]>(`${BFF_BASE_URL}/all-transactions`).then((res) => res.data),
+    refetchOnWindowFocus: false
   })
 }

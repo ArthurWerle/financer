@@ -14,5 +14,6 @@ export const useExpenseComparsionHistory = () => {
   return useQuery({
     queryKey: [KEY],
     queryFn: () => api.get<ExpenseComparsionHistoryResponse[]>(`${BFF_BASE_URL}/expense-comparsion-history`).then((res) => res.data),
+    refetchOnWindowFocus: false
   })
 }

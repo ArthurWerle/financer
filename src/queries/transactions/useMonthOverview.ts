@@ -21,5 +21,6 @@ export const useMonthOverview = () => {
   return useQuery({
     queryKey: [KEY],
     queryFn: () => api.get<MonthOverviewResponse>(`${BFF_BASE_URL}/overview/by-month`).then((res) => res.data),
+    refetchOnWindowFocus: false
   })
 }

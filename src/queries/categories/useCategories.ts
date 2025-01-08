@@ -9,5 +9,6 @@ export const useCategories = () => {
   return useQuery({
     queryKey: [KEY],
     queryFn: () => api.get<Category[]>(`${CATEGORY_SERVICE_BASE_URL}/category`).then((res) => res.data),
+    refetchOnWindowFocus: false
   })
 }
