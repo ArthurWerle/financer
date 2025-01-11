@@ -25,7 +25,7 @@ export const AddCategory = () => {
     setIsLoading(true)
 
     await addCategory(formData)
-      .catch((error) => console.error(error))
+      .catch((error) => alert(error))
       .finally(() => {
         queryClient.invalidateQueries({ queryKey: KEY })
         setIsLoading(false)

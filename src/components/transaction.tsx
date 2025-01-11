@@ -11,8 +11,6 @@ export function Transaction({  transaction, index }: { transaction: TransactionP
   const { description, categoryName, amount, endDate, frequency, date } = transaction
   const isRecurringTransaction = !!endDate
 
-  console.log({ date })
-
   return (
     <motion.div
       key={transaction.id + (index || amount)}

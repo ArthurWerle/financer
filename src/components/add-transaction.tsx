@@ -45,11 +45,20 @@ export const AddTransaction = () => {
   const { data: categories, isLoading: isLoadingCategories } = useCategories()
   const { data: types, isLoading: isLoadingTypes } = useTypes()
 
+  if (types?.length && !formData.typeId) {
+    const defaultTypeId = types?.find((type) => type.Name === 'expense')?.ID
+
+    setFormData({
+      ...formData,
+      typeId: defaultTypeId
+    })
+  }
+
   const handleSubmit = async (e: any) => {
     setIsLoading(true)
 
     await addTransaction(formData)
-      .catch((error) => console.error(error))
+      .catch((error) => alert(error))
       .finally(() => {
         queryClient.invalidateQueries({ queryKey: MONTH_OVERVIEW_QUERY_KEY })
         queryClient.invalidateQueries({ queryKey: EXPENSE_COMPARSION_HISTORY_QUERY_KEY })
@@ -107,7 +116,7 @@ export const AddTransaction = () => {
               <Label htmlFor="type">Type</Label>
               <Select 
                 onValueChange={(value) => setFormData({ ...formData, typeId: Number(value) })}
-                defaultValue={String(types?.find((type) => type.Name === 'expense')?.ID)}
+                defaultValue={String(formData.typeId)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select type" />
