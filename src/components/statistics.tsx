@@ -41,8 +41,9 @@ export function MonthlyOverview() {
             currency: "BRL",
           }).format(income?.currentMonth ?? 0)}
         </p>
-        {(income?.percentageVariation ?? 0) > 0 && (
-          <p className={`text-sm ${income?.percentageVariation || 0 >= 0 ? "text-green-600" : "text-red-600"} flex items-center`}>
+        {(income?.percentageVariation ?? 0) > 0  && !!income?.currentMonth && !!income?.lastMonth && (
+          <p className={`text-sm ${income?.currentMonth < income?.lastMonth ? "text-green-600" : "text-red-600"} flex items-center`}>
+            {income?.currentMonth < income?.lastMonth ? <ArrowUp className="w-4 h-4 mr-1" /> : <ArrowDown className="w-4 h-4 mr-1" />}
             <ArrowUp className="w-4 h-4 mr-1" />
             {income?.percentageVariation}% from last month
           </p>
@@ -56,9 +57,9 @@ export function MonthlyOverview() {
             currency: "BRL",
           }).format(expense?.currentMonth ?? 0)}
         </p>
-        {(expense?.percentageVariation ?? 0) > 0 && (
-        <p className={`text-sm ${expense?.percentageVariation || 0 >= 0 ? "text-red-600" : "text-green-600"} flex items-center`}>
-          <ArrowDown className="w-4 h-4 mr-1" />
+        {(expense?.percentageVariation ?? 0) > 0 && !!expense?.currentMonth && !!expense?.lastMonth && (
+        <p className={`text-sm ${expense?.currentMonth > expense?.lastMonth ? "text-red-600" : "text-green-600"} flex items-center`}>
+          {expense?.currentMonth > expense?.lastMonth ? <ArrowUp className="w-4 h-4 mr-1" /> : <ArrowDown className="w-4 h-4 mr-1" /> }
           {expense?.percentageVariation}% from last month
         </p>
         )}

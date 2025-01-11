@@ -22,7 +22,10 @@ export function getLeftPayments(endDate: Date, frequency: 'daily' | 'weekly' | '
       case 'weekly':
         return `${Math.ceil(diffDays / 7)} payments left`
       case 'monthly':
-        return `${Math.ceil(diffDays / 30)} payments left`
+        const currentMonth = today.getMonth()
+        const endMonth = endDate.getMonth()
+
+        return `${endMonth - currentMonth} payments left`
       case 'yearly':
         return `${Math.ceil(diffDays / 365)} payments left`
     }
