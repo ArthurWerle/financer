@@ -2,7 +2,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useCategoriesMonthyExpense } from "../queries/categories/useCategoriesMonthlyExpense"
 import { useMonthOverview } from "../queries/transactions/useMonthOverview"
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
-import test from "node:test";
 
 const COLORS = [
   '#3b82f6', 
@@ -47,7 +46,7 @@ export function ExpenseCategories() {
 
   return (
     <Card className="p-6 bg-white shadow-lg rounded-2xl">
-      <h3 className="text-xl font-semibold text-gray-800 mb-6">Monthly expense by category</h3>
+      <h3 className="text-xl font-semibold text-gray-800 mb-6">Monthly expenses by category</h3>
       <div>
         {isLoading || isLoadingMonthlyCategoriesExpense ? (
           <div className="h-24 bg-gray-100 rounded-lg" />

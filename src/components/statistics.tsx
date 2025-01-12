@@ -77,8 +77,8 @@ export function Statistics() {
         </div>
         <MonthlyOverview />
       </Card>
-      <ExpenseComparsionHistory />
       <ExpenseCategories />
+      <ExpenseComparsionHistory />
     </div>
   )
 }
