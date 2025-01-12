@@ -45,15 +45,6 @@ export const AddTransaction = () => {
   const { data: categories, isLoading: isLoadingCategories } = useCategories()
   const { data: types, isLoading: isLoadingTypes } = useTypes()
 
-  if (types?.length && !formData.typeId) {
-    const defaultTypeId = types?.find((type) => type.Name === 'expense')?.ID
-
-    setFormData({
-      ...formData,
-      typeId: defaultTypeId
-    })
-  }
-
   const handleSubmit = async (e: any) => {
     setIsLoading(true)
 
