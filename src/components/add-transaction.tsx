@@ -18,6 +18,7 @@ import { KEY as CATEGORIES_MONTHLY_EXPENSE_QUERY_KEY } from '@/src/queries/categ
 import { useQueryClient } from '@tanstack/react-query'
 import { Transaction } from '../types/transaction'
 import { RecurringTransaction } from '../types/recurring-transaction'
+import { toast } from 'react-toastify'
 
 type FormData = Partial<
   Omit<Transaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt' | 'date'> &
@@ -42,27 +43,42 @@ export const AddTransaction = () => {
 
   const queryClient = useQueryClient()
   const [isLoading, setIsLoading] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const { data: categories, isLoading: isLoadingCategories } = useCategories()
   const { data: types, isLoading: isLoadingTypes } = useTypes()
 
   const handleSubmit = async (e: any) => {
     setIsLoading(true)
+    e.preventDefault()
 
     await addTransaction(formData)
-      .catch((error) => alert(error))
+      .catch((error) => {
+        console.log({ error })
+        toast.error(`ERROR: ${error?.message || 'Error creating transaction'}`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        })
+      })
       .finally(() => {
         queryClient.invalidateQueries({ queryKey: MONTH_OVERVIEW_QUERY_KEY })
         queryClient.invalidateQueries({ queryKey: EXPENSE_COMPARSION_HISTORY_QUERY_KEY })
         queryClient.invalidateQueries({ queryKey: TRANSACTIONS_QUERY_KEY })
         queryClient.invalidateQueries({ queryKey: CATEGORIES_MONTHLY_EXPENSE_QUERY_KEY })
         setIsLoading(false)
+        setIsDialogOpen(false)
       })
   }
 
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" id="add-transaction-button">Add Transaction</Button>
+        <Button variant="default" id="add-transaction-button" onClick={() => setIsDialogOpen(true)}>Add Transaction</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
