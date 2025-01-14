@@ -2,7 +2,6 @@
 
 import React from "react"
 import { Card } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { ArrowUp, ArrowDown, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
 import { useMonthOverview } from "../queries/transactions/useMonthOverview"
 import { Skeleton } from "@/components/ui/skeleton"

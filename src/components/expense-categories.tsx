@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useCategoriesMonthyExpense } from "../queries/categories/useCategoriesMonthlyExpense"
 import { useMonthOverview } from "../queries/transactions/useMonthOverview"
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
+import { numberToCurrency } from "../utils/number-to-currency"
 
 const COLORS = [
   '#3b82f6', 
@@ -14,14 +15,16 @@ const COLORS = [
   '#a78bfa', 
   '#f472b6', 
   '#ef4444', 
-];
+]
 
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
       <Card>
-        <CardContent className="flex justify-center items-center px-4 py-2">
-          <p>{`${payload[0].name}: ${payload[0].value}%`}</p>
+        <CardContent className="flex flex-col justify-center items-center px-3 py-1 text-[12px]">
+          <p className="font-bold">{payload[0].name}</p>
+          <p>{numberToCurrency(payload[0]?.payload?.rawValue)}</p>
+          <p className="italic">{payload[0].value}% of total</p>
         </CardContent>
       </Card>
     )
@@ -41,6 +44,7 @@ export function ExpenseCategories() {
       ? Object.keys(expenseCategories).map((key) => ({
           name: key,
           value: Number(((expenseCategories[key] / expense.currentMonth) * 100).toFixed(0)),
+          rawValue: expenseCategories[key]
         }))
       : []
 
