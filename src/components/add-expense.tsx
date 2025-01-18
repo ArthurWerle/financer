@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,7 +27,7 @@ type FormData = Partial<
     startDate: Date
   }
 
-export const AddTransaction = () => {
+export const AddExpense = () => {
   const today = new Date()
   const [formData, setFormData] = useState<FormData>({
     amount: undefined,
@@ -46,12 +46,55 @@ export const AddTransaction = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const { data: categories, isLoading: isLoadingCategories } = useCategories()
   const { data: types, isLoading: isLoadingTypes } = useTypes()
+  const expenseTypeId = types?.find(type => type.Name === 'expense')?.ID
+
+  const formValidation = useMemo(() => {
+    let validation = {
+      isValid: true,
+      invalidFields: [] as string[]
+    }
+
+    if (!formData.amount || !formData.categoryId || !formData.description) {
+      validation = {
+        ...validation,
+        isValid: false,
+      }
+
+      if (!formData.amount) {
+        validation = {
+          ...validation,
+          invalidFields: ['Amount']
+        }
+      }
+
+      if (!formData.categoryId) {
+        validation = {
+          ...validation,
+          invalidFields: [...validation.invalidFields, 'Category']
+        }
+      }
+      
+      if (!formData.description) {
+        validation = {
+          ...validation,
+          invalidFields: [...validation.invalidFields, 'Description']
+        }
+      }
+    }
+
+    return validation
+  }, [formData.amount, formData.categoryId, formData.description]) 
 
   const handleSubmit = async (e: any) => {
     setIsLoading(true)
     e.preventDefault()
 
-    await addTransaction(formData)
+    const formDataWithTypeId = {
+      ...formData,
+      typeId: expenseTypeId
+    }
+
+    await addTransaction(formDataWithTypeId)
       .catch((error) => {
         console.log({ error })
         toast.error(`ERROR: ${error?.message || 'Error creating transaction'}`, {
@@ -78,7 +121,7 @@ export const AddTransaction = () => {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" id="add-transaction-button" onClick={() => setIsDialogOpen(true)}>Add Transaction</Button>
+        <Button variant="default" id="add-expense-button" onClick={() => setIsDialogOpen(true)}>New Expense</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -101,6 +144,7 @@ export const AddTransaction = () => {
               <Label htmlFor="category">Category</Label>
               <Select 
                 onValueChange={(value) => setFormData({ ...formData, categoryId: Number(value) })} 
+                required
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
@@ -112,29 +156,6 @@ export const AddTransaction = () => {
                     categories?.map((category) => (
                       <SelectItem key={category.ID} value={String(category.ID)}>
                         {category.Name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="type">Type</Label>
-              <Select 
-                onValueChange={(value) => setFormData({ ...formData, typeId: Number(value) })}
-                defaultValue={String(formData.typeId)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {isLoadingTypes ? (
-                    <SelectItem value="" disabled>Loading types...</SelectItem>
-                  ) : (
-                    types?.map((type) => (
-                      <SelectItem key={type.ID} value={String(type.ID)}>
-                        {type.Name}
                       </SelectItem>
                     ))
                   )}
@@ -210,9 +231,16 @@ export const AddTransaction = () => {
             )}
           </div>
           
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Loading..." : "Create"}
+          <Button type="submit" className="w-full" disabled={isLoading || isLoadingTypes || !expenseTypeId || !formValidation.isValid }>
+            {isLoading || isLoadingTypes || !expenseTypeId ? "Loading..." : "Create"}
           </Button>
+          {!formValidation.isValid && (
+            <ul>
+              {formValidation.invalidFields.map(invalidField => (
+                <li key={invalidField} className='text-red-500 text-[11px]'>Field &quot;{invalidField}&quot; is missing</li>
+              ))}
+            </ul>
+          )}
         </form>
       </DialogContent>
     </Dialog>

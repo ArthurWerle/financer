@@ -10,10 +10,10 @@ type Option = {
 const options: Option[] = [
   {
     id: "option1",
-    label: "Add Transaction",
+    label: "Add Expense",
     action: () => {
       //todo: improve how I do this
-      const button = document.querySelector('#add-transaction-button') as HTMLButtonElement
+      const button = document.querySelector('#add-expense-button') as HTMLButtonElement
 
       if (button) {
         button.click()
@@ -22,6 +22,18 @@ const options: Option[] = [
   },
   {
     id: "option2",
+    label: "Add Income",
+    action: () => {
+      //todo: improve how I do this
+      const button = document.querySelector('#add-income-button') as HTMLButtonElement
+
+      if (button) {
+        button.click()
+      }
+    },
+  },
+  {
+    id: "option3",
     label: "Go to Categories",
     action: () => {
       window.location.href = '/categories'

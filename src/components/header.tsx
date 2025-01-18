@@ -7,7 +7,8 @@ import { Menu, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { usePathname } from 'next/navigation'
-import { AddTransaction } from './add-transaction'
+import { AddExpense } from './add-expense'
+import { AddIncome } from './add-income'
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -49,7 +50,8 @@ const Header = () => {
           </nav>
           
           <div className="flex items-center space-x-4">
-            <AddTransaction />
+            <AddIncome />
+            <AddExpense />
             <Avatar>
               <AvatarImage src="/placeholder.svg" alt="User" />
               <AvatarFallback>AW</AvatarFallback>
