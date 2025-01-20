@@ -7,6 +7,8 @@ import { useMonthOverview } from "../queries/transactions/useMonthOverview"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ExpenseComparsionHistory } from "./expense-comparsion-history"
 import { ExpenseCategories } from "./expense-categories"
+import { LatestTransactions } from "./latest-transactions"
+import { BiggestTransactions } from "./biggest-transactions"
 
 export function MonthlyOverview() {
   const { data: monthOverview, isLoading } = useMonthOverview()
@@ -44,7 +46,7 @@ export function MonthlyOverview() {
           <p className={`text-sm ${income?.currentMonth < income?.lastMonth ? "text-green-600" : "text-red-600"} flex items-center`}>
             {income?.currentMonth < income?.lastMonth ? <ArrowUp className="w-4 h-4 mr-1" /> : <ArrowDown className="w-4 h-4 mr-1" />}
             <ArrowUp className="w-4 h-4 mr-1" />
-            {income?.percentageVariation}% from last month
+            {income?.percentageVariation.toFixed(0)}% from last month
           </p>
         )}
       </div>
@@ -59,7 +61,7 @@ export function MonthlyOverview() {
         {(expense?.percentageVariation ?? 0) > 0 && !!expense?.currentMonth && !!expense?.lastMonth && (
         <p className={`text-sm ${expense?.currentMonth > expense?.lastMonth ? "text-red-600" : "text-green-600"} flex items-center`}>
           {expense?.currentMonth > expense?.lastMonth ? <ArrowUp className="w-4 h-4 mr-1" /> : <ArrowDown className="w-4 h-4 mr-1" /> }
-          {expense?.percentageVariation}% from last month
+          {expense?.percentageVariation.toFixed(0)}% from last month
         </p>
         )}
       </div>
@@ -76,7 +78,14 @@ export function Statistics() {
         </div>
         <MonthlyOverview />
       </Card>
-      <ExpenseCategories />
+
+      <Card className="p-6 bg-white shadow-lg rounded-2xl flex justify-between">
+        <ExpenseCategories />
+        <div className="flex flex-col flex-1 gap-10">
+          <LatestTransactions />
+          <BiggestTransactions />
+        </div>
+      </Card>
       <ExpenseComparsionHistory />
     </div>
   )

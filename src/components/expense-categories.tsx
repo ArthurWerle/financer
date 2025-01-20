@@ -49,8 +49,8 @@ export function ExpenseCategories() {
       : []
 
   return (
-    <Card className="p-6 bg-white shadow-lg rounded-2xl">
-      <h3 className="text-xl font-semibold text-gray-800 mb-6">Monthly expenses by category</h3>
+    <div>
+      <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">Monthly expenses by category</h3>
       <div>
         {isLoading || isLoadingMonthlyCategoriesExpense ? (
           <div className="h-24 bg-gray-100 rounded-lg" />
@@ -78,6 +78,6 @@ export function ExpenseCategories() {
           </div>
         )}
       </div>
-    </Card>
+    </div>
   )
 }

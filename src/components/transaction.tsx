@@ -3,7 +3,7 @@ import { Transaction as TransactionType } from "../types/transaction"
 import { RecurringTransaction } from "../types/recurring-transaction"
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react"
 import { getLeftPayments } from "../utils/get-left-payments"
-import { humanReadableDate, validDate } from "../utils/format-date"
+import { humanReadableDate } from "../utils/format-date"
 
 type TransactionProps = TransactionType & RecurringTransaction
 
