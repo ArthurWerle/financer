@@ -8,4 +8,4 @@ services:
       context: .
       dockerfile: ./Dockerfile
     pull_policy: build
-    restart: unless_stoped
+    restart: unless-stopped
