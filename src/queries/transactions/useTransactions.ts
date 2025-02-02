@@ -7,11 +7,35 @@ import { useQuery } from "@tanstack/react-query"
 export const KEY = '/all-transactions'
 
 type TransactionResponseType = Transaction & RecurringTransaction
+type UseTransactionsProps = {
+  filters: {
+    category?: string[]
+    currentMonth?: string
+  }
+}
 
-export const useTransactions = () => {
+const getFilterParams = (filters: UseTransactionsProps['filters']) => {
+  const params: Record<string, string> = {}
+  
+  if (filters.category?.length) {
+    params.category = filters.category.join(',')
+  }
+  
+  if (filters.currentMonth?.trim()) {
+    params.currentMonth = filters.currentMonth
+  }
+  
+  return params
+}
+
+
+export const useTransactions = ({ filters }: UseTransactionsProps) => {
+  console.log({ filters })
   return useQuery({
-    queryKey: [KEY],
-    queryFn: () => api.get<TransactionResponseType[]>(`${BFF_BASE_URL}/all-transactions`).then((res) => res.data),
+    queryKey: [KEY, JSON.stringify(filters)],
+    queryFn: () => {
+      return api.get<TransactionResponseType[]>(`${BFF_BASE_URL}/all-transactions`, { params: getFilterParams(filters)}).then((res) => res.data)
+    },
     refetchOnWindowFocus: false
   })
 }
