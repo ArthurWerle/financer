@@ -11,7 +11,7 @@ interface UseFiltersReturn {
 }
 
 export const useFilters = (): UseFiltersReturn => {
-  const { filters, setFilters } = useFiltersStore()
+  const { filters, setFilters } = useFiltersStore() as { filters: Record<string, string | undefined>, setFilters: (filters: Record<string, string | undefined>) => void }
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search)
@@ -29,7 +29,8 @@ export const useFilters = (): UseFiltersReturn => {
 
     setFilters(newFilters)
     
-    const searchParams = new URLSearchParams(newFilters)
+    const validFilters = Object.fromEntries(Object.entries(newFilters).filter(([_, v]) => v !== undefined)) as Record<string, string>
+    const searchParams = new URLSearchParams(validFilters)
     const newUrl = `${window.location.pathname}${searchParams.toString() ? `?${searchParams}` : ''}`
     window.history.pushState({}, '', newUrl)
   }, [filters, setFilters])

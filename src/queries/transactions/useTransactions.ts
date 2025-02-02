@@ -1,4 +1,4 @@
-import { BFF_BASE_URL } from "@/src/constants"
+import { BFF_BASE_URL, TRANSACTION_SERVICE_BASE_URL } from "@/src/constants"
 import { RecurringTransaction } from "@/src/types/recurring-transaction"
 import { Transaction } from "@/src/types/transaction"
 import api from "@/src/utils/api"
@@ -34,7 +34,7 @@ export const useTransactions = ({ filters }: UseTransactionsProps) => {
   return useQuery({
     queryKey: [KEY, JSON.stringify(filters)],
     queryFn: () => {
-      return api.get<TransactionResponseType[]>(`${BFF_BASE_URL}/all-transactions`, { params: getFilterParams(filters)}).then((res) => res.data)
+      return api.get<TransactionResponseType[]>(`${TRANSACTION_SERVICE_BASE_URL}/combined-transactions/all`, { params: getFilterParams(filters)}).then((res) => res.data)
     },
     refetchOnWindowFocus: false
   })
