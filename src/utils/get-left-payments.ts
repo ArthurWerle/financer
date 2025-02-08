@@ -11,22 +11,25 @@
  * getLeftPayments(new Date('2022-12-31'), 'monthly')
  * // Expected output: '12 payments left'
  */
-export function getLeftPayments(endDate: Date, frequency: 'daily' | 'weekly' | 'monthly' | 'yearly') {
-    const today = new Date()
-    const diff = Math.abs(endDate.getTime() - today.getTime())
-    const diffDays = Math.ceil(diff / (1000 * 60 * 60 * 24))
-    
-    switch (frequency) {
-      case 'daily':
-        return `${diffDays} payments left`
-      case 'weekly':
-        return `${Math.ceil(diffDays / 7)} payments left`
-      case 'monthly':
-        const currentMonth = today.getMonth()
-        const endMonth = endDate.getMonth()
+export function getLeftPayments(endDateString: string | undefined, frequency: 'daily' | 'weekly' | 'monthly' | 'yearly') {
+  if (!endDateString) return 'No end date'
 
-        return `${endMonth - currentMonth} payments left`
-      case 'yearly':
-        return `${Math.ceil(diffDays / 365)} payments left`
-    }
+  const endDate = new Date(endDateString)
+  const today = new Date()
+  const diff = Math.abs(endDate.getTime() - today.getTime())
+  const diffDays = Math.ceil(diff / (1000 * 60 * 60 * 24))
+  
+  switch (frequency) {
+    case 'daily':
+      return `${diffDays} payments left`
+    case 'weekly':
+      return `${Math.ceil(diffDays / 7)} payments left`
+    case 'monthly':
+      const currentMonth = today.getMonth()
+      const endMonth = endDate.getMonth()
+
+      return `${endMonth - currentMonth} payments left`
+    case 'yearly':
+      return `${Math.ceil(diffDays / 365)} payments left`
+  }
 }

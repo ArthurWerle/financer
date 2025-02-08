@@ -9,7 +9,7 @@ type TransactionProps = TransactionType & RecurringTransaction
 
 export function Transaction({  transaction, index }: { transaction: TransactionProps, index?: number }) {
   const { description, categoryName, amount, endDate, frequency, date } = transaction
-  const isRecurringTransaction = !!endDate
+  const isRecurringTransaction = !!frequency
 
   return (
     <motion.div
@@ -48,7 +48,7 @@ export function Transaction({  transaction, index }: { transaction: TransactionP
             {
               isRecurringTransaction && (
                 <p className="text-sm text-gray-500">{
-                  getLeftPayments(new Date(endDate), frequency)
+                  getLeftPayments(endDate, frequency)
                 }</p>
               )
             }
