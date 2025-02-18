@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  env: {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    ...require('dotenv').config({ path: './stack.env' }).parsed
+  }
 };
 
 export default nextConfig;
