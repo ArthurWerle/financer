@@ -1,4 +1,4 @@
-const baseURL = process.env.NODE_ENV === 'development' ? `http://${process.env.NEXT_PUBLIC_SERVER_BASE_URL}` : 'http://localhost'
+const baseURL = process.env.NODE_ENV === 'production' ? `http://${process.env.NEXT_PUBLIC_SERVER_BASE_URL}` : 'http://localhost'
 
 console.log({
     env: process.env
