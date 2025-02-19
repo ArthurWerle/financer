@@ -21,7 +21,7 @@ import { RecurringTransaction } from '../types/recurring-transaction'
 import { toast } from 'react-toastify'
 
 type FormData = Partial<
-  Omit<Transaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt' | 'date'> &
+  Omit<Transaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt'> &
   Omit<RecurringTransaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt' | 'startDate'>> & {
     date: Date
     startDate: Date
@@ -29,6 +29,7 @@ type FormData = Partial<
 
 export const AddExpense = () => {
   const today = new Date()
+
   const [formData, setFormData] = useState<FormData>({
     amount: undefined,
     categoryId: undefined,
