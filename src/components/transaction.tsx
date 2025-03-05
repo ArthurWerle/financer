@@ -40,7 +40,7 @@ export function Transaction({  transaction, index }: { transaction: TransactionP
             </span>
           </div>
           <div className="flex gap-2 justify-end">
-            {date?.length > 0 && (
+            {date?.length > 0 && !endDate && (
               <p className="text-xs text-gray-500">
                 {`${humanReadableDate(date)}`}
               </p>

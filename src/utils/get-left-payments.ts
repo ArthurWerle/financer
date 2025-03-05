@@ -27,8 +27,10 @@ export function getLeftPayments(endDateString: string | undefined, frequency: 'd
     case 'monthly':
       const currentMonth = today.getMonth()
       const endMonth = endDate.getMonth()
+      const monthsDifference = endMonth - currentMonth
+      const totalMonths = monthsDifference > 0 ? monthsDifference : 12 + monthsDifference
 
-      return `${endMonth - currentMonth} payments left`
+      return `${totalMonths} payments left`
     case 'yearly':
       return `${Math.ceil(diffDays / 365)} payments left`
   }

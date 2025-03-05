@@ -19,12 +19,14 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Transaction } from '../types/transaction'
 import { RecurringTransaction } from '../types/recurring-transaction'
 import { toast } from 'react-toastify'
+import { addDate } from '../utils/add-date'
 
 type FormData = Partial<
   Omit<Transaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt'> &
   Omit<RecurringTransaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt' | 'startDate'>> & {
     date: Date
     startDate: Date
+    installments: number | undefined
   }
 
 export const AddExpense = () => {
@@ -36,8 +38,9 @@ export const AddExpense = () => {
     typeId: undefined,
     description: '',
     date: today,
-    frequency: '',
+    frequency: undefined,
     startDate: today,
+    installments: undefined,
     endDate: undefined,
     lastOccurrence: undefined,
   })
@@ -90,12 +93,13 @@ export const AddExpense = () => {
     setIsLoading(true)
     e.preventDefault()
 
-    const formDataWithTypeId = {
+    const formDataWithTypeIdAndEndDate = {
       ...formData,
-      typeId: expenseTypeId
+      typeId: expenseTypeId,
+      endDate: formData.installments ? addDate(formData.date, formData.installments) : undefined
     }
 
-    await addTransaction(formDataWithTypeId)
+    await addTransaction(formDataWithTypeIdAndEndDate)
       .catch((error) => {
         console.log({ error })
         toast.error(`ERROR: ${error?.message || 'Error creating transaction'}`, {
@@ -207,27 +211,18 @@ export const AddExpense = () => {
                   <SelectItem value="yearly">Yearly</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </div> 
 
             {formData.frequency && (
               <div className="grid gap-2">
-                <Label>End Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="justify-start text-left font-normal">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.endDate ? format(formData.endDate, "PPP") : "Pick an end date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={formData.endDate}
-                      onSelect={(date) => setFormData({ ...formData, endDate: date })}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <Label htmlFor="installments">Installments</Label>
+                <Input
+                  id="installments"
+                  type="number"
+                  value={formData.installments}
+                  onChange={(e) => setFormData({ ...formData, installments: Number(e.target.value) })}
+                  required
+                />
               </div>
             )}
           </div>
