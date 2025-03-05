@@ -221,7 +221,6 @@ export const AddExpense = () => {
                   type="number"
                   value={formData.installments}
                   onChange={(e) => setFormData({ ...formData, installments: Number(e.target.value) })}
-                  required
                 />
               </div>
             )}

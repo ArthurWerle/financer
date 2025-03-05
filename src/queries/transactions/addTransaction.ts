@@ -12,7 +12,6 @@ export const addTransaction = async (transaction: PostTransactionType) => {
   const isRecurring = transaction?.frequency?.length ?? 0 > 0
 
   if (isRecurring) {
-    console.log('isRecurring', transaction)
     return await api.post(`${TRANSACTION_SERVICE_BASE_URL}/recurring-transactions`, transaction)
   }
 
