@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import MultiSelect from "@/src/components/multi-select"
-import { useFilters } from "@/src/hooks/useFilters"
-import { useCategories } from "@/src/queries/categories/useCategories"
-import { Category } from "@/src/types/category"
+import MultiSelect from "@/components/multi-select"
+import { useFilters } from "@/hooks/useFilters"
+import { useCategories } from "@/queries/categories/useCategories"
+import { Category } from "@/types/category"
 
 export function Filters() {
   const { setUrl, filters } = useFilters()

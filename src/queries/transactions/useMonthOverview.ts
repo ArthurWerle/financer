@@ -1,5 +1,5 @@
-import { BFF_BASE_URL } from "@/src/constants"
-import api from "@/src/utils/api"
+import { BFF_BASE_URL } from "@/constants"
+import api from "@/utils/api"
 import { useQuery } from "@tanstack/react-query"
 
 export const KEY = '/overview/by-month'

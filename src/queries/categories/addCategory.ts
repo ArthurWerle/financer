@@ -1,6 +1,6 @@
-import { CATEGORY_SERVICE_BASE_URL } from "@/src/constants"
-import { Category } from "@/src/types/category"
-import api from "@/src/utils/api"
+import { CATEGORY_SERVICE_BASE_URL } from "@/constants"
+import { Category } from "@/types/category"
+import api from "@/utils/api"
 
 
 type PostCategoryType = 

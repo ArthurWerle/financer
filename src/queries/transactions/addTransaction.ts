@@ -1,7 +1,7 @@
-import { TRANSACTION_SERVICE_BASE_URL } from "@/src/constants"
-import { RecurringTransaction } from "@/src/types/recurring-transaction"
-import { Transaction } from "@/src/types/transaction"
-import api from "@/src/utils/api"
+import { TRANSACTION_SERVICE_BASE_URL } from "@/constants"
+import { RecurringTransaction } from "@/types/recurring-transaction"
+import { Transaction } from "@/types/transaction"
+import api from "@/utils/api"
 
 
 type PostTransactionType = Partial<

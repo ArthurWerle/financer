@@ -1,5 +1,5 @@
-import { TRANSACTION_SERVICE_BASE_URL } from "@/src/constants"
-import api from "@/src/utils/api"
+import { TRANSACTION_SERVICE_BASE_URL } from "@/constants"
+import api from "@/utils/api"
 import { useQuery } from "@tanstack/react-query"
 
 export const KEY = '/biggest-transactions'

@@ -1,9 +1,9 @@
 'use client'
 
 import { Card } from "@/components/ui/card"
-import { useTransactions } from '@/src/queries/transactions/useTransactions'
-import { Transaction } from '@/src/components/transaction'
-import { useFilters } from "@/src/hooks/useFilters"
+import { useTransactions } from '@/queries/transactions/useTransactions'
+import { Transaction } from '@/components/transaction'
+import { useFilters } from "@/hooks/useFilters"
 import { Filters } from "./components/filters"
 
 
