@@ -9,7 +9,7 @@ import { ExpenseComparsionHistory } from './expense-comparsion-history'
 import { ExpenseCategories } from './expense-categories'
 import { LatestTransactions } from './latest-transactions'
 import { BiggestTransactions } from './biggest-transactions'
-
+import { numberToCurrency } from '@/utils/number-to-currency'
 export function MonthlyOverview() {
   const { data: monthOverview, isLoading, error } = useMonthOverview()
 
@@ -41,10 +41,7 @@ export function MonthlyOverview() {
       <div className="space-y-2">
         <p className="text-3xl font-bold text-gray-900 flex items-center gap-2">
           <ArrowDownLeft className="h-6 w-6 text-green-400" />
-          {new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-          }).format(income?.currentMonth ?? 0)}
+          {numberToCurrency(income?.currentMonth ?? 0)}
         </p>
         {!!income?.currentMonth && !!income?.lastMonth && (
           <p
@@ -63,10 +60,7 @@ export function MonthlyOverview() {
       <div className="space-y-2">
         <p className="text-3xl font-bold text-gray-900 flex items-center gap-2">
           <ArrowUpRight className="h-6 w-6 text-red-400" />
-          {new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-          }).format(expense?.currentMonth ?? 0)}
+          {numberToCurrency(expense?.currentMonth ?? 0)}
         </p>
         {!!expense?.currentMonth && !!expense?.lastMonth && (
           <p
