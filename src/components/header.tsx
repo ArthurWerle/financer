@@ -4,11 +4,12 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { usePathname } from 'next/navigation'
 import { AddExpense } from './add-expense'
 import { AddIncome } from './add-income'
+import Image from 'next/image'
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -27,7 +28,13 @@ const Header = () => {
         <div className="flex items-center justify-between py-4 px-6">
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">F$</span>
+              <Image
+                src="/favicon-32x32.png"
+                alt="Financer Logo"
+                width={24}
+                height={24}
+                className="object-contain"
+              />
             </div>
             <span className="text-xl font-semibold">Financer</span>
           </Link>
@@ -40,15 +47,15 @@ const Header = () => {
                 href={item.href}
                 className={`text-sm font-medium transition-colors ${
                   pathname === item.href
-                    ? "text-primary"
-                    : "text-gray-600 hover:text-gray-900"
+                    ? 'text-primary'
+                    : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 {item.label}
               </Link>
             ))}
           </nav>
-          
+
           <div className="flex items-center space-x-4">
             <AddIncome />
             <AddExpense />
@@ -78,8 +85,8 @@ const Header = () => {
                     href={item.href}
                     className={`py-2 text-sm font-medium transition-colors ${
                       pathname === item.href
-                        ? "text-primary"
-                        : "text-gray-600 hover:text-gray-900"
+                        ? 'text-primary'
+                        : 'text-gray-600 hover:text-gray-900'
                     }`}
                     onClick={() => setIsOpen(false)}
                   >
@@ -99,4 +106,3 @@ const Header = () => {
 }
 
 export default Header
-
