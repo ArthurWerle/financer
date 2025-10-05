@@ -32,21 +32,20 @@ import { KEY as EXPENSE_COMPARSION_HISTORY_QUERY_KEY } from '@/queries/transacti
 import { KEY as TRANSACTIONS_QUERY_KEY } from '@/queries/transactions/useTransactions'
 import { KEY as CATEGORIES_MONTHLY_EXPENSE_QUERY_KEY } from '@/queries/categories/useCategoriesMonthlyExpense'
 import { useQueryClient } from '@tanstack/react-query'
-import { Transaction } from '../types/transaction'
-import { RecurringTransaction } from '../types/recurring-transaction'
 import { toast } from 'react-toastify'
 import { addDate } from '../utils/add-date'
 
-type FormData = Partial<
-  Omit<Transaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt'> &
-    Omit<
-      RecurringTransaction,
-      'id' | 'typeName' | 'createdAt' | 'updatedAt' | 'startDate'
-    >
-> & {
+type FormData = {
+  amount: number | undefined
+  categoryId: number | undefined
+  typeId: number | undefined
+  description: string
   date: Date
+  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly' | undefined
   startDate: Date
   installments: number | undefined
+  endDate: Date | undefined
+  lastOccurrence: string | undefined
 }
 
 export const AddExpense = () => {
@@ -114,12 +113,19 @@ export const AddExpense = () => {
     setIsLoading(true)
     e.preventDefault()
 
+    const endDate = formData.installments
+      ? addDate(formData.date, formData.installments)
+      : undefined
+
     const formDataWithTypeIdAndEndDate = {
-      ...formData,
+      amount: formData.amount,
+      categoryId: formData.categoryId,
+      description: formData.description,
       typeId: expenseTypeId,
-      endDate: formData.installments
-        ? addDate(formData.date, formData.installments)
-        : undefined,
+      date: formData.date.toISOString(),
+      frequency: formData.frequency,
+      startDate: formData.startDate.toISOString(),
+      endDate: endDate?.toISOString(),
     }
 
     await addTransaction(formDataWithTypeIdAndEndDate)
@@ -229,8 +235,10 @@ export const AddExpense = () => {
                     mode="single"
                     selected={formData.date}
                     onSelect={(date) => {
-                      setFormData({ ...formData, date })
-                      setDatePickerOpen(false)
+                      if (date) {
+                        setFormData({ ...formData, date })
+                        setDatePickerOpen(false)
+                      }
                     }}
                     initialFocus
                   />
@@ -254,7 +262,15 @@ export const AddExpense = () => {
               <Label htmlFor="frequency">Frequency</Label>
               <Select
                 onValueChange={(value) =>
-                  setFormData({ ...formData, frequency: value })
+                  setFormData({
+                    ...formData,
+                    frequency: value as
+                      | 'daily'
+                      | 'weekly'
+                      | 'monthly'
+                      | 'yearly'
+                      | undefined,
+                  })
                 }
               >
                 <SelectTrigger>
