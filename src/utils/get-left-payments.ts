@@ -23,6 +23,7 @@ export function getLeftPayments(endDateString: string | undefined, frequency: 'd
   const diff = endDate.getTime() - today.getTime()
 
   if (diff < 0) return 'No payments left'
+  if (diff === 0) return 'Last payment 🎉'
 
   const diffDays = Math.ceil(diff / (1000 * 60 * 60 * 24))
 
