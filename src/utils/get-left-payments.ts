@@ -16,20 +16,28 @@ export function getLeftPayments(endDateString: string | undefined, frequency: 'd
 
   const endDate = new Date(endDateString)
   const today = new Date()
-  const diff = Math.abs(endDate.getTime() - today.getTime())
+
+  today.setHours(0, 0, 0, 0)
+  endDate.setHours(0, 0, 0, 0)
+
+  const diff = endDate.getTime() - today.getTime()
+
+  if (diff < 0) return 'No payments left'
+
   const diffDays = Math.ceil(diff / (1000 * 60 * 60 * 24))
-  
+
   switch (frequency) {
     case 'daily':
       return `${diffDays} payments left`
     case 'weekly':
       return `${Math.ceil(diffDays / 7)} payments left`
     case 'monthly':
+      const currentYear = today.getFullYear()
       const currentMonth = today.getMonth()
+      const endYear = endDate.getFullYear()
       const endMonth = endDate.getMonth()
-      const monthsDifference = endMonth - currentMonth
-      const totalMonths = monthsDifference > 0 ? monthsDifference : 12 + monthsDifference
 
+      const totalMonths = (endYear - currentYear) * 12 + (endMonth - currentMonth)
       return `${totalMonths} payments left`
     case 'yearly':
       return `${Math.ceil(diffDays / 365)} payments left`
