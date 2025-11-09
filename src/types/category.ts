@@ -1,3 +1,5 @@
+import { Average } from './common'
+
 export interface Category {
   ID: number
   CreatedAt: string
@@ -7,3 +9,8 @@ export interface Category {
   Description: string
   Color: string
 }
+
+export type CategoryAverage = {
+  CategoryID: number
+  CategoryName: string
+} & Average

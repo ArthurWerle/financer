@@ -3,20 +3,19 @@
 import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
 import { useCategories } from '@/queries/categories/useCategories'
-import { AddCategory } from '@/components/add-category'
+import { useAverage } from '@/queries/categories/useAverage'
 
-export default function Categories() {
-  const { data: categories = [], isLoading } = useCategories()
+export default function Analytics() {
+  const { data: categories = [], isLoading: isLoadingCategories } =
+    useCategories()
+
+  const { data: averageByCategory, isLoading: isLoadingAverages } = useAverage()
 
   return (
     <div className="p-8">
-      <h1 className="text-4xl font-bold mb-8">Categories</h1>
+      <h1 className="text-4xl font-bold mb-8">Analytics</h1>
       <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold mb-6">Expense Categories</h2>
-          <AddCategory />
-        </div>
-        {isLoading ? (
+        {isLoadingCategories || isLoadingAverages ? (
           '...Loading'
         ) : (
           <div className="space-y-6">
@@ -32,6 +31,14 @@ export default function Categories() {
                     <p className="font-medium">{category.Name}</p>
                     <p className="text-sm text-gray-500">
                       {category.Description}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Average spend</p>
+                    <p className="text-sm text-gray-500">
+                      {averageByCategory?.find(
+                        (average) => average.CategoryID === category.ID
+                      )?.Average || 'Average not found'}
                     </p>
                   </div>
                 </div>

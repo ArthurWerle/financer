@@ -1,3 +1,10 @@
+import { Average } from './common'
+
+export enum Types {
+  Income = 'income',
+  Expense = 'expense',
+}
+
 export type Type = {
   ID: number
   CreatedAt: string
@@ -6,3 +13,8 @@ export type Type = {
   Name: string
   Description: string
 }
+
+export type TypeAverage = {
+  TypeID: number
+  TypeName: Types
+} & Average

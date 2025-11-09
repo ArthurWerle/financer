@@ -10,16 +10,24 @@ import { ExpenseCategories } from './expense-categories'
 import { LatestTransactions } from './latest-transactions'
 import { BiggestTransactions } from './biggest-transactions'
 import { numberToCurrency } from '@/utils/number-to-currency'
+import { useAverage } from '@/queries/types/useAverage'
 export function MonthlyOverview() {
-  const { data: monthOverview, isLoading, error } = useMonthOverview()
+  const {
+    data: averageByType,
+    isLoading: isLoadingAverage,
+    error: errorAverage,
+  } = useAverage()
+  const {
+    data: monthOverview,
+    isLoading: isLoadingOverview,
+    error: errorOverview,
+  } = useMonthOverview()
 
-  const { income, expense } = monthOverview || {}
-
-  if (error) {
+  if (errorOverview || errorAverage) {
     return <p className="text-red-600">Error loading financial data</p>
   }
 
-  if (isLoading) {
+  if (isLoadingOverview || isLoadingAverage) {
     return (
       <div className="flex gap-12">
         <div className="space-y-2">
@@ -41,40 +49,58 @@ export function MonthlyOverview() {
       <div className="space-y-2">
         <p className="text-3xl font-bold text-gray-900 flex items-center gap-2">
           <ArrowDownLeft className="h-6 w-6 text-green-400" />
-          {numberToCurrency(income?.currentMonth ?? 0)}
+          {numberToCurrency(monthOverview?.income?.currentMonth ?? 0)}
         </p>
-        {!!income?.currentMonth && !!income?.lastMonth && (
-          <p
-            className={`text-sm ${income?.currentMonth > income?.lastMonth ? 'text-green-600' : 'text-red-600'} flex items-center`}
-          >
-            {income?.currentMonth > income?.lastMonth ? (
-              <ArrowUp className="w-4 h-4 mr-1" />
-            ) : (
-              <ArrowDown className="w-4 h-4 mr-1" />
-            )}
-            {Math.abs(income?.percentageVariation ?? 0).toFixed(0)}% from last
-            month
-          </p>
-        )}
+        {!!monthOverview?.income?.currentMonth &&
+          !!averageByType?.income?.Average && (
+            <p
+              className={`text-sm ${monthOverview?.income?.currentMonth > averageByType?.income?.Average ? 'text-green-600' : 'text-red-600'} flex items-center`}
+            >
+              {monthOverview?.income?.currentMonth >
+              averageByType?.income?.Average ? (
+                <ArrowUp className="w-4 h-4 mr-1" />
+              ) : (
+                <ArrowDown className="w-4 h-4 mr-1" />
+              )}
+              {Math.abs(
+                averageByType?.income?.Average > 0
+                  ? ((monthOverview?.income?.currentMonth -
+                      averageByType?.income?.Average) /
+                      averageByType?.income?.Average) *
+                      100
+                  : 0
+              ).toFixed(0)}
+              % from average month
+            </p>
+          )}
       </div>
       <div className="space-y-2">
         <p className="text-3xl font-bold text-gray-900 flex items-center gap-2">
           <ArrowUpRight className="h-6 w-6 text-red-400" />
-          {numberToCurrency(expense?.currentMonth ?? 0)}
+          {numberToCurrency(monthOverview?.expense?.currentMonth ?? 0)}
         </p>
-        {!!expense?.currentMonth && !!expense?.lastMonth && (
-          <p
-            className={`text-sm ${expense?.currentMonth > expense?.lastMonth ? 'text-red-600' : 'text-green-600'} flex items-center`}
-          >
-            {expense?.currentMonth > expense?.lastMonth ? (
-              <ArrowUp className="w-4 h-4 mr-1" />
-            ) : (
-              <ArrowDown className="w-4 h-4 mr-1" />
-            )}
-            {Math.abs(expense?.percentageVariation ?? 0).toFixed(0)}% from last
-            month
-          </p>
-        )}
+        {!!monthOverview?.expense?.currentMonth &&
+          !!averageByType?.expense?.Average && (
+            <p
+              className={`text-sm ${monthOverview?.expense?.currentMonth > averageByType?.expense?.Average ? 'text-red-600' : 'text-green-600'} flex items-center`}
+            >
+              {monthOverview?.expense?.currentMonth >
+              averageByType?.expense?.Average ? (
+                <ArrowUp className="w-4 h-4 mr-1" />
+              ) : (
+                <ArrowDown className="w-4 h-4 mr-1" />
+              )}
+              {Math.abs(
+                averageByType?.expense?.Average > 0
+                  ? ((monthOverview?.expense?.currentMonth -
+                      averageByType?.expense?.Average) /
+                      averageByType?.expense?.Average) *
+                      100
+                  : 0
+              ).toFixed(0)}
+              % from average month
+            </p>
+          )}
       </div>
     </div>
   )
