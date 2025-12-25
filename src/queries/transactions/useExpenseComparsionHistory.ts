@@ -6,11 +6,11 @@ export const KEY = '/expense-comparsion-history'
 
 type ExpenseComparsionHistoryResponse = {
   month: string
-  currentYear: number
-  lastYear: number
+  income: number
+  expense: number
 }
 
-export const useExpenseComparsionHistory = () => {
+export const useIncomeAndExpenseComparsionHistory = () => {
   return useQuery({
     queryKey: [KEY],
     queryFn: () => api.get<ExpenseComparsionHistoryResponse[]>(`${BFF_BASE_URL}/expense-comparsion-history`).then((res) => res.data),
