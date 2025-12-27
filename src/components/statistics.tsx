@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card'
 import { ArrowUp, ArrowDown, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
 import { useMonthOverview } from '../queries/transactions/useMonthOverview'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ExpenseComparsionHistory } from './expense-comparsion-history'
+import { HistoricalData } from './historical-data'
 import { ExpenseCategories } from './expense-categories'
 import { LatestTransactions } from './latest-transactions'
 import { BiggestTransactions } from './biggest-transactions'
@@ -125,7 +125,7 @@ export function Statistics() {
           <BiggestTransactions />
         </div>
       </Card>
-      <ExpenseComparsionHistory />
+      <HistoricalData />
     </div>
   )
 }
