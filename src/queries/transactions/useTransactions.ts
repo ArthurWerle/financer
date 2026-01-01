@@ -1,14 +1,9 @@
 import {
-  BFF_BASE_URL,
   TRANSACTION_SERVICE_BASE_URL,
   TRANSACTION_V2_SERVICE_BASE_URL,
 } from '@/constants'
 import { RecurringTransaction } from '@/types/recurring-transaction'
-import {
-  Transaction,
-  TransactionV2,
-  TransactionV2Response,
-} from '@/types/transaction'
+import { Transaction, TransactionV2Response } from '@/types/transaction'
 import api from '@/utils/api'
 import { useQuery } from '@tanstack/react-query'
 
@@ -38,7 +33,11 @@ const getFilterParams = (filters: UseTransactionsProps['filters']) => {
 
 export const useTransactions = ({ filters }: UseTransactionsProps) => {
   return useQuery<TransactionResponseType[] | TransactionV2Response>({
-    queryKey: [KEY, JSON.stringify(filters)],
+    queryKey: [
+      KEY,
+      process.env.NEXT_PUBLIC_USE_TRANSACTIONS_V2,
+      JSON.stringify(filters),
+    ],
     queryFn: () => {
       if (process.env.NEXT_PUBLIC_USE_TRANSACTIONS_V2) {
         return api
