@@ -26,7 +26,11 @@ import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { useCategories } from '../queries/categories/useCategories'
 import { useTypes } from '../queries/types/useTypes'
-import { addTransaction } from '../queries/transactions/addTransaction'
+import {
+  addTransaction,
+  addTransactionV2,
+  PostTransactionTypeV2,
+} from '../queries/transactions/addTransaction'
 import { KEY as MONTH_OVERVIEW_QUERY_KEY } from '@/queries/transactions/useMonthOverview'
 import { KEY as EXPENSE_COMPARSION_HISTORY_QUERY_KEY } from '@/queries/transactions/useExpenseComparsionHistory'
 import { KEY as TRANSACTIONS_QUERY_KEY } from '@/queries/transactions/useTransactions'
@@ -117,46 +121,76 @@ export const AddExpense = () => {
       ? addDate(formData.date, formData.installments)
       : undefined
 
-    const formDataWithTypeIdAndEndDate = {
-      amount: formData.amount,
-      categoryId: formData.categoryId,
-      description: formData.description,
-      typeId: expenseTypeId,
-      date: formData.date.toISOString(),
-      frequency: formData.frequency,
-      startDate: formData.startDate.toISOString(),
-      endDate: endDate?.toISOString(),
-    }
+    if (!formData.amount || !formData.categoryId) return
 
-    await addTransaction(formDataWithTypeIdAndEndDate)
-      .catch((error) => {
-        console.log({ error })
-        toast.error(
-          `ERROR: ${error?.message || 'Error creating transaction'}`,
-          {
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'colored',
-          }
-        )
-      })
-      .finally(() => {
-        queryClient.invalidateQueries({ queryKey: MONTH_OVERVIEW_QUERY_KEY })
-        queryClient.invalidateQueries({
-          queryKey: EXPENSE_COMPARSION_HISTORY_QUERY_KEY,
+    if (process.env.NEXT_PUBLIC_USE_TRANSACTIONS_V2) {
+      const transactionV2: PostTransactionTypeV2 = {
+        amount: formData.amount,
+        category_id: formData.categoryId,
+        description: formData.description,
+        type: expenseTypeId === formData.typeId ? 'expense' : 'income',
+        date: formData.date.toISOString(),
+        frequency: formData.frequency,
+        end_date: endDate?.toISOString(),
+      }
+
+      await addTransactionV2(transactionV2)
+        .catch((error) => {
+          console.log({ error })
+          toast.error(
+            `ERROR: ${error?.message || 'Error creating transaction V2'}`,
+            {
+              position: 'top-right',
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: 'colored',
+            }
+          )
         })
-        queryClient.invalidateQueries({ queryKey: TRANSACTIONS_QUERY_KEY })
-        queryClient.invalidateQueries({
-          queryKey: CATEGORIES_MONTHLY_EXPENSE_QUERY_KEY,
+        .finally(() => {
+          queryClient.invalidateQueries()
+          setIsLoading(false)
+          setIsDialogOpen(false)
         })
-        setIsLoading(false)
-        setIsDialogOpen(false)
-      })
+    } else {
+      const formDataWithTypeIdAndEndDate = {
+        amount: formData.amount,
+        categoryId: formData.categoryId,
+        description: formData.description,
+        typeId: expenseTypeId,
+        date: formData.date.toISOString(),
+        frequency: formData.frequency,
+        startDate: formData.startDate.toISOString(),
+        endDate: endDate?.toISOString(),
+      }
+
+      await addTransaction(formDataWithTypeIdAndEndDate)
+        .catch((error) => {
+          console.log({ error })
+          toast.error(
+            `ERROR: ${error?.message || 'Error creating transaction'}`,
+            {
+              position: 'top-right',
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: 'colored',
+            }
+          )
+        })
+        .finally(() => {
+          queryClient.invalidateQueries()
+          setIsLoading(false)
+          setIsDialogOpen(false)
+        })
+    }
   }
 
   return (

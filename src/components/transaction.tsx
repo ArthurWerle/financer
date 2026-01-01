@@ -1,15 +1,44 @@
-import { motion } from "framer-motion"
-import { Transaction as TransactionType } from "../types/transaction"
-import { RecurringTransaction } from "../types/recurring-transaction"
-import { ArrowDownLeft, ArrowUpRight } from "lucide-react"
-import { getLeftPayments } from "../utils/get-left-payments"
-import { humanReadableDate } from "../utils/format-date"
+import { motion } from 'framer-motion'
+import {
+  Transaction as TransactionType,
+  TransactionV2,
+} from '../types/transaction'
+import { RecurringTransaction } from '../types/recurring-transaction'
+import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
+import { getLeftPayments } from '../utils/get-left-payments'
+import { humanReadableDate } from '../utils/format-date'
+import { Category } from '@/types/category'
 
-type TransactionProps = TransactionType & RecurringTransaction
+type TransactionV1 = TransactionType & Partial<RecurringTransaction>
+type TransactionProps = TransactionV2 | TransactionV1
 
-export function Transaction({  transaction, index }: { transaction: TransactionProps, index?: number }) {
-  const { description, categoryName, amount, endDate, frequency, date } = transaction
-  const isRecurringTransaction = !!frequency
+function isTransactionV2(
+  transaction: TransactionProps
+): transaction is TransactionV2 {
+  return 'type' in transaction
+}
+
+export function Transaction({
+  transaction,
+  categories,
+  index,
+}: {
+  transaction: TransactionProps
+  categories: Category[]
+  index?: number
+}) {
+  const isV2 = isTransactionV2(transaction)
+  const description = transaction.description
+  const amount = transaction.amount
+  const date = transaction.date
+  const categoryName = isV2
+    ? categories?.find((category) => category.ID === transaction.category_id)
+        ?.Name
+    : transaction.categoryName
+  const endDate = isV2 ? transaction.end_date : transaction.endDate
+  const frequency = transaction.frequency
+  const isRecurringTransaction = isV2 ? transaction.is_recurring : !!frequency
+  const type = isV2 ? transaction.type : transaction.typeName
 
   return (
     <motion.div
@@ -21,21 +50,21 @@ export function Transaction({  transaction, index }: { transaction: TransactionP
       <div className="flex justify-between items-center mb-2">
         <div>
           <p className="font-medium">{description}</p>
-          <p className="text-sm text-gray-500">{categoryName}</p>
+          {categoryName && (
+            <p className="text-sm text-gray-500">{categoryName}</p>
+          )}
         </div>
         <div>
-          <div className='flex gap-2 justify-end'>
-            {
-              transaction.typeName === 'expense' ? (
-                <ArrowUpRight className="h-5 w-5 text-red-400"/>
-              ) : (
-                <ArrowDownLeft className="h-5 w-5 text-green-400" />
-              )
-            }
-            <span className="font-medium">{
-              new Intl.NumberFormat("pt-BR", {
-                style: "currency",
-                currency: "BRL",
+          <div className="flex gap-2 justify-end">
+            {type === 'expense' ? (
+              <ArrowUpRight className="h-5 w-5 text-red-400" />
+            ) : (
+              <ArrowDownLeft className="h-5 w-5 text-green-400" />
+            )}
+            <span className="font-medium">
+              {new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
               }).format(amount)}
             </span>
           </div>
@@ -45,13 +74,14 @@ export function Transaction({  transaction, index }: { transaction: TransactionP
                 {`${humanReadableDate(date)}`}
               </p>
             )}
-            {
-              isRecurringTransaction && (
-                <p className="text-sm text-gray-500">{
-                  getLeftPayments(endDate, frequency)
-                }</p>
-              )
-            }
+            {isRecurringTransaction && frequency && (
+              <p className="text-sm text-gray-500">
+                {getLeftPayments(
+                  endDate,
+                  frequency as 'daily' | 'weekly' | 'monthly' | 'yearly'
+                )}
+              </p>
+            )}
           </div>
         </div>
       </div>

@@ -22,6 +22,10 @@ export function HistoricalData() {
     isError,
   } = useIncomeAndExpenseComparsionHistory()
 
+  console.log('[debug] NEXT_PUBLIC_TEST ->', process.env.NEXT_PUBLIC_TEST, {
+    env: process.env,
+  })
+
   if (isError) {
     return (
       <Card className="p-6 bg-white shadow-lg rounded-2xl">
