@@ -1,13 +1,18 @@
 services:
   nextjs:
-    image: nextjs-app:latest
+    image: ${APP_IMAGE:-nextjs-app}:latest
+    container_name: ${APP_CONTAINER_NAME:-financer}
     working_dir: /app
     ports:
-      - '3001:3000'
+      - '${APP_PORT:-3001}:3000'
     build:
       context: .
       dockerfile: ./Dockerfile
+      args:
+        - NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV:-production}
     pull_policy: build
     restart: unless-stopped
     env_file:
       - stack.env
+    environment:
+      - NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV:-production}

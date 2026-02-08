@@ -22,7 +22,7 @@ export const useBiggestTransactions = () => {
   return useQuery<Transaction[] | TransactionV2Response>({
     queryKey: [KEY],
     queryFn: () => {
-      if (process.env.NEXT_PUBLIC_USE_TRANSACTIONS_V2) {
+      if (process.env.NEXT_PUBLIC_USE_TRANSACTIONS_V2 === 'true') {
         return api
           .get<TransactionV2Response>(
             `${TRANSACTION_V2_SERVICE_BASE_URL}/v2/transactions/biggest`

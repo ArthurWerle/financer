@@ -2,6 +2,7 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import Header from '@/components/header'
 import AppProvider from '@/providers/app-provider'
+import StagingBanner from '@/components/staging-banner'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AppProvider>
+          <StagingBanner />
           <Header />
           <main className="pt-20 px-4 md:px-8 max-w-7xl mx-auto mb-[50px]">
             {children}

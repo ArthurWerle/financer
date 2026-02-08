@@ -123,7 +123,7 @@ export const AddExpense = () => {
 
     if (!formData.amount || !formData.categoryId) return
 
-    if (process.env.NEXT_PUBLIC_USE_TRANSACTIONS_V2) {
+    if (process.env.NEXT_PUBLIC_USE_TRANSACTIONS_V2 === 'true') {
       const transactionV2: PostTransactionTypeV2 = {
         amount: formData.amount,
         category_id: formData.categoryId,
