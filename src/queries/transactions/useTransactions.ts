@@ -48,7 +48,7 @@ export const useTransactions = ({ filters }: UseTransactionsProps) => {
       return api
         .get<
           TransactionResponseType[]
-        >(`${BFF_BASE_URL}/transactions`, { params: getFilterParams(filters) })
+        >(`${BFF_BASE_URL}/combined-transactions/all`, { params: getFilterParams(filters) })
         .then((res) => res.data)
     },
     refetchOnWindowFocus: false,

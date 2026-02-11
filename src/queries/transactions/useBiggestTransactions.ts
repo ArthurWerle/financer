@@ -30,7 +30,7 @@ export const useBiggestTransactions = () => {
       return api
         .get<
           Transaction[]
-        >(`${BFF_BASE_URL}/transactions/biggest`)
+        >(`${BFF_BASE_URL}/combined-transactions/biggest/${LIMIT}`)
         .then((res) => res.data)
     },
     select: (data) => {

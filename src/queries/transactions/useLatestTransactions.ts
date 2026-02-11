@@ -21,7 +21,7 @@ export const useLatestTransactions = () => {
       return api
         .get<
           Transaction[]
-        >(`${BFF_BASE_URL}/transactions/latest`)
+        >(`${BFF_BASE_URL}/combined-transactions/latest/${LIMIT}`)
         .then((res) => res.data)
     },
     select: (data) => {

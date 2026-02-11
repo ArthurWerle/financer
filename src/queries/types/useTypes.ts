@@ -6,6 +6,6 @@ import { useQuery } from "@tanstack/react-query"
 export const useTypes = () => {
   return useQuery({
     queryKey: ['types'],
-    queryFn: () => api.get<Type[]>(`${BFF_BASE_URL}/types`).then((res) => res.data),
+    queryFn: () => api.get<Type[]>(`${BFF_BASE_URL}/type`).then((res) => res.data),
   })
 }

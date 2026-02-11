@@ -8,7 +8,7 @@ export const KEY = '/categories'
 export const useCategories = () => {
   return useQuery({
     queryKey: [KEY],
-    queryFn: () => api.get<Category[]>(`${BFF_BASE_URL}/categories`).then((res) => res.data),
+    queryFn: () => api.get<Category[]>(`${BFF_BASE_URL}/category`).then((res) => res.data),
     refetchOnWindowFocus: false
   })
 }

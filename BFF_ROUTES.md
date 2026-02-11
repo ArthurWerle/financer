@@ -10,7 +10,7 @@ The frontend currently makes direct calls to:
 - **Transaction Service V2** (port 1235)
 - **Analytics Service** (port 1234)
 
-All these calls need to be routed through the BFF service (port 8082).
+All these calls need to be routed through the BFF service (port 8082). **The BFF acts as a transparent proxy, maintaining the same route structure as the backend services.**
 
 ---
 
@@ -32,32 +32,32 @@ These routes are already working and don't need changes:
 
 ### 1. Category Management
 
-#### GET `/api/bff/categories`
+#### GET `/api/bff/category`
 - **Purpose**: Fetch all categories
 - **Backend Service**: Category Service → `GET http://localhost:8085/api/category`
 - **Response Type**: `Category[]`
 - **Query Parameters**: None
-- **Notes**: Simple proxy to category service
+- **Notes**: Proxy request to category service maintaining same path
 
-#### POST `/api/bff/categories`
+#### POST `/api/bff/category`
 - **Purpose**: Create new category
 - **Backend Service**: Category Service → `POST http://localhost:8085/api/category`
 - **Request Body**: `Partial<Omit<Category, 'ID' | 'CreatedAt' | 'UpdatedAt' | 'DeletedAt'>>`
 - **Response Type**: Category creation response
-- **Notes**: Simple proxy to category service
+- **Notes**: Proxy request to category service maintaining same path
 
-#### GET `/api/bff/types`
+#### GET `/api/bff/type`
 - **Purpose**: Fetch all transaction types (income, expense)
 - **Backend Service**: Category Service → `GET http://localhost:8085/api/type`
 - **Response Type**: `Type[]`
 - **Query Parameters**: None
-- **Notes**: Simple proxy to category service
+- **Notes**: Proxy request to category service maintaining same path
 
 ---
 
 ### 2. Transaction Management (V1 - Legacy)
 
-#### GET `/api/bff/transactions`
+#### GET `/api/bff/combined-transactions/all`
 - **Purpose**: Fetch all transactions with optional filters
 - **Backend Service**: Transaction Service V1 → `GET http://localhost:8081/api/combined-transactions/all`
 - **Response Type**: `(Transaction & RecurringTransaction)[]`
@@ -67,24 +67,27 @@ These routes are already working and don't need changes:
 - **Notes**:
   - Used when `NEXT_PUBLIC_USE_TRANSACTIONS_V2 !== 'true'`
   - Returns combined transactions and recurring transactions
+  - Proxy maintains exact same path structure
 
-#### GET `/api/bff/transactions/latest`
+#### GET `/api/bff/combined-transactions/latest/3`
 - **Purpose**: Fetch latest 3 transactions
 - **Backend Service**: Transaction Service V1 → `GET http://localhost:8081/api/combined-transactions/latest/3`
 - **Response Type**: `Transaction[]`
 - **Query Parameters**: None
 - **Notes**:
-  - Limit is hardcoded to 3 in frontend
+  - Limit of 3 is in the path
   - Used when `NEXT_PUBLIC_USE_TRANSACTIONS_V2 !== 'true'`
+  - Proxy maintains exact same path structure
 
-#### GET `/api/bff/transactions/biggest`
+#### GET `/api/bff/combined-transactions/biggest/3`
 - **Purpose**: Fetch 3 biggest transactions by amount
 - **Backend Service**: Transaction Service V1 → `GET http://localhost:8081/api/combined-transactions/biggest/3`
 - **Response Type**: `Transaction[]`
 - **Query Parameters**: None
 - **Notes**:
-  - Limit is hardcoded to 3 in frontend
+  - Limit of 3 is in the path
   - Used when `NEXT_PUBLIC_USE_TRANSACTIONS_V2 !== 'true'`
+  - Proxy maintains exact same path structure
 
 ---
 
@@ -100,6 +103,7 @@ These routes are already working and don't need changes:
 - **Notes**:
   - Used when `NEXT_PUBLIC_USE_TRANSACTIONS_V2 === 'true'`
   - V2 uses different response schema (snake_case vs camelCase)
+  - Proxy maintains exact same path structure
 
 #### POST `/api/bff/v2/transactions`
 - **Purpose**: Create new transaction using V2 schema
@@ -109,56 +113,68 @@ These routes are already working and don't need changes:
 - **Notes**:
   - Used when `NEXT_PUBLIC_USE_TRANSACTIONS_V2 === 'true'`
   - Different schema from V1
+  - Proxy maintains exact same path structure
 
 #### GET `/api/bff/v2/transactions/latest`
 - **Purpose**: Fetch latest transactions (V2 schema)
 - **Backend Service**: Transaction Service V2 → `GET http://localhost:1235/api/v2/transactions/latest`
 - **Response Type**: `TransactionV2Response`
 - **Query Parameters**: None
-- **Notes**: Used when `NEXT_PUBLIC_USE_TRANSACTIONS_V2 === 'true'`
+- **Notes**:
+  - Used when `NEXT_PUBLIC_USE_TRANSACTIONS_V2 === 'true'`
+  - Proxy maintains exact same path structure
 
 #### GET `/api/bff/v2/transactions/biggest`
 - **Purpose**: Fetch biggest transactions by amount (V2 schema)
 - **Backend Service**: Transaction Service V2 → `GET http://localhost:1235/api/v2/transactions/biggest`
 - **Response Type**: `TransactionV2Response`
 - **Query Parameters**: None
-- **Notes**: Used when `NEXT_PUBLIC_USE_TRANSACTIONS_V2 === 'true'`
+- **Notes**:
+  - Used when `NEXT_PUBLIC_USE_TRANSACTIONS_V2 === 'true'`
+  - Proxy maintains exact same path structure
 
 ---
 
 ### 4. Analytics
 
-#### GET `/api/bff/categories/average`
+#### GET `/api/bff/v1/categories/average`
 - **Purpose**: Get average spending per category
 - **Backend Service**: Analytics Service → `GET http://localhost:1234/api/v1/categories/average`
 - **Response Type**: `CategoryAverage[]`
 - **Query Parameters**: None
-- **Notes**: Calculates average amounts spent in each category
+- **Notes**:
+  - Calculates average amounts spent in each category
+  - Proxy maintains exact same path structure including `/v1/`
 
-#### GET `/api/bff/types/average`
+#### GET `/api/bff/v1/types/average`
 - **Purpose**: Get average income vs expense
 - **Backend Service**: Analytics Service → `GET http://localhost:1234/api/v1/types/average`
 - **Response Type**: `TypeAverage[]`
 - **Query Parameters**: None
-- **Notes**: Returns average amounts for income and expense types
+- **Notes**:
+  - Returns average amounts for income and expense types
+  - Proxy maintains exact same path structure including `/v1/`
 
 ---
 
 ## Implementation Priority
 
 1. **High Priority** (Most Used):
-   - GET `/api/bff/transactions` (both V1 and V2)
-   - GET `/api/bff/categories`
-   - GET `/api/bff/types`
+   - GET `/api/bff/combined-transactions/all` (V1)
+   - GET `/api/bff/v2/transactions` (V2)
+   - GET `/api/bff/category`
+   - GET `/api/bff/type`
 
 2. **Medium Priority**:
-   - GET `/api/bff/transactions/latest` (both V1 and V2)
-   - GET `/api/bff/transactions/biggest` (both V1 and V2)
-   - POST `/api/bff/categories`
+   - GET `/api/bff/combined-transactions/latest/3` (V1)
+   - GET `/api/bff/v2/transactions/latest` (V2)
+   - GET `/api/bff/combined-transactions/biggest/3` (V1)
+   - GET `/api/bff/v2/transactions/biggest` (V2)
+   - POST `/api/bff/category`
 
 3. **Low Priority** (Analytics):
-   - GET `/api/bff/categories/average`
-   - GET `/api/bff/types/average`
+   - GET `/api/bff/v1/categories/average`
+   - GET `/api/bff/v1/types/average`
 
 ---
 
@@ -177,6 +193,22 @@ In production, replace `localhost` with the appropriate service discovery mechan
 
 ---
 
+## Implementation Notes
+
+**The BFF should act as a transparent proxy:**
+- Maintain the exact same route structure as the backend services
+- Forward all query parameters unchanged
+- Forward request bodies unchanged
+- Return responses unchanged (or with minimal transformation)
+- This approach makes the BFF implementation straightforward and keeps API consistency
+
+For example:
+- Frontend calls: `GET ${BFF_BASE_URL}/category`
+- BFF proxies to: `GET ${CATEGORY_SERVICE}/category`
+- Frontend receives the same response structure as if calling the service directly
+
+---
+
 ## Testing Checklist
 
 After implementing these routes, test:
@@ -189,13 +221,15 @@ After implementing these routes, test:
 - [ ] Category averages in analytics
 - [ ] Type averages in analytics
 - [ ] V1/V2 feature flag switching works correctly
+- [ ] Query parameters are correctly forwarded
+- [ ] Request bodies are correctly forwarded
 
 ---
 
 ## Migration Notes
 
-1. All frontend query files will be updated to use BFF URLs
-2. Direct service base URLs (CATEGORY_SERVICE_BASE_URL, etc.) can be removed from frontend constants
-3. Feature flag `NEXT_PUBLIC_USE_TRANSACTIONS_V2` still needs to be respected
-4. The BFF should handle all service-to-service communication
-5. Frontend only needs to know about BFF_BASE_URL
+1. Frontend now uses `BFF_BASE_URL` for all API calls
+2. Direct service base URLs (CATEGORY_SERVICE_BASE_URL, etc.) have been removed from frontend
+3. Feature flag `NEXT_PUBLIC_USE_TRANSACTIONS_V2` is still respected in frontend
+4. The BFF handles all service-to-service communication
+5. Route paths are maintained exactly as they are in backend services (transparent proxy pattern)

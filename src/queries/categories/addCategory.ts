@@ -7,5 +7,5 @@ type PostCategoryType =
   Partial<Omit<Category, 'ID' | 'CreatedAt' | 'UpdatedAt' | 'DeletedAt'>>
 
 export const addCategory = async (category: PostCategoryType) => {
-  return await api.post(`${BFF_BASE_URL}/categories`, category)
+  return await api.post(`${BFF_BASE_URL}/category`, category)
 }
