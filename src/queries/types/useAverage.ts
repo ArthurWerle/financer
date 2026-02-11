@@ -1,4 +1,4 @@
-import { ANALYTICS_SERVICE_BASE_URL } from '@/constants'
+import { BFF_BASE_URL } from '@/constants'
 import { TypeAverage, Types } from '@/types/type'
 import api from '@/utils/api'
 import { useQuery } from '@tanstack/react-query'
@@ -8,7 +8,7 @@ export const useAverage = () => {
     queryKey: ['types/average'],
     queryFn: () =>
       api
-        .get<TypeAverage[]>(`${ANALYTICS_SERVICE_BASE_URL}/types/average`)
+        .get<TypeAverage[]>(`${BFF_BASE_URL}/types/average`)
         .then((res) => res.data),
     select: (data) => {
       const expense = data.find((average) => average.TypeName === Types.Expense)

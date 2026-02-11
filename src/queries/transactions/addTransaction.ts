@@ -1,4 +1,4 @@
-import { BFF_BASE_URL, TRANSACTION_V2_SERVICE_BASE_URL } from '@/constants'
+import { BFF_BASE_URL } from '@/constants'
 import { RecurringTransaction } from '@/types/recurring-transaction'
 import { Transaction, TransactionV2 } from '@/types/transaction'
 import api from '@/utils/api'
@@ -35,7 +35,7 @@ export const addTransaction = async (transaction: PostTransactionType) => {
 
 export const addTransactionV2 = async (transaction: PostTransactionTypeV2) => {
   return await api.post(
-    `${TRANSACTION_V2_SERVICE_BASE_URL}/v2/transactions`,
+    `${BFF_BASE_URL}/v2/transactions`,
     transaction
   )
 }
