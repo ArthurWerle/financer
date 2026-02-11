@@ -1,7 +1,4 @@
-import {
-  TRANSACTION_SERVICE_BASE_URL,
-  TRANSACTION_V2_SERVICE_BASE_URL,
-} from '@/constants'
+import { BFF_BASE_URL } from '@/constants'
 import { Transaction, TransactionV2Response } from '@/types/transaction'
 import api from '@/utils/api'
 import { useQuery } from '@tanstack/react-query'
@@ -25,7 +22,7 @@ export const useBiggestTransactions = () => {
       if (process.env.NEXT_PUBLIC_USE_TRANSACTIONS_V2 === 'true') {
         return api
           .get<TransactionV2Response>(
-            `${TRANSACTION_V2_SERVICE_BASE_URL}/v2/transactions/biggest`
+            `${BFF_BASE_URL}/v2/transactions/biggest`
           )
           .then((res) => res.data)
       }
@@ -33,7 +30,7 @@ export const useBiggestTransactions = () => {
       return api
         .get<
           Transaction[]
-        >(`${TRANSACTION_SERVICE_BASE_URL}/combined-transactions/biggest/${LIMIT}`)
+        >(`${BFF_BASE_URL}/transactions/biggest`)
         .then((res) => res.data)
     },
     select: (data) => {
