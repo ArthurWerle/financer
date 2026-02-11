@@ -8,7 +8,7 @@ export const useAverage = () => {
     queryKey: ['types/average'],
     queryFn: () =>
       api
-        .get<TypeAverage[]>(`${BFF_BASE_URL}/v1/types/average`)
+        .get<TypeAverage[]>(`${BFF_BASE_URL}/types/average`)
         .then((res) => res.data),
     select: (data) => {
       const expense = data.find((average) => average.TypeName === Types.Expense)

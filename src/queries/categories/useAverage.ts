@@ -10,7 +10,7 @@ export const useAverage = () => {
       api
         .get<
           CategoryAverage[]
-        >(`${BFF_BASE_URL}/v1/categories/average`)
+        >(`${BFF_BASE_URL}/categories/average`)
         .then((res) => res.data),
   })
 }
