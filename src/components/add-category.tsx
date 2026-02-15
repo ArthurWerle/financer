@@ -24,7 +24,10 @@ export const AddCategory = () => {
   const handleSubmit = async (e: any) => {
     setIsLoading(true)
 
-    await addCategory(formData)
+    await addCategory({
+      name: formData.Name,
+      description: formData.Description,
+    })
       .catch((error) => alert(error))
       .finally(() => {
         queryClient.invalidateQueries({ queryKey: KEY })

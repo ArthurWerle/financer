@@ -1,13 +1,17 @@
 import { Average } from './common'
 
 export interface Category {
-  ID: number
-  CreatedAt: string
-  UpdatedAt: string
-  DeletedAt: string | null
-  Name: string
-  Description: string
-  Color: string
+  id: number
+  createdAt: string
+  updatedAt: string
+  deletedAt: string | null
+  name: string
+  description: string
+  color: string
+}
+
+export interface CategoryResponse {
+  categories: Category[]
 }
 
 export type CategoryAverage = {

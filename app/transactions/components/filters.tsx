@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import MultiSelect from "@/components/multi-select"
 import { useFilters } from "@/hooks/useFilters"
 import { useCategories } from "@/queries/categories/useCategories"
@@ -29,7 +28,7 @@ export function Filters() {
       </div>
       <div>
         <MultiSelect
-          options={categories.map((category: Category) => ({ value: String(category.ID), label: category.Name }))} 
+          options={categories.map((category: Category) => ({ value: String(category.id), label: category.name }))} 
           value={filters.category ? filters.category.split(',') : []} 
           onChange={(selected) => setUrl('category', selected.join(','))}
         />

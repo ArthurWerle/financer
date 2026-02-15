@@ -150,8 +150,8 @@ export const AddIncome = () => {
                     <SelectItem value="" disabled>Loading categories...</SelectItem>
                   ) : (
                     categories?.map((category) => (
-                      <SelectItem key={category.ID} value={String(category.ID)}>
-                        {category.Name}
+                      <SelectItem key={category.id} value={String(category.id)}>
+                        {category.name}
                       </SelectItem>
                     ))
                   )}

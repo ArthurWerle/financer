@@ -32,8 +32,8 @@ export function Transaction({
   const amount = transaction.amount
   const date = transaction.date
   const categoryName = isV2
-    ? categories?.find((category) => category.ID === transaction.category_id)
-        ?.Name
+    ? categories?.find((category) => category.id === transaction.category_id)
+        ?.name
     : transaction.categoryName
   const endDate = isV2 ? transaction.end_date : transaction.endDate
   const frequency = transaction.frequency
