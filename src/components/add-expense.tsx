@@ -25,19 +25,15 @@ import {
 import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { useCategories } from '../queries/categories/useCategories'
-import { useTypes } from '../queries/types/useTypes'
 import {
   addTransaction,
   addTransactionV2,
   PostTransactionTypeV2,
 } from '../queries/transactions/addTransaction'
-import { KEY as MONTH_OVERVIEW_QUERY_KEY } from '@/queries/transactions/useMonthOverview'
-import { KEY as EXPENSE_COMPARSION_HISTORY_QUERY_KEY } from '@/queries/transactions/useExpenseComparsionHistory'
-import { KEY as TRANSACTIONS_QUERY_KEY } from '@/queries/transactions/useTransactions'
-import { KEY as CATEGORIES_MONTHLY_EXPENSE_QUERY_KEY } from '@/queries/categories/useCategoriesMonthlyExpense'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { addDate } from '../utils/add-date'
+import { TransactionType } from '@/enums/enums'
 
 type FormData = {
   amount: number | undefined
@@ -73,8 +69,6 @@ export const AddExpense = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const { data: categories, isLoading: isLoadingCategories } = useCategories()
-  const { data: types, isLoading: isLoadingTypes } = useTypes()
-  const expenseTypeId = types?.find((type) => type.Name === 'expense')?.ID
 
   const formValidation = useMemo(() => {
     let validation = {
@@ -123,12 +117,11 @@ export const AddExpense = () => {
 
     if (!formData.amount || !formData.categoryId) return
 
-    if (process.env.NEXT_PUBLIC_USE_TRANSACTIONS_V2 === 'true') {
       const transactionV2: PostTransactionTypeV2 = {
         amount: formData.amount,
         category_id: formData.categoryId,
         description: formData.description,
-        type: expenseTypeId === formData.typeId ? 'expense' : 'income',
+        type: TransactionType.Expense,
         date: formData.date.toISOString(),
         frequency: formData.frequency,
         end_date: endDate?.toISOString(),
@@ -156,41 +149,7 @@ export const AddExpense = () => {
           setIsLoading(false)
           setIsDialogOpen(false)
         })
-    } else {
-      const formDataWithTypeIdAndEndDate = {
-        amount: formData.amount,
-        categoryId: formData.categoryId,
-        description: formData.description,
-        typeId: expenseTypeId,
-        date: formData.date.toISOString(),
-        frequency: formData.frequency,
-        startDate: formData.startDate.toISOString(),
-        endDate: endDate?.toISOString(),
-      }
-
-      await addTransaction(formDataWithTypeIdAndEndDate)
-        .catch((error) => {
-          console.log({ error })
-          toast.error(
-            `ERROR: ${error?.message || 'Error creating transaction'}`,
-            {
-              position: 'top-right',
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: false,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: 'colored',
-            }
-          )
-        })
-        .finally(() => {
-          queryClient.invalidateQueries()
-          setIsLoading(false)
-          setIsDialogOpen(false)
-        })
-    }
+    
   }
 
   return (
@@ -342,12 +301,10 @@ export const AddExpense = () => {
             className="w-full"
             disabled={
               isLoading ||
-              isLoadingTypes ||
-              !expenseTypeId ||
               !formValidation.isValid
             }
           >
-            {isLoading || isLoadingTypes || !expenseTypeId
+            {isLoading
               ? 'Loading...'
               : 'Create'}
           </Button>

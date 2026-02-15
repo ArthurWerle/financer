@@ -9,16 +9,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { useCategories } from '../queries/categories/useCategories'
-import { useTypes } from '../queries/types/useTypes'
-import { addTransaction } from '../queries/transactions/addTransaction'
-import { KEY as MONTH_OVERVIEW_QUERY_KEY } from '@/queries/transactions/useMonthOverview'
-import { KEY as EXPENSE_COMPARSION_HISTORY_QUERY_KEY } from '@/queries/transactions/useExpenseComparsionHistory'
-import { KEY as TRANSACTIONS_QUERY_KEY } from '@/queries/transactions/useTransactions'
-import { KEY as CATEGORIES_MONTHLY_EXPENSE_QUERY_KEY } from '@/queries/categories/useCategoriesMonthlyExpense'
+import { addTransactionV2, PostTransactionTypeV2 } from '../queries/transactions/addTransaction'
 import { useQueryClient } from '@tanstack/react-query'
 import { Transaction } from '../types/transaction'
 import { RecurringTransaction } from '../types/recurring-transaction'
 import { toast } from 'react-toastify'
+import { TransactionType } from '@/enums/enums'
 
 type FormData = Partial<
   Omit<Transaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt' | 'date'> &
@@ -41,8 +37,6 @@ export const AddIncome = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const { data: categories, isLoading: isLoadingCategories } = useCategories()
-  const { data: types, isLoading: isLoadingTypes } = useTypes()
-  const incomeTypeId = types?.find(type => type.Name === 'income')?.ID
 
   const formValidation = useMemo(() => {
     let validation = {
@@ -85,30 +79,33 @@ export const AddIncome = () => {
     setIsLoading(true)
     e.preventDefault()
 
-    const formDataWithTypeId = {
-      ...formData,
-      typeId: incomeTypeId
+    const transactionV2: PostTransactionTypeV2 = {
+      amount: formData.amount ?? 0,
+      category_id: formData.categoryId ?? 0,
+      description: formData.description ?? '',
+      type: TransactionType.Income,
+      date: formData.date.toISOString() ?? '',
     }
 
-    await addTransaction(formDataWithTypeId)
+    await addTransactionV2(transactionV2)
       .catch((error) => {
         console.log({ error })
-        toast.error(`ERROR: ${error?.message || 'Error creating transaction'}`, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        })
+        toast.error(
+          `ERROR: ${error?.message || 'Error creating transaction V2'}`,
+          {
+            position: 'top-right',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'colored',
+          }
+        )
       })
       .finally(() => {
-        queryClient.invalidateQueries({ queryKey: MONTH_OVERVIEW_QUERY_KEY })
-        queryClient.invalidateQueries({ queryKey: EXPENSE_COMPARSION_HISTORY_QUERY_KEY })
-        queryClient.invalidateQueries({ queryKey: TRANSACTIONS_QUERY_KEY })
-        queryClient.invalidateQueries({ queryKey: CATEGORIES_MONTHLY_EXPENSE_QUERY_KEY })
+        queryClient.invalidateQueries()
         setIsLoading(false)
         setIsDialogOpen(false)
       })
@@ -190,8 +187,8 @@ export const AddIncome = () => {
             </div>
           </div>
           
-          <Button type="submit" className="w-full" disabled={isLoading || isLoadingTypes || !incomeTypeId || !formValidation.isValid }>
-            {isLoading || isLoadingTypes || !incomeTypeId ? "Loading..." : "Create"}
+          <Button type="submit" className="w-full" disabled={isLoading || !formValidation.isValid }>
+            {isLoading ? "Loading..." : "Create"}
           </Button>
           {!formValidation.isValid && (
             <ul>
