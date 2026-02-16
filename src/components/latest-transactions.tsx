@@ -6,7 +6,7 @@ export function LatestTransactions() {
   const { data } = useLatestTransactions()
   const { data: categories = [] } = useCategories()
 
-  const transactions = (Array.isArray(data) ? data : data?.transactions) || []
+  const transactions = data?.transactions || []
 
   return (
     <div className="w-[350px] mx-auto">

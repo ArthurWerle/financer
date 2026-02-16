@@ -1,6 +1,6 @@
-import { BFF_BASE_URL } from "@/constants"
-import api from "@/utils/api"
-import { useQuery } from "@tanstack/react-query"
+import { BFF_BASE_URL } from '@/constants'
+import api from '@/utils/api'
+import { useQuery } from '@tanstack/react-query'
 
 export const KEY = '/expense-comparsion-history'
 
@@ -13,7 +13,13 @@ type ExpenseComparsionHistoryResponse = {
 export const useIncomeAndExpenseComparsionHistory = () => {
   return useQuery({
     queryKey: [KEY],
-    queryFn: () => api.get<ExpenseComparsionHistoryResponse[]>(`${BFF_BASE_URL}/expense-comparsion-history`).then((res) => res.data),
-    refetchOnWindowFocus: false
+    queryFn: () =>
+      api
+        .get<
+          ExpenseComparsionHistoryResponse[]
+        >(`${BFF_BASE_URL}/expense-comparsion-history`)
+        .then((res) => res.data),
+    refetchOnWindowFocus: false,
+    select: (data) => data.reverse(),
   })
 }

@@ -5,14 +5,12 @@ import { getLeftPayments } from '../utils/get-left-payments'
 import { humanReadableDate } from '../utils/format-date'
 import { Category } from '@/types/category'
 
-type TransactionProps = TransactionV2
-
 export function Transaction({
   transaction,
   categories,
   index,
 }: {
-  transaction: TransactionProps
+  transaction: TransactionV2
   categories: Category[]
   index?: number
 }) {
