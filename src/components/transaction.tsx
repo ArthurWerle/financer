@@ -7,7 +7,7 @@ import { humanReadableDate } from '../utils/format-date'
 import { Category } from '@/types/category'
 import { deleteTransaction } from '@/queries/transactions/deleteTransaction'
 import { useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { toast } from 'react-toastify'
 
 export function Transaction({
   transaction,

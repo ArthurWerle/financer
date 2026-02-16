@@ -30,7 +30,6 @@ import {
   PostTransactionTypeV2,
 } from '../queries/transactions/addTransaction'
 import { useQueryClient } from '@tanstack/react-query'
-import { RecurringTransaction } from '../types/recurring-transaction'
 import { toast } from 'react-toastify'
 import { TransactionType } from '@/enums/enums'
 import { TransactionV2 } from '@/types/transaction'
