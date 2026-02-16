@@ -10,7 +10,7 @@ export const useLatestTransactions = () => {
     queryKey: [KEY],
     queryFn: () => {
       return api
-        .get<TransactionV2Response>(`${BFF_BASE_URL}  /transactions/latest`)
+        .get<TransactionV2Response>(`${BFF_BASE_URL}/transactions/latest`)
         .then((res) => res.data)
     },
     refetchOnWindowFocus: false,
