@@ -6,6 +6,7 @@ import {
   ArrowUpRight,
   CalendarIcon,
   MoreVertical,
+  CreditCard,
   Pencil,
   Trash2,
 } from 'lucide-react'
@@ -13,6 +14,7 @@ import { getLeftPayments } from '../utils/get-left-payments'
 import { humanReadableDate } from '../utils/format-date'
 import { Category } from '@/types/category'
 import { deleteTransaction } from '@/queries/transactions/deleteTransaction'
+import { prepayTransaction } from '@/queries/transactions/prepayTransaction'
 import {
   updateTransaction,
   UpdateTransactionData,
@@ -59,6 +61,7 @@ export function Transaction({
   index?: number
 }) {
   const queryClient = useQueryClient()
+  const [isPrepaying, setIsPrepaying] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -110,6 +113,21 @@ export function Transaction({
       })
       .finally(() => {
         setIsSubmitting(false)
+      })
+  }
+
+  const handlePrepay = async () => {
+    setIsPrepaying(true)
+    await prepayTransaction(transaction.id)
+      .then(() => {
+        toast.success('Transaction prepaid')
+        queryClient.invalidateQueries()
+      })
+      .catch((error) => {
+        toast.error(`ERROR: ${error?.message || 'Error prepaying transaction'}`)
+      })
+      .finally(() => {
+        setIsPrepaying(false)
       })
   }
 
@@ -185,7 +203,7 @@ export function Transaction({
               <DropdownMenuTrigger asChild>
                 <button
                   className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                  disabled={isDeleting}
+                  disabled={isDeleting || isPrepaying}
                 >
                   <MoreVertical className="h-4 w-4" />
                 </button>
@@ -194,6 +212,13 @@ export function Transaction({
                 <DropdownMenuItem onClick={handleEditOpen}>
                   <Pencil className="h-4 w-4" />
                   Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handlePrepay}
+                  disabled={isPrepaying}
+                >
+                  <CreditCard className="h-4 w-4" />
+                  {isPrepaying ? 'Prepaying...' : 'Prepay'}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleDelete}
