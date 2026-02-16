@@ -22,16 +22,16 @@ export default function Categories() {
           <div className="space-y-6">
             {categories.map((category, index) => (
               <motion.div
-                key={category.Name}
+                key={category.name}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
                 <div className="flex justify-between items-center mb-2">
                   <div>
-                    <p className="font-medium">{category.Name}</p>
+                    <p className="font-medium">{category.name}</p>
                     <p className="text-sm text-gray-500">
-                      {category.Description}
+                      {category.description}
                     </p>
                   </div>
                 </div>
