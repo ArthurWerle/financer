@@ -26,7 +26,6 @@ import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { useCategories } from '../queries/categories/useCategories'
 import {
-  addTransaction,
   addTransactionV2,
   PostTransactionTypeV2,
 } from '../queries/transactions/addTransaction'
@@ -117,39 +116,38 @@ export const AddExpense = () => {
 
     if (!formData.amount || !formData.categoryId) return
 
-      const transactionV2: PostTransactionTypeV2 = {
-        amount: formData.amount,
-        category_id: formData.categoryId,
-        description: formData.description,
-        type: TransactionType.Expense,
-        date: formData.date.toISOString(),
-        frequency: formData.frequency,
-        end_date: endDate?.toISOString(),
-      }
+    const transactionV2: PostTransactionTypeV2 = {
+      amount: formData.amount,
+      category_id: formData.categoryId,
+      description: formData.description,
+      type: TransactionType.Expense,
+      date: formData.date.toISOString(),
+      frequency: formData.frequency,
+      end_date: endDate?.toISOString(),
+    }
 
-      await addTransactionV2(transactionV2)
-        .catch((error) => {
-          console.log({ error })
-          toast.error(
-            `ERROR: ${error?.message || 'Error creating transaction V2'}`,
-            {
-              position: 'top-right',
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: false,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: 'colored',
-            }
-          )
-        })
-        .finally(() => {
-          queryClient.invalidateQueries()
-          setIsLoading(false)
-          setIsDialogOpen(false)
-        })
-    
+    await addTransactionV2(transactionV2)
+      .catch((error) => {
+        console.log({ error })
+        toast.error(
+          `ERROR: ${error?.message || 'Error creating transaction V2'}`,
+          {
+            position: 'top-right',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'colored',
+          }
+        )
+      })
+      .finally(() => {
+        queryClient.invalidateQueries()
+        setIsLoading(false)
+        setIsDialogOpen(false)
+      })
   }
 
   return (
@@ -299,14 +297,9 @@ export const AddExpense = () => {
           <Button
             type="submit"
             className="w-full"
-            disabled={
-              isLoading ||
-              !formValidation.isValid
-            }
+            disabled={isLoading || !formValidation.isValid}
           >
-            {isLoading
-              ? 'Loading...'
-              : 'Create'}
+            {isLoading ? 'Loading...' : 'Create'}
           </Button>
           {!formValidation.isValid && (
             <ul>

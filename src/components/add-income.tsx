@@ -1,34 +1,52 @@
 import { useMemo, useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Calendar } from '@/components/ui/calendar'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { format } from 'date-fns'
+import { CalendarIcon } from 'lucide-react'
 import { useCategories } from '../queries/categories/useCategories'
-import { addTransactionV2, PostTransactionTypeV2 } from '../queries/transactions/addTransaction'
+import {
+  addTransactionV2,
+  PostTransactionTypeV2,
+} from '../queries/transactions/addTransaction'
 import { useQueryClient } from '@tanstack/react-query'
-import { Transaction } from '../types/transaction'
 import { RecurringTransaction } from '../types/recurring-transaction'
 import { toast } from 'react-toastify'
 import { TransactionType } from '@/enums/enums'
+import { TransactionV2 } from '@/types/transaction'
 
 type FormData = Partial<
-  Omit<Transaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt' | 'date'> &
-  Omit<RecurringTransaction, 'id' | 'typeName' | 'createdAt' | 'updatedAt' | 'startDate'>> & {
+  Omit<TransactionV2, 'id' | 'type' | 'created_at' | 'updated_at' | 'date'> & {
     date: Date
     startDate: Date
   }
+>
 
 export const AddIncome = () => {
   const today = new Date()
   const [formData, setFormData] = useState<FormData>({
     amount: undefined,
-    categoryId: undefined,
-    typeId: undefined,
+    category_id: undefined,
     description: '',
     date: today,
   })
@@ -41,10 +59,10 @@ export const AddIncome = () => {
   const formValidation = useMemo(() => {
     let validation = {
       isValid: true,
-      invalidFields: [] as string[]
+      invalidFields: [] as string[],
     }
 
-    if (!formData.amount || !formData.categoryId || !formData.description) {
+    if (!formData.amount || !formData.category_id || !formData.description) {
       validation = {
         ...validation,
         isValid: false,
@@ -53,27 +71,27 @@ export const AddIncome = () => {
       if (!formData.amount) {
         validation = {
           ...validation,
-          invalidFields: ['Amount']
+          invalidFields: ['Amount'],
         }
       }
 
-      if (!formData.categoryId) {
+      if (!formData.category_id) {
         validation = {
           ...validation,
-          invalidFields: [...validation.invalidFields, 'Category']
+          invalidFields: [...validation.invalidFields, 'Category'],
         }
       }
-      
+
       if (!formData.description) {
         validation = {
           ...validation,
-          invalidFields: [...validation.invalidFields, 'Description']
+          invalidFields: [...validation.invalidFields, 'Description'],
         }
       }
     }
 
     return validation
-  }, [formData.amount, formData.categoryId, formData.description]) 
+  }, [formData.amount, formData.category_id, formData.description])
 
   const handleSubmit = async (e: any) => {
     setIsLoading(true)
@@ -81,10 +99,10 @@ export const AddIncome = () => {
 
     const transactionV2: PostTransactionTypeV2 = {
       amount: formData.amount ?? 0,
-      category_id: formData.categoryId ?? 0,
+      category_id: formData.category_id ?? 0,
       description: formData.description ?? '',
       type: TransactionType.Income,
-      date: formData.date.toISOString() ?? '',
+      date: formData.date?.toISOString() ?? '',
     }
 
     await addTransactionV2(transactionV2)
@@ -114,7 +132,13 @@ export const AddIncome = () => {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" id="add-income-button" onClick={() => setIsDialogOpen(true)}>New Income</Button>
+        <Button
+          variant="secondary"
+          id="add-income-button"
+          onClick={() => setIsDialogOpen(true)}
+        >
+          New Income
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -128,15 +152,19 @@ export const AddIncome = () => {
                 id="amount"
                 type="number"
                 value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({ ...formData, amount: Number(e.target.value) })
+                }
                 required
               />
             </div>
-            
+
             <div className="grid gap-2">
               <Label htmlFor="category">Category</Label>
-              <Select 
-                onValueChange={(value) => setFormData({ ...formData, categoryId: Number(value) })} 
+              <Select
+                onValueChange={(value) =>
+                  setFormData({ ...formData, category_id: Number(value) })
+                }
                 required
               >
                 <SelectTrigger>
@@ -144,7 +172,9 @@ export const AddIncome = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {isLoadingCategories ? (
-                    <SelectItem value="" disabled>Loading categories...</SelectItem>
+                    <SelectItem value="" disabled>
+                      Loading categories...
+                    </SelectItem>
                   ) : (
                     categories?.map((category) => (
                       <SelectItem key={category.id} value={String(category.id)}>
@@ -160,9 +190,14 @@ export const AddIncome = () => {
               <Label>Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="justify-start text-left font-normal">
+                  <Button
+                    variant="outline"
+                    className="justify-start text-left font-normal"
+                  >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.date ? format(formData.date, "PPP") : "Pick a date"}
+                    {formData.date
+                      ? format(formData.date, 'PPP')
+                      : 'Pick a date'}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -181,19 +216,27 @@ export const AddIncome = () => {
               <Input
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 required
               />
             </div>
           </div>
-          
-          <Button type="submit" className="w-full" disabled={isLoading || !formValidation.isValid }>
-            {isLoading ? "Loading..." : "Create"}
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isLoading || !formValidation.isValid}
+          >
+            {isLoading ? 'Loading...' : 'Create'}
           </Button>
           {!formValidation.isValid && (
             <ul>
-              {formValidation.invalidFields.map(invalidField => (
-                <li key={invalidField} className='text-red-500 text-[11px]'>Field &quot;{invalidField}&quot; is missing</li>
+              {formValidation.invalidFields.map((invalidField) => (
+                <li key={invalidField} className="text-red-500 text-[11px]">
+                  Field &quot;{invalidField}&quot; is missing
+                </li>
               ))}
             </ul>
           )}

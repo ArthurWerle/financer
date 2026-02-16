@@ -20,7 +20,7 @@ export default function Transactions() {
     },
   })
 
-  const transactions = (Array.isArray(data) ? data : data?.transactions) || []
+  const transactions = data?.transactions || []
 
   return (
     <div className="p-8">
