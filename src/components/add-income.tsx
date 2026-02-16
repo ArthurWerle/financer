@@ -16,14 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Calendar } from '@/components/ui/calendar'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import { format } from 'date-fns'
-import { CalendarIcon } from 'lucide-react'
 import { useCategories } from '../queries/categories/useCategories'
 import {
   addTransactionV2,
@@ -187,27 +179,16 @@ export const AddIncome = () => {
 
             <div className="grid gap-2">
               <Label>Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="justify-start text-left font-normal"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.date
-                      ? format(formData.date, 'PPP')
-                      : 'Pick a date'}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={formData.date}
-                    onSelect={(date) => setFormData({ ...formData, date })}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <Input
+                type="date"
+                value={formData.date?.toISOString().split('T')[0] ?? ''}
+                onChange={(e) => {
+                  const date = new Date(e.target.value + 'T00:00:00')
+                  if (!isNaN(date.getTime())) {
+                    setFormData({ ...formData, date })
+                  }
+                }}
+              />
             </div>
 
             <div className="grid gap-2">
