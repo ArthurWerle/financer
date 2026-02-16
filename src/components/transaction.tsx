@@ -1,22 +1,11 @@
 import { motion } from 'framer-motion'
-import {
-  Transaction as TransactionType,
-  TransactionV2,
-} from '../types/transaction'
-import { RecurringTransaction } from '../types/recurring-transaction'
+import { TransactionV2 } from '../types/transaction'
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
 import { getLeftPayments } from '../utils/get-left-payments'
 import { humanReadableDate } from '../utils/format-date'
 import { Category } from '@/types/category'
 
-type TransactionV1 = TransactionType & Partial<RecurringTransaction>
-type TransactionProps = TransactionV2 | TransactionV1
-
-function isTransactionV2(
-  transaction: TransactionProps
-): transaction is TransactionV2 {
-  return 'type' in transaction
-}
+type TransactionProps = TransactionV2
 
 export function Transaction({
   transaction,
@@ -27,18 +16,16 @@ export function Transaction({
   categories: Category[]
   index?: number
 }) {
-  const isV2 = isTransactionV2(transaction)
   const description = transaction.description
   const amount = transaction.amount
   const date = transaction.date
-  const categoryName = isV2
-    ? categories?.find((category) => category.id === transaction.category_id)
-        ?.name
-    : transaction.categoryName
-  const endDate = isV2 ? transaction.end_date : transaction.endDate
+  const categoryName = categories?.find(
+    (category) => category.id === transaction.category_id
+  )?.name
+  const endDate = transaction.end_date
   const frequency = transaction.frequency
-  const isRecurringTransaction = isV2 ? transaction.is_recurring : !!frequency
-  const type = isV2 ? transaction.type : transaction.typeName
+  const isRecurringTransaction = transaction.is_recurring
+  const type = transaction.type
 
   return (
     <motion.div
@@ -69,12 +56,12 @@ export function Transaction({
             </span>
           </div>
           <div className="flex gap-2 justify-end">
-            {date?.length > 0 && !endDate && (
+            {!isRecurringTransaction && (
               <p className="text-xs text-gray-500">
                 {`${humanReadableDate(date)}`}
               </p>
             )}
-            {isRecurringTransaction && frequency && (
+            {isRecurringTransaction && (
               <p className="text-sm text-gray-500">
                 {getLeftPayments(
                   endDate,

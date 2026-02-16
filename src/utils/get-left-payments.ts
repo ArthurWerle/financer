@@ -1,17 +1,20 @@
 /**
  * This function receives an `endDate` and a `frequency` and returns
  * how much times this bill will be repeated until the `endDate`.
- * 
+ *
  * @param endDate Date
  * @param frequency 'daily' | 'weekly' | 'monthly' | 'yearly'
- * 
+ *
  * @returns string
- * 
+ *
  * @example
  * getLeftPayments(new Date('2022-12-31'), 'monthly')
  * // Expected output: '12 payments left'
  */
-export function getLeftPayments(endDateString: string | undefined, frequency: 'daily' | 'weekly' | 'monthly' | 'yearly') {
+export function getLeftPayments(
+  endDateString: string | undefined,
+  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'monthly'
+) {
   if (!endDateString) return 'No end date'
 
   const endDate = new Date(endDateString)
@@ -38,7 +41,8 @@ export function getLeftPayments(endDateString: string | undefined, frequency: 'd
       const endYear = endDate.getFullYear()
       const endMonth = endDate.getMonth()
 
-      const totalMonths = (endYear - currentYear) * 12 + (endMonth - currentMonth)
+      const totalMonths =
+        (endYear - currentYear) * 12 + (endMonth - currentMonth)
       return `${totalMonths} payments left`
     case 'yearly':
       return `${Math.ceil(diffDays / 365)} payments left`
