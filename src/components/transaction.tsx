@@ -213,13 +213,15 @@ export function Transaction({
                   <Pencil className="h-4 w-4" />
                   Edit
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={handlePrepay}
-                  disabled={isPrepaying}
-                >
-                  <CreditCard className="h-4 w-4" />
-                  {isPrepaying ? 'Prepaying...' : 'Prepay'}
-                </DropdownMenuItem>
+                {transaction.is_recurring && (
+                  <DropdownMenuItem
+                    onClick={handlePrepay}
+                    disabled={isPrepaying}
+                  >
+                    <CreditCard className="h-4 w-4" />
+                    {isPrepaying ? 'Prepaying...' : 'Prepay'}
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                   onClick={handleDelete}
                   className="text-red-600 focus:text-red-600"
@@ -289,10 +291,7 @@ export function Transaction({
                   </SelectTrigger>
                   <SelectContent>
                     {categories?.map((category) => (
-                      <SelectItem
-                        key={category.id}
-                        value={String(category.id)}
-                      >
+                      <SelectItem key={category.id} value={String(category.id)}>
                         {category.name}
                       </SelectItem>
                     ))}
@@ -302,10 +301,7 @@ export function Transaction({
 
               <div className="grid gap-2">
                 <Label>Date</Label>
-                <Popover
-                  open={datePickerOpen}
-                  onOpenChange={setDatePickerOpen}
-                >
+                <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
@@ -334,9 +330,7 @@ export function Transaction({
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor={`frequency-${transaction.id}`}>
-                  Frequency
-                </Label>
+                <Label htmlFor={`frequency-${transaction.id}`}>Frequency</Label>
                 <Select
                   value={editData.frequency || ''}
                   onValueChange={(value) =>
@@ -359,11 +353,7 @@ export function Transaction({
               </div>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </Button>
           </form>
