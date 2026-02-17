@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { TransactionV2 } from '../types/transaction'
+import type { Transaction } from '../types/transaction'
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -56,7 +57,7 @@ export function Transaction({
   categories,
   index,
 }: {
-  transaction: TransactionV2
+  transaction: Transaction
   categories: Category[]
   index?: number
 }) {
@@ -163,10 +164,21 @@ export function Transaction({
       >
         <div className="flex justify-between items-center mb-2">
           <div>
-            <p className="font-medium">{description}</p>
-            {categoryName && (
-              <p className="text-sm text-gray-500">{categoryName}</p>
-            )}
+            <Link href={`/transactions/${transaction.id}`} className="font-medium hover:underline">
+              {description}
+            </Link>
+            <div className="flex items-center gap-1.5">
+              {categoryName && (
+                <p className="text-sm text-gray-500">{categoryName}</p>
+              )}
+              {transaction.prepaid_from_id && (
+                <Link href={`/transactions/${transaction.prepaid_from_id}`}>
+                  <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium hover:bg-blue-200">
+                    Prepaid
+                  </span>
+                </Link>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <div>

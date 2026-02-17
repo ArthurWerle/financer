@@ -24,10 +24,10 @@ import {
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { TransactionType } from '@/enums/enums'
-import { TransactionV2 } from '@/types/transaction'
+import { Transaction } from '@/types/transaction'
 
 type FormData = Partial<
-  Omit<TransactionV2, 'id' | 'type' | 'created_at' | 'updated_at' | 'date'> & {
+  Omit<Transaction, 'id' | 'type' | 'created_at' | 'updated_at' | 'date'> & {
     date: Date
     startDate: Date
   }

@@ -1,9 +1,9 @@
 import { BFF_BASE_URL } from '@/constants'
-import { TransactionV2 } from '@/types/transaction'
+import { Transaction } from '@/types/transaction'
 import api from '@/utils/api'
 
 export type PostTransactionTypeV2 = Pick<
-  TransactionV2,
+  Transaction,
   | 'amount'
   | 'type'
   | 'created_by_id'

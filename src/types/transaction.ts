@@ -1,4 +1,4 @@
-export interface TransactionV2 {
+export interface Transaction {
   id: number
   created_by_id?: number
   is_recurring?: boolean
@@ -10,12 +10,13 @@ export interface TransactionV2 {
   description: string
   date: string
   start_date?: string
+  prepaid_from_id?: number
   end_date?: string
   created_at: string
   updated_at: string
 }
 
-export interface TransactionV2Response {
+export interface TransactionResponse {
   count: number
-  transactions: TransactionV2[]
+  transactions: Transaction[]
 }
