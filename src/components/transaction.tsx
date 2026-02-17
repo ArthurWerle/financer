@@ -50,6 +50,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { format } from 'date-fns'
 
 export function Transaction({
@@ -143,6 +149,13 @@ export function Transaction({
     setIsEditOpen(true)
   }
 
+  const isLastMonth = (() => {
+    if (!transaction.end_date) return false
+    const now = new Date()
+    const end = new Date(transaction.end_date)
+    return now.getFullYear() === end.getFullYear() && now.getMonth() === end.getMonth()
+  })()
+
   const description = transaction.description
   const amount = transaction.amount
   const date = transaction.date
@@ -226,13 +239,24 @@ export function Transaction({
                   Edit
                 </DropdownMenuItem>
                 {transaction.is_recurring && (
-                  <DropdownMenuItem
-                    onClick={handlePrepay}
-                    disabled={isPrepaying}
-                  >
-                    <CreditCard className="h-4 w-4" />
-                    {isPrepaying ? 'Prepaying...' : 'Prepay'}
-                  </DropdownMenuItem>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuItem
+                          onClick={isLastMonth ? undefined : handlePrepay}
+                          disabled={isPrepaying || isLastMonth}
+                        >
+                          <CreditCard className="h-4 w-4" />
+                          {isPrepaying ? 'Prepaying...' : 'Prepay'}
+                        </DropdownMenuItem>
+                      </TooltipTrigger>
+                      {isLastMonth && (
+                        <TooltipContent>
+                          <p>Cannot prepay — this is the last month</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
                 <DropdownMenuItem
                   onClick={handleDelete}

@@ -10,6 +10,7 @@ import {
   ArrowLeft,
   ArrowDownLeft,
   ArrowUpRight,
+  CalendarIcon,
   Pencil,
   Trash2,
   CreditCard,
@@ -17,10 +18,42 @@ import {
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Calendar } from '@/components/ui/calendar'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { format } from 'date-fns'
 import { useTransaction } from '@/queries/transactions/useTransaction'
 import { useCategories } from '@/queries/categories/useCategories'
 import { deleteTransaction } from '@/queries/transactions/deleteTransaction'
 import { prepayTransaction } from '@/queries/transactions/prepayTransaction'
+import {
+  updateTransaction,
+  UpdateTransactionData,
+} from '@/queries/transactions/updateTransaction'
 import { humanReadableDate } from '@/utils/format-date'
 import { getLeftPayments } from '@/utils/get-left-payments'
 
@@ -34,13 +67,70 @@ export default function TransactionDetailPage({
   const queryClient = useQueryClient()
   const [isDeleting, setIsDeleting] = useState(false)
   const [isPrepaying, setIsPrepaying] = useState(false)
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [datePickerOpen, setDatePickerOpen] = useState(false)
 
   const { data: transaction, isLoading, isError } = useTransaction(id)
   const { data: categories = [] } = useCategories()
 
+  const isLastMonth = (() => {
+    if (!transaction?.end_date) return false
+    const now = new Date()
+    const end = new Date(transaction.end_date)
+    return now.getFullYear() === end.getFullYear() && now.getMonth() === end.getMonth()
+  })()
+
   const categoryName = categories.find(
     (c) => c.id === transaction?.category_id
   )?.name
+
+  const handleEditOpen = () => {
+    if (!transaction) return
+    setEditData({
+      amount: transaction.amount,
+      description: transaction.description,
+      category_id: transaction.category_id,
+      date: new Date(transaction.date),
+      frequency: transaction.frequency,
+    })
+    setIsEditOpen(true)
+  }
+
+  const [editData, setEditData] = useState({
+    amount: 0,
+    description: '',
+    category_id: 0,
+    date: new Date(),
+    frequency: undefined as string | undefined,
+  })
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!transaction) return
+    setIsSubmitting(true)
+
+    const data: UpdateTransactionData = {
+      amount: editData.amount,
+      description: editData.description,
+      category_id: editData.category_id,
+      date: editData.date.toISOString(),
+      frequency: editData.frequency,
+    }
+
+    await updateTransaction(transaction.id, data)
+      .then(() => {
+        toast.success('Transaction updated')
+        queryClient.invalidateQueries()
+        setIsEditOpen(false)
+      })
+      .catch((error) => {
+        toast.error(`ERROR: ${error?.message || 'Error updating transaction'}`)
+      })
+      .finally(() => {
+        setIsSubmitting(false)
+      })
+  }
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat('pt-BR', {
@@ -197,15 +287,35 @@ export default function TransactionDetailPage({
         </div>
 
         <div className="flex gap-2 pt-2">
+          <Button
+            variant="outline"
+            onClick={handleEditOpen}
+          >
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
           {transaction.is_recurring && (
-            <Button
-              variant="outline"
-              onClick={handlePrepay}
-              disabled={isPrepaying}
-            >
-              <CreditCard className="h-4 w-4 mr-2" />
-              {isPrepaying ? 'Prepaying...' : 'Prepay'}
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button
+                      variant="outline"
+                      onClick={handlePrepay}
+                      disabled={isPrepaying || isLastMonth}
+                    >
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      {isPrepaying ? 'Prepaying...' : 'Prepay'}
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                {isLastMonth && (
+                  <TooltipContent>
+                    <p>Cannot prepay — this is the last month</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
           )}
           <Button
             variant="destructive"
@@ -217,6 +327,129 @@ export default function TransactionDetailPage({
           </Button>
         </div>
       </Card>
+
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Transaction</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-amount">Amount</Label>
+                <Input
+                  id="edit-amount"
+                  type="number"
+                  value={editData.amount}
+                  onChange={(e) =>
+                    setEditData({
+                      ...editData,
+                      amount: Number(e.target.value),
+                    })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="edit-description">Description</Label>
+                <Input
+                  id="edit-description"
+                  value={editData.description}
+                  onChange={(e) =>
+                    setEditData({
+                      ...editData,
+                      description: e.target.value,
+                    })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="edit-category">Category</Label>
+                <Select
+                  value={String(editData.category_id)}
+                  onValueChange={(value) =>
+                    setEditData({
+                      ...editData,
+                      category_id: Number(value),
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories?.map((category) => (
+                      <SelectItem key={category.id} value={String(category.id)}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid gap-2">
+                <Label>Date</Label>
+                <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {editData.date
+                        ? format(editData.date, 'PPP')
+                        : 'Pick a date'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={editData.date}
+                      onSelect={(date) => {
+                        if (date) {
+                          setEditData({ ...editData, date })
+                          setDatePickerOpen(false)
+                        }
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="edit-frequency">Frequency</Label>
+                <Select
+                  value={editData.frequency || ''}
+                  onValueChange={(value) =>
+                    setEditData({
+                      ...editData,
+                      frequency: value || undefined,
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select frequency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="yearly">Yearly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
