@@ -9,7 +9,7 @@ export function BiggestTransactions() {
   const transactions = data?.transactions || []
 
   return (
-    <div className="w-[350px] mx-auto">
+    <div>
       <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">
         Biggest transactions
       </h3>

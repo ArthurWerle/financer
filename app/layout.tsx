@@ -32,7 +32,7 @@ export default function RootLayout({
         <AppProvider>
           <StagingBanner />
           <Header />
-          <main className="pt-20 px-4 md:px-8 max-w-7xl mx-auto mb-[50px]">
+          <main className="pt-20 px-4 md:px-8 max-w-8xl mx-auto mb-[50px]">
             {children}
           </main>
         </AppProvider>
