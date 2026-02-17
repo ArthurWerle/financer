@@ -28,11 +28,7 @@ const getFilterParams = (filters: UseTransactionsProps['filters']) => {
 
 export const useTransactions = ({ filters }: UseTransactionsProps) => {
   return useQuery<TransactionV2Response>({
-    queryKey: [
-      KEY,
-      process.env.NEXT_PUBLIC_USE_TRANSACTIONS_V2,
-      JSON.stringify(filters),
-    ],
+    queryKey: [KEY, JSON.stringify(filters)],
     queryFn: () => {
       return api
         .get<TransactionV2Response>(`${BFF_BASE_URL}/transactions`, {
