@@ -209,6 +209,9 @@ export default function TransactionDetailPage({
               {transaction.is_recurring && (
                 <Badge variant="outline">Recurring</Badge>
               )}
+              {transaction.is_prepaid && (
+                <Badge className="bg-green-100 text-green-700">Prepaid</Badge>
+              )}
               {transaction.prepaid_from_id && (
                 <Link href={`/transactions/${transaction.prepaid_from_id}`}>
                   <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 cursor-pointer">
@@ -302,16 +305,16 @@ export default function TransactionDetailPage({
                     <Button
                       variant="outline"
                       onClick={handlePrepay}
-                      disabled={isPrepaying || isLastMonth}
+                      disabled={isPrepaying || isLastMonth || transaction.is_prepaid}
                     >
                       <CreditCard className="h-4 w-4 mr-2" />
                       {isPrepaying ? 'Prepaying...' : 'Prepay'}
                     </Button>
                   </span>
                 </TooltipTrigger>
-                {isLastMonth && (
+                {(isLastMonth || transaction.is_prepaid) && (
                   <TooltipContent>
-                    <p>Cannot prepay — this is the last month</p>
+                    <p>{transaction.is_prepaid ? 'Already prepaid' : 'Cannot prepay — this is the last month'}</p>
                   </TooltipContent>
                 )}
               </Tooltip>

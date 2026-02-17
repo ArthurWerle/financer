@@ -1,6 +1,7 @@
 export interface Transaction {
   id: number
   created_by_id?: number
+  is_prepaid: boolean
   is_recurring?: boolean
   category_id: number
   frequency?: string

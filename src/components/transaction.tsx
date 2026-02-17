@@ -243,16 +243,16 @@ export function Transaction({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <DropdownMenuItem
-                          onClick={isLastMonth ? undefined : handlePrepay}
-                          disabled={isPrepaying || isLastMonth}
+                          onClick={isLastMonth || transaction.is_prepaid ? undefined : handlePrepay}
+                          disabled={isPrepaying || isLastMonth || transaction.is_prepaid}
                         >
                           <CreditCard className="h-4 w-4" />
                           {isPrepaying ? 'Prepaying...' : 'Prepay'}
                         </DropdownMenuItem>
                       </TooltipTrigger>
-                      {isLastMonth && (
+                      {(isLastMonth || transaction.is_prepaid) && (
                         <TooltipContent>
-                          <p>Cannot prepay — this is the last month</p>
+                          <p>{transaction.is_prepaid ? 'Already prepaid' : 'Cannot prepay — this is the last month'}</p>
                         </TooltipContent>
                       )}
                     </Tooltip>
