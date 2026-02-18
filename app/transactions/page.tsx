@@ -2,10 +2,10 @@
 
 import { Card } from '@/components/ui/card'
 import { useTransactions } from '@/queries/transactions/useTransactions'
-import { Transaction } from '@/components/transaction'
 import { useFilters } from '@/hooks/useFilters'
 import { Filters } from './components/filters'
 import { useCategories } from '@/queries/categories/useCategories'
+import { TransactionsTable } from './components/transactions-table'
 
 export default function Transactions() {
   const { filters } = useFilters()
@@ -31,16 +31,7 @@ export default function Transactions() {
         {isLoading || isLoadingCategories ? (
           '...Loading'
         ) : (
-          <div className="space-y-6">
-            {transactions.map((transaction, index) => (
-              <Transaction
-                key={`${transaction.id}-${index}-${transaction.amount}`}
-                categories={categories}
-                transaction={transaction}
-                index={index}
-              />
-            ))}
-          </div>
+          <TransactionsTable transactions={transactions} categories={categories} />
         )}
       </Card>
     </div>
