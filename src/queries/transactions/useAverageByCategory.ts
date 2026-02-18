@@ -1,4 +1,4 @@
-import { API_V2_BASE_URL } from '@/constants'
+import { BFF_BASE_URL } from '@/constants'
 import api from '@/utils/api'
 import { useQuery } from '@tanstack/react-query'
 
@@ -21,7 +21,7 @@ export const useAverageByCategory = () => {
     queryFn: () =>
       api
         .get<AverageByCategoryResponse>(
-          `${API_V2_BASE_URL}/transactions/average/by-category`
+          `${BFF_BASE_URL}/transactions/average/by-category`
         )
         .then((res) => res.data.averageByCategory),
     refetchOnWindowFocus: false,
