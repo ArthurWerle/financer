@@ -30,6 +30,7 @@ import {
   UpdateTransactionData,
 } from '@/queries/transactions/updateTransaction'
 import { humanReadableDate } from '@/utils/format-date'
+import { getLeftPayments } from '@/utils/get-left-payments'
 import {
   Table,
   TableBody,
@@ -421,6 +422,21 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
               {row.original.type}
             </span>
           </div>
+        )
+      },
+    },
+    {
+      id: 'payments_left',
+      header: 'Payments left',
+      cell: ({ row }) => {
+        if (!row.original.is_recurring) return <span className="text-gray-300">—</span>
+        return (
+          <span className="text-sm text-gray-600">
+            {getLeftPayments(
+              row.original.end_date,
+              row.original.frequency as 'daily' | 'weekly' | 'monthly' | 'yearly'
+            )}
+          </span>
         )
       },
     },
