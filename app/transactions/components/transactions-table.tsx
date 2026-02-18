@@ -348,15 +348,6 @@ function ActionsCell({
 function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
   return [
     {
-      accessorKey: 'date',
-      header: 'Date',
-      cell: ({ row }) => (
-        <span className="text-sm text-gray-600 whitespace-nowrap">
-          {humanReadableDate(row.original.date)}
-        </span>
-      ),
-    },
-    {
       accessorKey: 'description',
       header: 'Description',
       cell: ({ row }) => (
@@ -375,6 +366,27 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
             </Link>
           )}
         </div>
+      ),
+    },
+    {
+      accessorKey: 'amount',
+      header: 'Amount',
+      cell: ({ row }) => (
+        <span className="font-medium whitespace-nowrap">
+          {new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+          }).format(row.original.amount)}
+        </span>
+      ),
+    },
+    {
+      accessorKey: 'date',
+      header: 'Date',
+      cell: ({ row }) => (
+        <span className="text-sm text-gray-600 whitespace-nowrap">
+          {row.original.date ? humanReadableDate(row.original.date) : '—'}
+        </span>
       ),
     },
     {
@@ -411,18 +423,6 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
           </div>
         )
       },
-    },
-    {
-      accessorKey: 'amount',
-      header: 'Amount',
-      cell: ({ row }) => (
-        <span className="font-medium whitespace-nowrap">
-          {new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-          }).format(row.original.amount)}
-        </span>
-      ),
     },
     {
       id: 'actions',
