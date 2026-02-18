@@ -17,6 +17,7 @@ export default function Transactions() {
     filters: {
       ...filters,
       category: filters.category ? filters.category.split(',') : undefined,
+      query: filters.query,
     },
   })
 

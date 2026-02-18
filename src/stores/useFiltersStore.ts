@@ -3,6 +3,7 @@ import { create } from 'zustand'
 type Filters = {
   category?: string
   currentMonth?: string
+  query?: string
 }
 
 type FiltersState = {
