@@ -8,5 +8,6 @@ const baseURL =
 const BFF_PORT = process.env.NEXT_PUBLIC_BFF_PORT || '8082'
 
 export const BFF_BASE_URL = `${baseURL}:${BFF_PORT}/api/bff` as const
+export const API_V2_BASE_URL = `${baseURL}:${BFF_PORT}/api/v2` as const
 
 export const TYPES = [TransactionType.Income, TransactionType.Expense]
