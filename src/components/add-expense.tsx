@@ -141,7 +141,27 @@ export const AddExpense = () => {
   }
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(open) => {
+        if (open) {
+          const now = new Date()
+          setFormData({
+            amount: undefined,
+            categoryId: undefined,
+            typeId: undefined,
+            description: '',
+            date: now,
+            frequency: undefined,
+            startDate: now,
+            installments: undefined,
+            endDate: undefined,
+            lastOccurrence: undefined,
+          })
+        }
+        setIsDialogOpen(open)
+      }}
+    >
       <DialogTrigger asChild>
         <Button
           variant="default"

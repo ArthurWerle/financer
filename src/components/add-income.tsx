@@ -121,7 +121,20 @@ export const AddIncome = () => {
   }
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(open) => {
+        if (open) {
+          setFormData({
+            amount: undefined,
+            category_id: undefined,
+            description: '',
+            date: new Date(),
+          })
+        }
+        setIsDialogOpen(open)
+      }}
+    >
       <DialogTrigger asChild>
         <Button
           variant="secondary"
