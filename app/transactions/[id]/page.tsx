@@ -259,6 +259,12 @@ export default function TransactionDetailPage({
               </p>
             </div>
           )}
+          {transaction.is_recurring && transaction.total_paid !== undefined && (
+            <div>
+              <p className="text-gray-500">Total paid</p>
+              <p className="font-medium">{formatCurrency(transaction.total_paid)}</p>
+            </div>
+          )}
           {transaction.start_date && (
             <div>
               <p className="text-gray-500">Start date</p>

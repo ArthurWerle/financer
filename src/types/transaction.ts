@@ -13,6 +13,7 @@ export interface Transaction {
   start_date?: string
   prepaid_from_id?: number
   end_date?: string
+  total_paid?: number
   created_at: string
   updated_at: string
 }
