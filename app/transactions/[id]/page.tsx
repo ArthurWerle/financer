@@ -14,6 +14,7 @@ import {
   Pencil,
   Trash2,
   CreditCard,
+  CircleCheck,
 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -54,6 +55,7 @@ import {
   updateTransaction,
   UpdateTransactionData,
 } from '@/queries/transactions/updateTransaction'
+import { endTransaction } from '@/queries/transactions/endTransaction'
 import { humanReadableDate } from '@/utils/format-date'
 import { getLeftPayments } from '@/utils/get-left-payments'
 
@@ -70,6 +72,10 @@ export default function TransactionDetailPage({
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [datePickerOpen, setDatePickerOpen] = useState(false)
+  const [isMarkFinishedOpen, setIsMarkFinishedOpen] = useState(false)
+  const [isMarkingFinished, setIsMarkingFinished] = useState(false)
+  const [finishedDatePickerOpen, setFinishedDatePickerOpen] = useState(false)
+  const [finishedDate, setFinishedDate] = useState<Date>(new Date())
 
   const { data: transaction, isLoading, isError } = useTransaction(id)
   const { data: categories = [] } = useCategories()
@@ -80,6 +86,31 @@ export default function TransactionDetailPage({
     const end = new Date(transaction.end_date)
     return now.getFullYear() === end.getFullYear() && now.getMonth() === end.getMonth()
   })()
+
+  const shouldShowMarkFinished = (() => {
+    if (!transaction?.is_recurring) return false
+    if (!transaction.end_date) return true
+    const now = new Date()
+    const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+    return new Date(transaction.end_date) < oneMonthAgo
+  })()
+
+  const handleMarkFinished = async () => {
+    if (!transaction) return
+    setIsMarkingFinished(true)
+    await endTransaction(transaction.id, finishedDate.toISOString())
+      .then(() => {
+        toast.success('Transaction marked as finished')
+        queryClient.invalidateQueries()
+        setIsMarkFinishedOpen(false)
+      })
+      .catch((error) => {
+        toast.error(`ERROR: ${error?.message || 'Error marking transaction as finished'}`)
+      })
+      .finally(() => {
+        setIsMarkingFinished(false)
+      })
+  }
 
   const categoryName = categories.find(
     (c) => c.id === transaction?.category_id
@@ -326,6 +357,18 @@ export default function TransactionDetailPage({
               </Tooltip>
             </TooltipProvider>
           )}
+          {shouldShowMarkFinished && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFinishedDate(new Date())
+                setIsMarkFinishedOpen(true)
+              }}
+            >
+              <CircleCheck className="h-4 w-4 mr-2" />
+              Mark as Finished
+            </Button>
+          )}
           <Button
             variant="destructive"
             onClick={handleDelete}
@@ -336,6 +379,50 @@ export default function TransactionDetailPage({
           </Button>
         </div>
       </Card>
+
+      <Dialog open={isMarkFinishedOpen} onOpenChange={setIsMarkFinishedOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Mark as Finished</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid gap-2">
+              <Label>End date</Label>
+              <Popover open={finishedDatePickerOpen} onOpenChange={setFinishedDatePickerOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="justify-start text-left font-normal"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {finishedDate ? format(finishedDate, 'PPP') : 'Pick a date'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={finishedDate}
+                    onSelect={(date) => {
+                      if (date) {
+                        setFinishedDate(date)
+                        setFinishedDatePickerOpen(false)
+                      }
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <Button
+              className="w-full"
+              onClick={handleMarkFinished}
+              disabled={isMarkingFinished}
+            >
+              {isMarkingFinished ? 'Saving...' : 'Confirm'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent className="sm:max-w-[425px]">
