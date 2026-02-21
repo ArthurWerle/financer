@@ -10,29 +10,36 @@ import { useCategories } from "@/queries/categories/useCategories"
 import { Category } from "@/types/category"
 
 export function Filters() {
-  const { setUrl, filters } = useFilters()
+  const { setUrl, setMultipleUrl, filters } = useFilters()
   const { data: categories = [] } = useCategories()
   const [searchValue, setSearchValue] = useState(filters.query ?? '')
+  const [localDateRange, setLocalDateRange] = useState<DateRange | undefined>(() =>
+    filters.startDate
+      ? {
+          from: parseISO(filters.startDate),
+          to: filters.endDate ? parseISO(filters.endDate) : undefined,
+        }
+      : undefined
+  )
 
   const applySearch = () => {
     setUrl('query', searchValue.trim() || null)
   }
 
-  const dateRange: DateRange | undefined = filters.startDate
-    ? {
-        from: parseISO(filters.startDate),
-        to: filters.endDate ? parseISO(filters.endDate) : undefined,
-      }
-    : undefined
-
   const handleDateRangeChange = (range: DateRange | undefined) => {
+    setLocalDateRange(range)
+
     if (!range?.from) {
-      setUrl('startDate', null)
-      setUrl('endDate', null)
+      setMultipleUrl({ startDate: null, endDate: null })
       return
     }
-    setUrl('startDate', format(range.from, 'yyyy-MM-dd'))
-    setUrl('endDate', range.to ? format(range.to, 'yyyy-MM-dd') : null)
+
+    if (range.to) {
+      setMultipleUrl({
+        startDate: format(range.from, 'yyyy-MM-dd'),
+        endDate: format(range.to, 'yyyy-MM-dd'),
+      })
+    }
   }
 
   return (
@@ -61,7 +68,7 @@ export function Filters() {
         />
       </div>
       <div>
-        <DatePickerWithRange selected={dateRange} onSelect={handleDateRangeChange} />
+        <DatePickerWithRange selected={localDateRange} onSelect={handleDateRangeChange} />
       </div>
       <div>
         <Input
