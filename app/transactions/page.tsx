@@ -20,6 +20,7 @@ export default function Transactions() {
       query: filters.query,
       start_date: filters.startDate,
       end_date: filters.endDate,
+      type: filters.type ?? 'expense',
     },
   })
 

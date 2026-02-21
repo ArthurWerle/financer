@@ -8,6 +8,7 @@ interface UseFiltersReturn {
     startDate?: string
     endDate?: string
     query?: string
+    type?: string
   }
   setUrl: (key: string, value: string | null) => void
   setMultipleUrl: (updates: Record<string, string | null>) => void

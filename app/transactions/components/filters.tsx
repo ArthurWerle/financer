@@ -42,8 +42,26 @@ export function Filters() {
     }
   }
 
+  const activeType = filters.type ?? 'expense'
+
   return (
     <div className="flex gap-2 mb-10 flex-wrap">
+      <div className="flex rounded-lg border border-input overflow-hidden">
+        <Button
+          onClick={() => setUrl('type', 'expense')}
+          variant="ghost"
+          className={`rounded-none ${activeType === 'expense' ? 'bg-muted font-semibold' : ''}`}
+        >
+          Expense
+        </Button>
+        <Button
+          onClick={() => setUrl('type', 'income')}
+          variant="ghost"
+          className={`rounded-none border-l ${activeType === 'income' ? 'bg-muted font-semibold' : ''}`}
+        >
+          Income
+        </Button>
+      </div>
       <div>
         <Button
           onClick={() => {

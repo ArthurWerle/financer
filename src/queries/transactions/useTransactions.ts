@@ -12,6 +12,7 @@ type UseTransactionsProps = {
     query?: string
     start_date?: string
     end_date?: string
+    type?: string
   }
 }
 
@@ -36,6 +37,10 @@ const getFilterParams = (filters: UseTransactionsProps['filters']) => {
 
   if (filters.end_date?.trim()) {
     params.end_date = filters.end_date
+  }
+
+  if (filters.type?.trim()) {
+    params.type = filters.type
   }
 
   return params
