@@ -18,10 +18,19 @@ export default function Transactions() {
       ...filters,
       category: filters.category ? filters.category.split(',') : undefined,
       query: filters.query,
+      startDate: filters.startDate,
+      endDate: filters.endDate,
     },
   })
 
   const transactions = data?.transactions || []
+  const count = data?.count ?? 0
+  const sum = data?.sum ?? 0
+
+  const formattedSum = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(sum)
 
   return (
     <div className="p-8">
@@ -31,7 +40,12 @@ export default function Transactions() {
         {isLoading || isLoadingCategories ? (
           '...Loading'
         ) : (
-          <TransactionsTable transactions={transactions} categories={categories} />
+          <>
+            <p className="text-sm text-gray-500 mb-3">
+              Showing {count} transaction{count !== 1 ? 's' : ''} · Total: {formattedSum}
+            </p>
+            <TransactionsTable transactions={transactions} categories={categories} />
+          </>
         )}
       </Card>
     </div>

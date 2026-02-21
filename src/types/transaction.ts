@@ -23,5 +23,6 @@ export interface Transaction {
 
 export interface TransactionResponse {
   count: number
+  sum: number
   transactions: Transaction[]
 }
