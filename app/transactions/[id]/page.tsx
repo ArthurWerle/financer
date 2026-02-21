@@ -302,6 +302,18 @@ export default function TransactionDetailPage({
               <p className="font-medium">{formatCurrency(transaction.total_left)}</p>
             </div>
           )}
+          {transaction.category_month_percent !== undefined && (
+            <div>
+              <p className="text-gray-500">% of category this month</p>
+              <p className="font-medium">{transaction.category_month_percent.toFixed(1)}%</p>
+            </div>
+          )}
+          {transaction.total_month_percent !== undefined && (
+            <div>
+              <p className="text-gray-500">% of total expenses this month</p>
+              <p className="font-medium">{transaction.total_month_percent.toFixed(1)}%</p>
+            </div>
+          )}
           {transaction.start_date && (
             <div>
               <p className="text-gray-500">Start date</p>

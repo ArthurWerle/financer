@@ -15,6 +15,8 @@ export interface Transaction {
   end_date?: string
   total_paid?: number
   total_left?: number
+  category_month_percent?: number
+  total_month_percent?: number
   created_at: string
   updated_at: string
 }
