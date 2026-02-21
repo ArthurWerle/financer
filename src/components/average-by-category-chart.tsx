@@ -68,7 +68,10 @@ type Props = {
 }
 
 export function AverageByCategoryChart({ startDate, endDate }: Props) {
-  const { data, isLoading } = useAverageByCategory({ startDate, endDate })
+  const { data, isLoading } = useAverageByCategory({
+    start_date: startDate,
+    end_date: endDate,
+  })
 
   const sorted = data ? [...data].sort((a, b) => b.average - a.average) : []
 

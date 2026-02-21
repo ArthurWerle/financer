@@ -13,7 +13,8 @@
  */
 export function getLeftPayments(
   endDateString: string | undefined,
-  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'monthly'
+  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'monthly',
+  short: boolean = false
 ) {
   if (!endDateString) return 'No end date'
 
@@ -43,6 +44,9 @@ export function getLeftPayments(
 
       const totalMonths =
         (endYear - currentYear) * 12 + (endMonth - currentMonth)
+
+      if (short) return totalMonths
+
       return `${totalMonths} payments left`
     case 'yearly':
       return `${Math.ceil(diffDays / 365)} payments left`

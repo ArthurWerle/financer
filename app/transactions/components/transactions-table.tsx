@@ -294,7 +294,9 @@ function ActionsCell({
                       className="justify-start text-left font-normal"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {editData.date ? format(editData.date, 'PPP') : 'Pick a date'}
+                      {editData.date
+                        ? format(editData.date, 'PPP')
+                        : 'Pick a date'}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
@@ -353,16 +355,25 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
       accessorKey: 'description',
       header: 'Description',
       cell: ({ row }) => (
-        <div>
-          <Link
-            href={`/transactions/${row.original.id}`}
-            className="font-medium hover:underline"
-          >
-            {row.original.description}
-          </Link>
+        <div className="flex items-center gap-2 max-w-[220px]">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href={`/transactions/${row.original.id}`}
+                  className="font-medium hover:underline truncate block"
+                >
+                  {row.original.description}
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{row.original.description}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           {row.original.prepaid_from_id && (
-            <Link href={`/transactions/${row.original.prepaid_from_id}`}>
-              <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium hover:bg-blue-200">
+            <Link href={`/transactions/${row.original.prepaid_from_id}`} className="shrink-0">
+              <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium hover:bg-blue-200">
                 Prepaid
               </span>
             </Link>
@@ -398,10 +409,22 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
         const category = categories.find(
           (c) => c.id === row.original.category_id
         )
+        const name = category?.name ?? '—'
         return (
-          <span className="text-sm text-gray-500">
-            {category?.name ?? '—'}
-          </span>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-sm text-gray-500 max-w-[120px] truncate block">
+                  {name}
+                </span>
+              </TooltipTrigger>
+              {category && (
+                <TooltipContent>
+                  <p>{name}</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         )
       },
     },
@@ -433,12 +456,18 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
       id: 'payments_left',
       header: 'Payments left',
       cell: ({ row }) => {
-        if (!row.original.is_recurring) return <span className="text-gray-300">—</span>
+        if (!row.original.is_recurring)
+          return <span className="text-gray-300">—</span>
         return (
           <span className="text-sm text-gray-600">
             {getLeftPayments(
               row.original.end_date,
-              row.original.frequency as 'daily' | 'weekly' | 'monthly' | 'yearly'
+              row.original.frequency as
+                | 'daily'
+                | 'weekly'
+                | 'monthly'
+                | 'yearly',
+              true
             )}
           </span>
         )
