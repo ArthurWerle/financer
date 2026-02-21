@@ -6,6 +6,8 @@ export const humanReadableDate = (date: string) => {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
     timeZone: 'America/Sao_Paulo',
   }).format(parsed)
 }

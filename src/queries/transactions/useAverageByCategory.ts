@@ -15,13 +15,19 @@ type AverageByCategoryResponse = {
 
 export const KEY = 'transactions/average/by-category'
 
-export const useAverageByCategory = () => {
+type Params = {
+  startDate?: string
+  endDate?: string
+}
+
+export const useAverageByCategory = (params?: Params) => {
   return useQuery({
-    queryKey: [KEY],
+    queryKey: [KEY, params],
     queryFn: () =>
       api
         .get<AverageByCategoryResponse>(
-          `${BFF_BASE_URL}/transactions/average/by-category`
+          `${BFF_BASE_URL}/transactions/average/by-category`,
+          { params }
         )
         .then((res) => res.data.averageByCategory),
     refetchOnWindowFocus: false,

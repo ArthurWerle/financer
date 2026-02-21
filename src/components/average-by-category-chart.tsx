@@ -55,8 +55,13 @@ const CustomTooltip = ({
   return null
 }
 
-export function AverageByCategoryChart() {
-  const { data, isLoading } = useAverageByCategory()
+type Props = {
+  startDate?: string
+  endDate?: string
+}
+
+export function AverageByCategoryChart({ startDate, endDate }: Props) {
+  const { data, isLoading } = useAverageByCategory({ startDate, endDate })
 
   const sorted = data
     ? [...data].sort((a, b) => b.average - a.average)
