@@ -18,8 +18,8 @@ export default function Transactions() {
       ...filters,
       category: filters.category ? filters.category.split(',') : undefined,
       query: filters.query,
-      startDate: filters.startDate,
-      endDate: filters.endDate,
+      start_date: filters.startDate,
+      end_date: filters.endDate,
     },
   })
 
@@ -42,9 +42,13 @@ export default function Transactions() {
         ) : (
           <>
             <p className="text-sm text-gray-500 mb-3">
-              Showing {count} transaction{count !== 1 ? 's' : ''} · Total: {formattedSum}
+              Showing {count} transaction{count !== 1 ? 's' : ''} · Total:{' '}
+              {formattedSum}
             </p>
-            <TransactionsTable transactions={transactions} categories={categories} />
+            <TransactionsTable
+              transactions={transactions}
+              categories={categories}
+            />
           </>
         )}
       </Card>

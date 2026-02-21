@@ -10,8 +10,8 @@ type UseTransactionsProps = {
     category?: string[]
     currentMonth?: string
     query?: string
-    startDate?: string
-    endDate?: string
+    start_date?: string
+    end_date?: string
   }
 }
 
@@ -30,12 +30,12 @@ const getFilterParams = (filters: UseTransactionsProps['filters']) => {
     params.query = filters.query.trim()
   }
 
-  if (filters.startDate?.trim()) {
-    params.startDate = filters.startDate
+  if (filters.start_date?.trim()) {
+    params.start_date = filters.start_date
   }
 
-  if (filters.endDate?.trim()) {
-    params.endDate = filters.endDate
+  if (filters.end_date?.trim()) {
+    params.end_date = filters.end_date
   }
 
   return params
