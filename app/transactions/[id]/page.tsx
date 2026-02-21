@@ -84,14 +84,21 @@ export default function TransactionDetailPage({
     if (!transaction?.end_date) return false
     const now = new Date()
     const end = new Date(transaction.end_date)
-    return now.getFullYear() === end.getFullYear() && now.getMonth() === end.getMonth()
+    return (
+      now.getFullYear() === end.getFullYear() &&
+      now.getMonth() === end.getMonth()
+    )
   })()
 
   const shouldShowMarkFinished = (() => {
     if (!transaction?.is_recurring) return false
     if (!transaction.end_date) return true
     const now = new Date()
-    const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    )
     return new Date(transaction.end_date) < oneMonthAgo
   })()
 
@@ -105,7 +112,9 @@ export default function TransactionDetailPage({
         setIsMarkFinishedOpen(false)
       })
       .catch((error) => {
-        toast.error(`ERROR: ${error?.message || 'Error marking transaction as finished'}`)
+        toast.error(
+          `ERROR: ${error?.message || 'Error marking transaction as finished'}`
+        )
       })
       .finally(() => {
         setIsMarkingFinished(false)
@@ -214,7 +223,11 @@ export default function TransactionDetailPage({
     return (
       <div className="p-8">
         <p className="text-red-500">Error loading transaction.</p>
-        <Button variant="outline" className="mt-4" onClick={() => router.back()}>
+        <Button
+          variant="outline"
+          className="mt-4"
+          onClick={() => router.back()}
+        >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Go back
         </Button>
@@ -271,7 +284,9 @@ export default function TransactionDetailPage({
           </div>
           <div>
             <p className="text-gray-500">Date</p>
-            <p className="font-medium">{humanReadableDate(transaction.date)}</p>
+            <p className="font-medium">
+              {humanReadableDate(transaction.date, true)}
+            </p>
           </div>
           {transaction.frequency && (
             <div>
@@ -285,7 +300,11 @@ export default function TransactionDetailPage({
               <p className="font-medium">
                 {getLeftPayments(
                   transaction.end_date,
-                  transaction.frequency as 'daily' | 'weekly' | 'monthly' | 'yearly'
+                  transaction.frequency as
+                    | 'daily'
+                    | 'weekly'
+                    | 'monthly'
+                    | 'yearly'
                 )}
               </p>
             </div>
@@ -293,25 +312,33 @@ export default function TransactionDetailPage({
           {transaction.is_recurring && transaction.total_paid !== undefined && (
             <div>
               <p className="text-gray-500">Total paid</p>
-              <p className="font-medium">{formatCurrency(transaction.total_paid)}</p>
+              <p className="font-medium">
+                {formatCurrency(transaction.total_paid)}
+              </p>
             </div>
           )}
           {transaction.is_recurring && transaction.total_left !== undefined && (
             <div>
               <p className="text-gray-500">Total left</p>
-              <p className="font-medium">{formatCurrency(transaction.total_left)}</p>
+              <p className="font-medium">
+                {formatCurrency(transaction.total_left)}
+              </p>
             </div>
           )}
           {transaction.category_month_percent !== undefined && (
             <div>
               <p className="text-gray-500">% of category this month</p>
-              <p className="font-medium">{transaction.category_month_percent.toFixed(1)}%</p>
+              <p className="font-medium">
+                {transaction.category_month_percent.toFixed(1)}%
+              </p>
             </div>
           )}
           {transaction.total_month_percent !== undefined && (
             <div>
               <p className="text-gray-500">% of total expenses this month</p>
-              <p className="font-medium">{transaction.total_month_percent.toFixed(1)}%</p>
+              <p className="font-medium">
+                {transaction.total_month_percent.toFixed(1)}%
+              </p>
             </div>
           )}
           {transaction.start_date && (
@@ -333,7 +360,7 @@ export default function TransactionDetailPage({
           <div>
             <p className="text-gray-500">Created at</p>
             <p className="font-medium">
-              {humanReadableDate(transaction.created_at)}
+              {humanReadableDate(transaction.created_at, true)}
             </p>
           </div>
           <div>
@@ -345,10 +372,7 @@ export default function TransactionDetailPage({
         </div>
 
         <div className="flex gap-2 pt-2">
-          <Button
-            variant="outline"
-            onClick={handleEditOpen}
-          >
+          <Button variant="outline" onClick={handleEditOpen}>
             <Pencil className="h-4 w-4 mr-2" />
             Edit
           </Button>
@@ -360,7 +384,9 @@ export default function TransactionDetailPage({
                     <Button
                       variant="outline"
                       onClick={handlePrepay}
-                      disabled={isPrepaying || isLastMonth || transaction.is_prepaid}
+                      disabled={
+                        isPrepaying || isLastMonth || transaction.is_prepaid
+                      }
                     >
                       <CreditCard className="h-4 w-4 mr-2" />
                       {isPrepaying ? 'Prepaying...' : 'Prepay'}
@@ -369,7 +395,11 @@ export default function TransactionDetailPage({
                 </TooltipTrigger>
                 {(isLastMonth || transaction.is_prepaid) && (
                   <TooltipContent>
-                    <p>{transaction.is_prepaid ? 'Already prepaid' : 'Cannot prepay — this is the last month'}</p>
+                    <p>
+                      {transaction.is_prepaid
+                        ? 'Already prepaid'
+                        : 'Cannot prepay — this is the last month'}
+                    </p>
                   </TooltipContent>
                 )}
               </Tooltip>
@@ -406,7 +436,10 @@ export default function TransactionDetailPage({
           <div className="space-y-4">
             <div className="grid gap-2">
               <Label>End date</Label>
-              <Popover open={finishedDatePickerOpen} onOpenChange={setFinishedDatePickerOpen}>
+              <Popover
+                open={finishedDatePickerOpen}
+                onOpenChange={setFinishedDatePickerOpen}
+              >
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"

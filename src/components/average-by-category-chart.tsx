@@ -11,7 +11,10 @@ import {
   YAxis,
 } from 'recharts'
 import { Card, CardContent } from '@/components/ui/card'
-import { useAverageByCategory, CategoryAverage } from '@/queries/transactions/useAverageByCategory'
+import {
+  useAverageByCategory,
+  CategoryAverage,
+} from '@/queries/transactions/useAverageByCategory'
 import { numberToCurrency } from '@/utils/number-to-currency'
 
 const COLORS = [
@@ -42,11 +45,15 @@ const CustomTooltip = ({
           <p className="font-bold text-base">{data.category_name}</p>
           <p>
             <span className="text-gray-500">Monthly avg: </span>
-            <span className="font-medium">{numberToCurrency(data.average)}</span>
+            <span className="font-medium">
+              {numberToCurrency(data.average)}
+            </span>
           </p>
           <p>
             <span className="text-gray-500">Total spent: </span>
-            <span className="font-medium">{numberToCurrency(data.total_spent)}</span>
+            <span className="font-medium">
+              {numberToCurrency(data.total_spent)}
+            </span>
           </p>
         </CardContent>
       </Card>
@@ -63,9 +70,7 @@ type Props = {
 export function AverageByCategoryChart({ startDate, endDate }: Props) {
   const { data, isLoading } = useAverageByCategory({ startDate, endDate })
 
-  const sorted = data
-    ? [...data].sort((a, b) => b.average - a.average)
-    : []
+  const sorted = data ? [...data].sort((a, b) => b.average - a.average) : []
 
   return (
     <div>
@@ -79,7 +84,7 @@ export function AverageByCategoryChart({ startDate, endDate }: Props) {
           <BarChart
             data={sorted}
             layout="vertical"
-            margin={{ top: 0, right: 24, left: 140, bottom: 0 }}
+            margin={{ top: 0, right: 24, left: 100, bottom: 0 }}
           >
             <CartesianGrid strokeDasharray="3 3" horizontal={false} />
             <XAxis

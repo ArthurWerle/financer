@@ -1,4 +1,4 @@
-export const humanReadableDate = (date: string) => {
+export const humanReadableDate = (date: string, showHours: boolean = false) => {
   const parsed = new Date(date)
   if (isNaN(parsed.getTime())) return 'Invalid date'
   return new Intl.DateTimeFormat('en-US', {
@@ -6,8 +6,8 @@ export const humanReadableDate = (date: string) => {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    hour: showHours ? '2-digit' : undefined,
+    minute: showHours ? '2-digit' : undefined,
     timeZone: 'America/Sao_Paulo',
   }).format(parsed)
 }

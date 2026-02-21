@@ -16,6 +16,7 @@ import {
   CreditCard,
   MoreVertical,
   Pencil,
+  RefreshCw,
   Trash2,
 } from 'lucide-react'
 import { format } from 'date-fns'
@@ -421,6 +422,9 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
             >
               {row.original.type}
             </span>
+            {row.original.is_recurring && (
+              <RefreshCw className="h-3.5 w-3.5 text-gray-400" />
+            )}
           </div>
         )
       },
