@@ -4,10 +4,15 @@ import { useQuery } from "@tanstack/react-query"
 
 export const KEY = '/categories-monthly-expense'
 
-export const useCategoriesMonthyExpense = () => {
+type Params = {
+  month?: number
+  year?: number
+}
+
+export const useCategoriesMonthyExpense = (params?: Params) => {
   return useQuery({
-    queryKey: [KEY],
-    queryFn: () => api.get<Record<string, number>>(`${BFF_BASE_URL}/monthly-expenses-by-category`).then((res) => res.data),
+    queryKey: [KEY, params],
+    queryFn: () => api.get<Record<string, number>>(`${BFF_BASE_URL}/monthly-expenses-by-category`, { params }).then((res) => res.data),
     refetchOnWindowFocus: false
   })
 }
