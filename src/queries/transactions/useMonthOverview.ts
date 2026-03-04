@@ -17,10 +17,15 @@ type MonthOverviewResponse = {
   }
 }
 
-export const useMonthOverview = () => {
+type Params = {
+  month?: number
+  year?: number
+}
+
+export const useMonthOverview = (params?: Params) => {
   return useQuery({
-    queryKey: [KEY],
-    queryFn: () => api.get<MonthOverviewResponse>(`${BFF_BASE_URL}/overview/by-month`).then((res) => res.data),
+    queryKey: [KEY, params],
+    queryFn: () => api.get<MonthOverviewResponse>(`${BFF_BASE_URL}/overview/by-month`, { params }).then((res) => res.data),
     refetchOnWindowFocus: false
   })
 }
