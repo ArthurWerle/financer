@@ -72,6 +72,7 @@ export default function TransactionDetailPage({
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [datePickerOpen, setDatePickerOpen] = useState(false)
+  const [endDatePickerOpen, setEndDatePickerOpen] = useState(false)
   const [isMarkFinishedOpen, setIsMarkFinishedOpen] = useState(false)
   const [isMarkingFinished, setIsMarkingFinished] = useState(false)
   const [finishedDatePickerOpen, setFinishedDatePickerOpen] = useState(false)
@@ -133,6 +134,7 @@ export default function TransactionDetailPage({
       category_id: transaction.category_id,
       date: new Date(transaction.date),
       frequency: transaction.frequency,
+      end_date: transaction.end_date ? new Date(transaction.end_date) : undefined,
     })
     setIsEditOpen(true)
   }
@@ -143,6 +145,7 @@ export default function TransactionDetailPage({
     category_id: 0,
     date: new Date(),
     frequency: undefined as string | undefined,
+    end_date: undefined as Date | undefined,
   })
 
   const handleEditSubmit = async (e: React.FormEvent) => {
@@ -156,6 +159,7 @@ export default function TransactionDetailPage({
       category_id: editData.category_id,
       date: editData.date.toISOString(),
       frequency: editData.frequency,
+      end_date: editData.end_date?.toISOString(),
     }
 
     await updateTransaction(transaction.id, data)
@@ -589,6 +593,34 @@ export default function TransactionDetailPage({
                   </SelectContent>
                 </Select>
               </div>
+
+              {transaction.is_recurring && (
+                <div className="grid gap-2">
+                  <Label>End Date</Label>
+                  <Popover open={endDatePickerOpen} onOpenChange={setEndDatePickerOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="justify-start text-left font-normal"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {editData.end_date ? format(editData.end_date, 'PPP') : 'No end date'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={editData.end_date}
+                        onSelect={(date) => {
+                          setEditData({ ...editData, end_date: date ?? undefined })
+                          setEndDatePickerOpen(false)
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
             </div>
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
