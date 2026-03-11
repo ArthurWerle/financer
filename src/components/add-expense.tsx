@@ -113,7 +113,7 @@ export const AddExpense = () => {
       type: TransactionType.Expense,
       date: formData.date.toISOString(),
       frequency: formData.frequency,
-      end_date: endDate?.toISOString(),
+      end_date: endDate?.toISOString().split('T')[0],
     }
 
     await addTransactionV2(transactionV2)
