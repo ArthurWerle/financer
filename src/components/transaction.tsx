@@ -115,7 +115,7 @@ export function Transaction({
       category_id: editData.category_id,
       date: editData.date.toISOString(),
       frequency: editData.frequency,
-      end_date: editData.end_date?.toISOString(),
+      end_date: editData.end_date ? format(editData.end_date, 'yyyy-MM-dd') : undefined,
     }
 
     await updateTransaction(transaction.id, data)
