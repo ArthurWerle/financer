@@ -14,6 +14,8 @@ type UseTransactionsProps = {
     end_date?: string
     type?: string
   }
+  limit: number
+  offset: number
 }
 
 const getFilterParams = (filters: UseTransactionsProps['filters']) => {
@@ -46,13 +48,13 @@ const getFilterParams = (filters: UseTransactionsProps['filters']) => {
   return params
 }
 
-export const useTransactions = ({ filters }: UseTransactionsProps) => {
+export const useTransactions = ({ filters, limit, offset }: UseTransactionsProps) => {
   return useQuery<TransactionResponse>({
-    queryKey: [KEY, JSON.stringify(filters)],
+    queryKey: [KEY, JSON.stringify(filters), offset],
     queryFn: () => {
       return api
         .get<TransactionResponse>(`${BFF_BASE_URL}/transactions`, {
-          params: getFilterParams(filters),
+          params: { ...getFilterParams(filters), limit, offset },
         })
         .then((res) => res.data)
     },
