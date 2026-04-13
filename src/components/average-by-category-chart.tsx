@@ -15,6 +15,7 @@ import {
   useAverageByCategory,
   CategoryAverage,
 } from '@/queries/transactions/useAverageByCategory'
+import { useTransactions } from '@/queries/transactions/useTransactions'
 import { numberToCurrency } from '@/utils/number-to-currency'
 
 const COLORS = [
@@ -30,12 +31,14 @@ const COLORS = [
   '#ef4444',
 ]
 
+type CategoryAverageWithPercent = CategoryAverage & { incomePercent: number }
+
 const CustomTooltip = ({
   active,
   payload,
 }: {
   active?: boolean
-  payload?: { payload: CategoryAverage }[]
+  payload?: { payload: CategoryAverageWithPercent }[]
 }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload
@@ -55,6 +58,12 @@ const CustomTooltip = ({
               {numberToCurrency(data.total_spent)}
             </span>
           </p>
+          {data.incomePercent > 0 && (
+            <p>
+              <span className="text-gray-500">% of income: </span>
+              <span className="font-medium">{data.incomePercent}%</span>
+            </p>
+          )}
         </CardContent>
       </Card>
     )
@@ -73,7 +82,24 @@ export function AverageByCategoryChart({ startDate, endDate }: Props) {
     end_date: endDate,
   })
 
-  const sorted = data ? [...data].sort((a, b) => b.average - a.average) : []
+  const { data: incomeData } = useTransactions({
+    filters: { type: 'income', start_date: startDate, end_date: endDate },
+    limit: 1,
+    offset: 0,
+  })
+  const totalIncome = incomeData?.sum ?? 0
+
+  const sorted: CategoryAverageWithPercent[] = data
+    ? [...data]
+        .sort((a, b) => b.average - a.average)
+        .map((item) => ({
+          ...item,
+          incomePercent:
+            totalIncome > 0
+              ? Number(((item.total_spent / totalIncome) * 100).toFixed(1))
+              : 0,
+        }))
+    : []
 
   return (
     <div>

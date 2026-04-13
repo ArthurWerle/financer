@@ -12,7 +12,7 @@ type Params = {
 
 export const useBiggestTransactions = (params?: Params) => {
   return useQuery<TransactionResponse>({
-    queryKey: [KEY, params],
+    queryKey: [KEY, params?.month, params?.year],
     queryFn: () => {
       return api
         .get<TransactionResponse>(`${BFF_BASE_URL}/transactions/biggest`, { params })

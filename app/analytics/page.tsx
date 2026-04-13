@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { format } from 'date-fns'
 import { DateRange } from 'react-day-picker'
 import { AverageByCategoryChart } from '@/components/average-by-category-chart'
+import { AnalyticsAverages } from '@/components/analytics-averages'
 import { Card } from '@/components/ui/card'
 import { DatePickerWithRange } from '@/components/ui/date-range-picker'
 
@@ -16,6 +17,7 @@ export default function Analytics() {
   return (
     <div className="p-8">
       <h1 className="text-4xl font-bold mb-8">Analytics</h1>
+      <AnalyticsAverages />
       <div className="mb-6">
         <DatePickerWithRange selected={dateRange} onSelect={setDateRange} />
       </div>
