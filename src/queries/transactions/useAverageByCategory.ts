@@ -22,7 +22,7 @@ type Params = {
 
 export const useAverageByCategory = (params?: Params) => {
   return useQuery({
-    queryKey: [KEY, params],
+    queryKey: [KEY, params?.start_date, params?.end_date],
     queryFn: () =>
       api
         .get<AverageByCategoryResponse>(
