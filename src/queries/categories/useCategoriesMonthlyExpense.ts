@@ -12,7 +12,10 @@ type Params = {
 export const useCategoriesMonthyExpense = (params?: Params) => {
   return useQuery({
     queryKey: [KEY, params?.month, params?.year],
-    queryFn: () => api.get<Record<string, number>>(`${BFF_BASE_URL}/monthly-expenses-by-category`, { params }).then((res) => res.data),
+    queryFn: ({ queryKey }) => {
+      const [, month, year] = queryKey
+      return api.get<Record<string, number>>(`${BFF_BASE_URL}/monthly-expenses-by-category`, { params: { month, year } }).then((res) => res.data)
+    },
     refetchOnWindowFocus: false
   })
 }
