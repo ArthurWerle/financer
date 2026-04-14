@@ -13,9 +13,10 @@ type Params = {
 export const useBiggestTransactions = (params?: Params) => {
   return useQuery<TransactionResponse>({
     queryKey: [KEY, params?.month, params?.year],
-    queryFn: () => {
+    queryFn: ({ queryKey }) => {
+      const [, month, year] = queryKey
       return api
-        .get<TransactionResponse>(`${BFF_BASE_URL}/transactions/biggest`, { params })
+        .get<TransactionResponse>(`${BFF_BASE_URL}/transactions/biggest`, { params: { month, year } })
         .then((res) => res.data)
     },
     refetchOnWindowFocus: false,

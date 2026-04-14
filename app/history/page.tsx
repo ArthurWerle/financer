@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
 import { useMonthOverview } from '@/queries/transactions/useMonthOverview'
@@ -63,7 +63,7 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: { name
 }
 
 export default function HistoryPage() {
-  const monthOptions = buildMonthOptions()
+  const monthOptions = useMemo(() => buildMonthOptions(), [])
   const [selected, setSelected] = useState(monthOptions[0])
 
   const params = { month: selected.month, year: selected.year }
