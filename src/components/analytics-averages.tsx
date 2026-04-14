@@ -1,7 +1,7 @@
 'use client'
 
 import { Card } from '@/components/ui/card'
-import { ArrowDownLeft, ArrowUpRight, TrendingUp } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, PiggyBank, TrendingUp } from 'lucide-react'
 import { useAverage } from '@/queries/types/useAverage'
 import { numberToCurrency } from '@/utils/number-to-currency'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -12,30 +12,39 @@ export function AnalyticsAverages() {
   const avgIncome = data?.income?.Average ?? 0
   const avgExpense = data?.expense?.Average ?? 0
   const avgBalance = avgIncome - avgExpense
+  const avgSavedPercent = avgIncome > 0
+    ? ((avgIncome - avgExpense) / avgIncome) * 100
+    : 0
 
   const cards = [
     {
       label: 'Avg Monthly Income',
-      value: avgIncome,
+      displayValue: numberToCurrency(avgIncome),
       icon: <ArrowDownLeft className="h-5 w-5 text-green-400" />,
       valueColor: 'text-gray-900',
     },
     {
       label: 'Avg Monthly Spent',
-      value: avgExpense,
+      displayValue: numberToCurrency(avgExpense),
       icon: <ArrowUpRight className="h-5 w-5 text-red-400" />,
       valueColor: 'text-gray-900',
     },
     {
       label: 'Avg Monthly Balance',
-      value: avgBalance,
+      displayValue: numberToCurrency(avgBalance),
       icon: <TrendingUp className="h-5 w-5 text-blue-400" />,
       valueColor: avgBalance >= 0 ? 'text-green-600' : 'text-red-600',
+    },
+    {
+      label: 'Avg % Saved',
+      displayValue: `${avgSavedPercent.toFixed(1)}%`,
+      icon: <PiggyBank className="h-5 w-5 text-blue-400" />,
+      valueColor: avgSavedPercent >= 0 ? 'text-green-600' : 'text-red-600',
     },
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {cards.map((card) => (
         <Card
           key={card.label}
@@ -47,7 +56,7 @@ export function AnalyticsAverages() {
           ) : (
             <p className={`text-3xl font-bold flex items-center gap-2 ${card.valueColor}`}>
               {card.icon}
-              {numberToCurrency(card.value)}
+              {card.displayValue}
             </p>
           )}
         </Card>
