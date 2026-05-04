@@ -5,6 +5,7 @@ import { format } from 'date-fns'
 import { DateRange } from 'react-day-picker'
 import { AverageByCategoryChart } from '@/components/average-by-category-chart'
 import { AnalyticsAverages } from '@/components/analytics-averages'
+import { CategoryComparisonHistory } from '@/components/category-comparison-history'
 import { Card } from '@/components/ui/card'
 import { DatePickerWithRange } from '@/components/ui/date-range-picker'
 
@@ -24,6 +25,9 @@ export default function Analytics() {
       <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
         <AverageByCategoryChart startDate={startDate} endDate={endDate} />
       </Card>
+      <div className="mt-8">
+        <CategoryComparisonHistory />
+      </div>
     </div>
   )
 }
