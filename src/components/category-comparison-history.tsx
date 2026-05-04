@@ -8,9 +8,23 @@ import {
   Legend,
   Line,
   LineChart,
+  ResponsiveContainer,
   XAxis,
   YAxis,
 } from 'recharts'
+
+const COLORS = [
+  '#3b82f6',
+  '#f97316',
+  '#22c55e',
+  '#eab308',
+  '#14b8a6',
+  '#60a5fa',
+  '#818cf8',
+  '#a78bfa',
+  '#f472b6',
+  '#ef4444',
+]
 import { Card } from '@/components/ui/card'
 import {
   ChartContainer,
@@ -56,9 +70,9 @@ export function CategoryComparisonHistory() {
   })
 
   const chartConfig = Object.fromEntries(
-    (data ?? []).map((cat) => [
+    (data ?? []).map((cat, index) => [
       cat.category_name,
-      { label: cat.category_name, color: cat.color },
+      { label: cat.category_name, color: COLORS[index % COLORS.length] },
     ])
   )
 
@@ -132,34 +146,36 @@ export function CategoryComparisonHistory() {
 
       {!isLoading && !isError && data && data.length > 0 && (
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
-          <LineChart data={mergedData}>
-            <XAxis
-              dataKey="month"
-              stroke="#888888"
-              fontSize={10}
-              tickLine={false}
-              axisLine={false}
-            />
-            <CartesianGrid strokeDasharray="3 3" />
-            <YAxis
-              stroke="#888888"
-              fontSize={10}
-              tickLine={false}
-              axisLine={false}
-            />
-            <ChartTooltip content={<ChartTooltipContent />} />
-            <Legend verticalAlign="top" height={36} />
-            {data.map((cat) => (
-              <Line
-                key={cat.category_id}
-                type="monotone"
-                dataKey={cat.category_name}
-                strokeWidth={2}
-                dot={true}
-                stroke={cat.color}
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={mergedData}>
+              <XAxis
+                dataKey="month"
+                stroke="#888888"
+                fontSize={10}
+                tickLine={false}
+                axisLine={false}
               />
-            ))}
-          </LineChart>
+              <CartesianGrid strokeDasharray="3 3" />
+              <YAxis
+                stroke="#888888"
+                fontSize={10}
+                tickLine={false}
+                axisLine={false}
+              />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Legend verticalAlign="top" height={36} />
+              {data.map((cat, index) => (
+                <Line
+                  key={cat.category_id}
+                  type="monotone"
+                  dataKey={cat.category_name}
+                  strokeWidth={2}
+                  dot={true}
+                  stroke={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
         </ChartContainer>
       )}
     </Card>
