@@ -18,6 +18,9 @@ export default function Analytics() {
   return (
     <div className="p-8">
       <h1 className="text-4xl font-bold mb-8">Analytics</h1>
+      <div className="mb-8">
+        <CategoryComparisonHistory />
+      </div>
       <AnalyticsAverages />
       <div className="mb-6">
         <DatePickerWithRange selected={dateRange} onSelect={setDateRange} />
@@ -25,9 +28,6 @@ export default function Analytics() {
       <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
         <AverageByCategoryChart startDate={startDate} endDate={endDate} />
       </Card>
-      <div className="mt-8">
-        <CategoryComparisonHistory />
-      </div>
     </div>
   )
 }
