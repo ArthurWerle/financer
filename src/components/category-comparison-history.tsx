@@ -8,7 +8,6 @@ import {
   Legend,
   Line,
   LineChart,
-  ResponsiveContainer,
   XAxis,
   YAxis,
 } from 'recharts'
@@ -133,36 +132,34 @@ export function CategoryComparisonHistory() {
 
       {!isLoading && !isError && data && data.length > 0 && (
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={mergedData}>
-              <XAxis
-                dataKey="month"
-                stroke="#888888"
-                fontSize={10}
-                tickLine={false}
-                axisLine={false}
+          <LineChart data={mergedData}>
+            <XAxis
+              dataKey="month"
+              stroke="#888888"
+              fontSize={10}
+              tickLine={false}
+              axisLine={false}
+            />
+            <CartesianGrid strokeDasharray="3 3" />
+            <YAxis
+              stroke="#888888"
+              fontSize={10}
+              tickLine={false}
+              axisLine={false}
+            />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Legend verticalAlign="top" height={36} />
+            {data.map((cat) => (
+              <Line
+                key={cat.category_id}
+                type="monotone"
+                dataKey={cat.category_name}
+                strokeWidth={2}
+                dot={true}
+                stroke={cat.color}
               />
-              <CartesianGrid strokeDasharray="3 3" />
-              <YAxis
-                stroke="#888888"
-                fontSize={10}
-                tickLine={false}
-                axisLine={false}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Legend verticalAlign="top" height={36} />
-              {data.map((cat) => (
-                <Line
-                  key={cat.category_id}
-                  type="monotone"
-                  dataKey={cat.category_name}
-                  strokeWidth={2}
-                  dot={true}
-                  stroke={cat.color}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+            ))}
+          </LineChart>
         </ChartContainer>
       )}
     </Card>
