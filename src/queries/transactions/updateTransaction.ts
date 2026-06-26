@@ -4,6 +4,7 @@ import api from '@/utils/api'
 export type UpdateTransactionData = {
   is_recurring?: boolean
   category_id?: number
+  subcategory_id?: number
   amount?: number
   type?: string
   subtype?: string

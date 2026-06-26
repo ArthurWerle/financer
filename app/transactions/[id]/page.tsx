@@ -49,6 +49,7 @@ import {
 import { format } from 'date-fns'
 import { useTransaction } from '@/queries/transactions/useTransaction'
 import { useCategories } from '@/queries/categories/useCategories'
+import { useSubcategories } from '@/queries/subcategories/useSubcategories'
 import { deleteTransaction } from '@/queries/transactions/deleteTransaction'
 import { prepayTransaction } from '@/queries/transactions/prepayTransaction'
 import {
@@ -80,6 +81,7 @@ export default function TransactionDetailPage({
 
   const { data: transaction, isLoading, isError } = useTransaction(id)
   const { data: categories = [] } = useCategories()
+  const { data: subcategories = [] } = useSubcategories()
 
   const isLastMonth = (() => {
     if (!transaction?.end_date) return false
@@ -132,6 +134,7 @@ export default function TransactionDetailPage({
       amount: transaction.amount,
       description: transaction.description,
       category_id: transaction.category_id,
+      subcategory_id: transaction.subcategory_id,
       date: new Date(transaction.date),
       frequency: transaction.frequency,
       end_date: transaction.end_date ? new Date(transaction.end_date) : undefined,
@@ -143,6 +146,7 @@ export default function TransactionDetailPage({
     amount: 0,
     description: '',
     category_id: 0,
+    subcategory_id: undefined as number | undefined,
     date: new Date(),
     frequency: undefined as string | undefined,
     end_date: undefined as Date | undefined,
@@ -157,6 +161,7 @@ export default function TransactionDetailPage({
       amount: editData.amount,
       description: editData.description,
       category_id: editData.category_id,
+      subcategory_id: editData.subcategory_id,
       date: editData.date.toISOString(),
       frequency: editData.frequency,
       end_date: editData.end_date ? format(editData.end_date, 'yyyy-MM-dd') : undefined,
@@ -253,6 +258,9 @@ export default function TransactionDetailPage({
             <div className="flex items-center gap-2 mt-1">
               {categoryName && (
                 <Badge variant="secondary">{categoryName}</Badge>
+              )}
+              {transaction.subcategory?.name && (
+                <Badge variant="outline">{transaction.subcategory.name}</Badge>
               )}
               {transaction.is_recurring && (
                 <Badge variant="outline">Recurring</Badge>
@@ -535,6 +543,30 @@ export default function TransactionDetailPage({
                     {categories?.map((category) => (
                       <SelectItem key={category.id} value={String(category.id)}>
                         {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="edit-subcategory">Subcategory</Label>
+                <Select
+                  value={String(editData.subcategory_id ?? '')}
+                  onValueChange={(value) =>
+                    setEditData({
+                      ...editData,
+                      subcategory_id: value ? Number(value) : undefined,
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select subcategory (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subcategories?.map((subcategory) => (
+                      <SelectItem key={subcategory.id} value={String(subcategory.id)}>
+                        {subcategory.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
