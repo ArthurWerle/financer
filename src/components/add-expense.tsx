@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useCategories } from '../queries/categories/useCategories'
+import { useSubcategories } from '../queries/subcategories/useSubcategories'
 import {
   addTransactionV2,
   PostTransactionTypeV2,
@@ -29,6 +30,7 @@ import { TransactionType } from '@/enums/enums'
 type FormData = {
   amount: number | undefined
   categoryId: number | undefined
+  subcategoryId: number | undefined
   typeId: number | undefined
   description: string
   date: Date
@@ -44,6 +46,7 @@ export const AddExpense = () => {
   const [formData, setFormData] = useState<FormData>({
     amount: undefined,
     categoryId: undefined,
+    subcategoryId: undefined,
     typeId: undefined,
     description: '',
     date: today,
@@ -58,6 +61,7 @@ export const AddExpense = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const { data: categories, isLoading: isLoadingCategories } = useCategories()
+  const { data: subcategories, isLoading: isLoadingSubcategories } = useSubcategories()
 
   const formValidation = useMemo(() => {
     let validation = {
@@ -109,6 +113,7 @@ export const AddExpense = () => {
     const transactionV2: PostTransactionTypeV2 = {
       amount: formData.amount,
       category_id: formData.categoryId,
+      subcategory_id: formData.subcategoryId,
       description: formData.description,
       type: TransactionType.Expense,
       date: formData.date.toISOString(),
@@ -149,6 +154,7 @@ export const AddExpense = () => {
           setFormData({
             amount: undefined,
             categoryId: undefined,
+            subcategoryId: undefined,
             typeId: undefined,
             description: '',
             date: now,
@@ -210,6 +216,32 @@ export const AddExpense = () => {
                     categories?.map((category) => (
                       <SelectItem key={category.id} value={String(category.id)}>
                         {category.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="subcategory">Subcategory</Label>
+              <Select
+                onValueChange={(value) =>
+                  setFormData({ ...formData, subcategoryId: Number(value) })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select subcategory (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {isLoadingSubcategories ? (
+                    <SelectItem value="" disabled>
+                      Loading subcategories...
+                    </SelectItem>
+                  ) : (
+                    subcategories?.map((subcategory) => (
+                      <SelectItem key={subcategory.id} value={String(subcategory.id)}>
+                        {subcategory.name}
                       </SelectItem>
                     ))
                   )}

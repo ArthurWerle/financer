@@ -10,6 +10,7 @@ export type PostTransactionTypeV2 = Pick<
   | 'is_recurring'
   | 'frequency'
   | 'category_id'
+  | 'subcategory_id'
   | 'description'
   | 'date'
 > & { end_date?: string }

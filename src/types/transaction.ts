@@ -1,9 +1,13 @@
+import { Subcategory } from '@/types/subcategory'
+
 export interface Transaction {
   id: number
   created_by_id?: number
   is_prepaid: boolean
   is_recurring?: boolean
   category_id: number
+  subcategory_id?: number
+  subcategory?: Subcategory
   frequency?: string
   amount: number
   subtype?: string

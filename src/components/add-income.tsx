@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useCategories } from '../queries/categories/useCategories'
+import { useSubcategories } from '../queries/subcategories/useSubcategories'
 import {
   addTransactionV2,
   PostTransactionTypeV2,
@@ -46,6 +47,7 @@ export const AddIncome = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const { data: categories, isLoading: isLoadingCategories } = useCategories()
+  const { data: subcategories, isLoading: isLoadingSubcategories } = useSubcategories()
 
   const formValidation = useMemo(() => {
     let validation = {
@@ -91,6 +93,7 @@ export const AddIncome = () => {
     const transactionV2: PostTransactionTypeV2 = {
       amount: formData.amount ?? 0,
       category_id: formData.category_id ?? 0,
+      subcategory_id: formData.subcategory_id,
       description: formData.description ?? '',
       type: TransactionType.Income,
       date: formData.date?.toISOString() ?? '',
@@ -128,6 +131,7 @@ export const AddIncome = () => {
           setFormData({
             amount: undefined,
             category_id: undefined,
+            subcategory_id: undefined,
             description: '',
             date: new Date(),
           })
@@ -183,6 +187,32 @@ export const AddIncome = () => {
                     categories?.map((category) => (
                       <SelectItem key={category.id} value={String(category.id)}>
                         {category.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="subcategory">Subcategory</Label>
+              <Select
+                onValueChange={(value) =>
+                  setFormData({ ...formData, subcategory_id: Number(value) })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select subcategory (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {isLoadingSubcategories ? (
+                    <SelectItem value="" disabled>
+                      Loading subcategories...
+                    </SelectItem>
+                  ) : (
+                    subcategories?.map((subcategory) => (
+                      <SelectItem key={subcategory.id} value={String(subcategory.id)}>
+                        {subcategory.name}
                       </SelectItem>
                     ))
                   )}
