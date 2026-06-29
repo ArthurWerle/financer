@@ -7,6 +7,7 @@ export type UpdateTransactionData = {
   subcategory_id?: number
   amount?: number
   type?: string
+  /** @deprecated Do not use. */
   subtype?: string
   description?: string
   date?: string
