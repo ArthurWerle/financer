@@ -58,6 +58,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { LocationCombobox } from '@/components/ui/location-combobox'
 import { format } from 'date-fns'
 
 export function Transaction({
@@ -85,6 +86,7 @@ export function Transaction({
     amount: transaction.amount,
     description: transaction.description,
     category_id: transaction.category_id,
+    location: transaction.location?.name ?? '',
     date: new Date(transaction.date),
     frequency: transaction.frequency,
     end_date: transaction.end_date ? new Date(transaction.end_date) : undefined as Date | undefined,
@@ -116,6 +118,8 @@ export function Transaction({
       date: editData.date.toISOString(),
       frequency: editData.frequency,
       end_date: editData.end_date ? format(editData.end_date, 'yyyy-MM-dd') : undefined,
+      // Always send so clearing the field removes the location on the backend.
+      location: editData.location.trim(),
     }
 
     await updateTransaction(transaction.id, data)
@@ -152,6 +156,7 @@ export function Transaction({
       amount: transaction.amount,
       description: transaction.description,
       category_id: transaction.category_id,
+      location: transaction.location?.name ?? '',
       date: new Date(transaction.date),
       frequency: transaction.frequency,
       end_date: transaction.end_date ? new Date(transaction.end_date) : undefined,
@@ -217,6 +222,11 @@ export function Transaction({
             <div className="flex items-center gap-1.5">
               {categoryName && (
                 <p className="text-sm text-gray-500">{categoryName}</p>
+              )}
+              {transaction.location?.name && (
+                <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full font-medium">
+                  {transaction.location.name}
+                </span>
               )}
               {transaction.prepaid_from_id && (
                 <Link href={`/transactions/${transaction.prepaid_from_id}`}>
@@ -420,6 +430,19 @@ export function Transaction({
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor={`location-${transaction.id}`}>
+                  Where? (optional)
+                </Label>
+                <LocationCombobox
+                  id={`location-${transaction.id}`}
+                  value={editData.location}
+                  onChange={(location) =>
+                    setEditData({ ...editData, location })
+                  }
+                />
               </div>
 
               <div className="grid gap-2">

@@ -26,6 +26,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { TransactionType } from '@/enums/enums'
 import { Transaction } from '@/types/transaction'
+import { LocationCombobox } from '@/components/ui/location-combobox'
 
 type FormData = Partial<
   Omit<Transaction, 'id' | 'type' | 'created_at' | 'updated_at' | 'date'> & {
@@ -43,6 +44,7 @@ export const AddIncome = () => {
     date: today,
   })
 
+  const [location, setLocation] = useState('')
   const queryClient = useQueryClient()
   const [isLoading, setIsLoading] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -97,6 +99,7 @@ export const AddIncome = () => {
       description: formData.description ?? '',
       type: TransactionType.Income,
       date: formData.date?.toISOString() ?? '',
+      location: location.trim() || undefined,
     }
 
     await addTransactionV2(transactionV2)
@@ -135,6 +138,7 @@ export const AddIncome = () => {
             description: '',
             date: new Date(),
           })
+          setLocation('')
         }
         setIsDialogOpen(open)
       }}
@@ -243,6 +247,15 @@ export const AddIncome = () => {
                   setFormData({ ...formData, description: e.target.value })
                 }
                 required
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="location">Where? (optional)</Label>
+              <LocationCombobox
+                id="location"
+                value={location}
+                onChange={setLocation}
               />
             </div>
           </div>

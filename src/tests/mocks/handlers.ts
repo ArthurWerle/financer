@@ -92,6 +92,29 @@ export const handlers = [
     )
   }),
 
+  // Mock locations endpoint
+  rest.get('http://localhost:8082/api/bff/locations', (req, res, ctx) => {
+    return res(
+      ctx.json({
+        count: 2,
+        locations: [
+          {
+            id: 1,
+            name: 'Mercado X',
+            created_at: '2024-01-01',
+            updated_at: '2024-01-01',
+          },
+          {
+            id: 2,
+            name: 'Lancheria Y',
+            created_at: '2024-01-01',
+            updated_at: '2024-01-01',
+          },
+        ],
+      })
+    )
+  }),
+
   // Mock categories endpoints
   rest.get('/api/categories', (req, res, ctx) => {
     return res(

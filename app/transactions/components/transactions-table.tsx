@@ -74,6 +74,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Calendar } from '@/components/ui/calendar'
+import { LocationCombobox } from '@/components/ui/location-combobox'
 
 function ActionsCell({
   transaction,
@@ -94,6 +95,7 @@ function ActionsCell({
     amount: transaction.amount,
     description: transaction.description,
     category_id: transaction.category_id,
+    location: transaction.location?.name ?? '',
     date: new Date(transaction.date),
     frequency: transaction.frequency,
     end_date: transaction.end_date ? new Date(transaction.end_date) : undefined as Date | undefined,
@@ -144,6 +146,7 @@ function ActionsCell({
       amount: transaction.amount,
       description: transaction.description,
       category_id: transaction.category_id,
+      location: transaction.location?.name ?? '',
       date: new Date(transaction.date),
       frequency: transaction.frequency,
       end_date: transaction.end_date ? new Date(transaction.end_date) : undefined,
@@ -162,6 +165,8 @@ function ActionsCell({
       date: editData.date.toISOString(),
       frequency: editData.frequency,
       end_date: editData.end_date ? format(editData.end_date, 'yyyy-MM-dd') : undefined,
+      // Always send so clearing the field removes the location on the backend.
+      location: editData.location.trim(),
     }
 
     await updateTransaction(transaction.id, data)
@@ -287,6 +292,19 @@ function ActionsCell({
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor={`location-${transaction.id}`}>
+                  Where? (optional)
+                </Label>
+                <LocationCombobox
+                  id={`location-${transaction.id}`}
+                  value={editData.location}
+                  onChange={(location) =>
+                    setEditData({ ...editData, location })
+                  }
+                />
               </div>
 
               <div className="grid gap-2">

@@ -26,6 +26,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { addDate } from '../utils/add-date'
 import { TransactionType } from '@/enums/enums'
+import { LocationCombobox } from '@/components/ui/location-combobox'
 
 type FormData = {
   amount: number | undefined
@@ -33,6 +34,7 @@ type FormData = {
   subcategoryId: number | undefined
   typeId: number | undefined
   description: string
+  location: string
   date: Date
   frequency: 'daily' | 'weekly' | 'monthly' | 'yearly' | undefined
   startDate: Date
@@ -49,6 +51,7 @@ export const AddExpense = () => {
     subcategoryId: undefined,
     typeId: undefined,
     description: '',
+    location: '',
     date: today,
     frequency: undefined,
     startDate: today,
@@ -119,6 +122,7 @@ export const AddExpense = () => {
       date: formData.date.toISOString(),
       frequency: formData.frequency,
       end_date: endDate?.toISOString().split('T')[0],
+      location: formData.location.trim() || undefined,
     }
 
     await addTransactionV2(transactionV2)
@@ -157,6 +161,7 @@ export const AddExpense = () => {
             subcategoryId: undefined,
             typeId: undefined,
             description: '',
+            location: '',
             date: now,
             frequency: undefined,
             startDate: now,
@@ -272,6 +277,15 @@ export const AddExpense = () => {
                   setFormData({ ...formData, description: e.target.value })
                 }
                 required
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="location">Where? (optional)</Label>
+              <LocationCombobox
+                id="location"
+                value={formData.location}
+                onChange={(location) => setFormData({ ...formData, location })}
               />
             </div>
 

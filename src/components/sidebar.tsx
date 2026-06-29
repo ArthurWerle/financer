@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Home, PlusCircle, BarChart2, Tag, Calendar } from 'lucide-react'
+import { Home, PlusCircle, BarChart2, Tag, Calendar, MapPin } from 'lucide-react'
 
 const Sidebar = () => {
   return (
@@ -29,6 +29,12 @@ const Sidebar = () => {
             <Link href="/categories" className="flex items-center space-x-3 hover:text-white transition-colors">
               <Tag size={20} />
               <span>Categories</span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/locations" className="flex items-center space-x-3 hover:text-white transition-colors">
+              <MapPin size={20} />
+              <span>Locations</span>
             </Link>
           </li>
           <li>

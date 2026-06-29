@@ -13,7 +13,7 @@ export type PostTransactionTypeV2 = Pick<
   | 'subcategory_id'
   | 'description'
   | 'date'
-> & { end_date?: string }
+> & { end_date?: string; location?: string }
 
 export const addTransactionV2 = async (transaction: PostTransactionTypeV2) => {
   return await api.post(`${BFF_BASE_URL}/transactions`, transaction)
