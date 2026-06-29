@@ -19,6 +19,7 @@ const Header = () => {
     { href: '/', label: 'Dashboard' },
     { href: '/transactions', label: 'Transactions' },
     { href: '/categories', label: 'Categories' },
+    { href: '/locations', label: 'Locations' },
     { href: '/analytics', label: 'Analytics' },
     { href: '/history', label: 'History' },
   ]

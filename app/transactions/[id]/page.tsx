@@ -46,6 +46,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { LocationCombobox } from '@/components/ui/location-combobox'
 import { format } from 'date-fns'
 import { useTransaction } from '@/queries/transactions/useTransaction'
 import { useCategories } from '@/queries/categories/useCategories'
@@ -135,6 +136,7 @@ export default function TransactionDetailPage({
       description: transaction.description,
       category_id: transaction.category_id,
       subcategory_id: transaction.subcategory_id,
+      location: transaction.location?.name ?? '',
       date: new Date(transaction.date),
       frequency: transaction.frequency,
       end_date: transaction.end_date ? new Date(transaction.end_date) : undefined,
@@ -147,6 +149,7 @@ export default function TransactionDetailPage({
     description: '',
     category_id: 0,
     subcategory_id: undefined as number | undefined,
+    location: '',
     date: new Date(),
     frequency: undefined as string | undefined,
     end_date: undefined as Date | undefined,
@@ -165,6 +168,8 @@ export default function TransactionDetailPage({
       date: editData.date.toISOString(),
       frequency: editData.frequency,
       end_date: editData.end_date ? format(editData.end_date, 'yyyy-MM-dd') : undefined,
+      // Always send so clearing the field removes the location on the backend.
+      location: editData.location.trim(),
     }
 
     await updateTransaction(transaction.id, data)
@@ -261,6 +266,9 @@ export default function TransactionDetailPage({
               )}
               {transaction.subcategory?.name && (
                 <Badge variant="outline">{transaction.subcategory.name}</Badge>
+              )}
+              {transaction.location?.name && (
+                <Badge variant="outline">{transaction.location.name}</Badge>
               )}
               {transaction.is_recurring && (
                 <Badge variant="outline">Recurring</Badge>
@@ -571,6 +579,17 @@ export default function TransactionDetailPage({
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="edit-location">Where? (optional)</Label>
+                <LocationCombobox
+                  id="edit-location"
+                  value={editData.location}
+                  onChange={(location) =>
+                    setEditData({ ...editData, location })
+                  }
+                />
               </div>
 
               <div className="grid gap-2">
