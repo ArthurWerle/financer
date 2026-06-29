@@ -1,6 +1,8 @@
 import { Subcategory } from '@/types/subcategory'
 import { Location } from '@/types/location'
 
+export type TransactionOrigin = 'web' | 'api' | 'mcp'
+
 export interface Transaction {
   id: number
   created_by_id?: number
@@ -13,7 +15,9 @@ export interface Transaction {
   location?: Location
   frequency?: string
   amount: number
+  /** @deprecated Do not use. */
   subtype?: string
+  origin?: TransactionOrigin
   type: 'income' | 'expense'
   description: string
   date: string
