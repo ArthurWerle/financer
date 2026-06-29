@@ -1,4 +1,5 @@
 import { Subcategory } from '@/types/subcategory'
+import { Location } from '@/types/location'
 
 export interface Transaction {
   id: number
@@ -8,6 +9,8 @@ export interface Transaction {
   category_id: number
   subcategory_id?: number
   subcategory?: Subcategory
+  location_id?: number
+  location?: Location
   frequency?: string
   amount: number
   subtype?: string

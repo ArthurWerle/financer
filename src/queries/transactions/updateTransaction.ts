@@ -13,6 +13,7 @@ export type UpdateTransactionData = {
   frequency?: string
   start_date?: string
   end_date?: string
+  location?: string
 }
 
 export const updateTransaction = async (
