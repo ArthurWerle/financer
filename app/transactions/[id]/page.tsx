@@ -302,6 +302,12 @@ export default function TransactionDetailPage({
             <p className="text-gray-500">Type</p>
             <p className="font-medium capitalize">{transaction.type}</p>
           </div>
+          {transaction.origin && (
+            <div>
+              <p className="text-gray-500">Origin</p>
+              <p className="font-medium capitalize">{transaction.origin}</p>
+            </div>
+          )}
           <div>
             <p className="text-gray-500">Date</p>
             <p className="font-medium">
