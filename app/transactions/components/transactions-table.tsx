@@ -32,6 +32,7 @@ import {
 } from '@/queries/transactions/updateTransaction'
 import { humanReadableDate } from '@/utils/format-date'
 import { getLeftPayments } from '@/utils/get-left-payments'
+import { numberToCurrency } from '@/utils/number-to-currency'
 import {
   Table,
   TableBody,
@@ -436,10 +437,7 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
       header: 'Amount',
       cell: ({ row }) => (
         <span className="font-medium whitespace-nowrap">
-          {new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-          }).format(row.original.amount)}
+          {numberToCurrency(row.original.amount)}
         </span>
       ),
     },

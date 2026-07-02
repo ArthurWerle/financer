@@ -72,7 +72,7 @@ export const KeyboardNavigationProvider = ({ children }: { children: ReactNode }
           setFocusedOptionIndex((prevIndex) => (prevIndex - 1 + options.length) % options.length)
           break
         case "Enter":
-          event.preventDefault();
+          event.preventDefault()
           options[focusedOptionIndex]?.action()
           setIsModalOpen(false)
           break
@@ -105,8 +105,8 @@ export const KeyboardNavigationProvider = ({ children }: { children: ReactNode }
                   index === focusedOptionIndex ? "bg-gray-100" : ""
                 }`}
                 onClick={() => {
-                  option.action();
-                  setIsModalOpen(false);
+                  option.action()
+                  setIsModalOpen(false)
                 }}
                 onMouseEnter={() => setFocusedOptionIndex(index)}
               >

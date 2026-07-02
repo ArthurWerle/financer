@@ -35,6 +35,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Category } from '@/types/category'
 import { Subcategory } from '@/types/subcategory'
 
@@ -363,20 +364,32 @@ function SubcategoryItem({ subcategory, index }: { subcategory: Subcategory; ind
   )
 }
 
+function LoadingList() {
+  return (
+    <div className="space-y-4">
+      {[...Array(4)].map((_, i) => (
+        <Skeleton key={i} className="h-12 w-full" />
+      ))}
+    </div>
+  )
+}
+
 export default function Categories() {
   const { data: categories = [], isLoading } = useCategories()
   const { data: subcategories = [], isLoading: isLoadingSubcategories } = useSubcategories()
 
   return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold mb-8">Categories</h1>
-      <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold mb-6">Expense Categories</h2>
+    <div>
+      <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8">
+        Categories
+      </h1>
+      <Card className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
+        <div className="flex flex-wrap justify-between items-center gap-2 mb-6">
+          <h2 className="text-2xl font-bold">Expense Categories</h2>
           <AddCategory />
         </div>
         {isLoading ? (
-          '...Loading'
+          <LoadingList />
         ) : (
           <div className="space-y-6">
             {categories.map((category, index) => (
@@ -390,13 +403,13 @@ export default function Categories() {
         )}
       </Card>
 
-      <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl mt-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold mb-6">Sub Categories</h2>
+      <Card className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl mt-8">
+        <div className="flex flex-wrap justify-between items-center gap-2 mb-6">
+          <h2 className="text-2xl font-bold">Sub Categories</h2>
           <AddSubcategory />
         </div>
         {isLoadingSubcategories ? (
-          '...Loading'
+          <LoadingList />
         ) : (
           <div className="space-y-6">
             {subcategories.map((subcategory, index) => (

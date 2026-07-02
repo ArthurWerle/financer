@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { getLeftPayments } from '../utils/get-left-payments'
 import { humanReadableDate } from '../utils/format-date'
+import { numberToCurrency } from '../utils/number-to-currency'
 import { Category } from '@/types/category'
 import { deleteTransaction } from '@/queries/transactions/deleteTransaction'
 import { prepayTransaction } from '@/queries/transactions/prepayTransaction'
@@ -246,10 +247,7 @@ export function Transaction({
                   <ArrowDownLeft className="h-5 w-5 text-green-400" />
                 )}
                 <span className="font-medium">
-                  {new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL',
-                  }).format(amount)}
+                  {numberToCurrency(amount)}
                 </span>
               </div>
               <div className="flex gap-2 justify-end">

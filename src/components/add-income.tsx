@@ -24,6 +24,7 @@ import {
 } from '../queries/transactions/addTransaction'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
+import { format } from 'date-fns'
 import { TransactionType } from '@/enums/enums'
 import { Transaction } from '@/types/transaction'
 import { LocationCombobox } from '@/components/ui/location-combobox'
@@ -88,9 +89,9 @@ export const AddIncome = () => {
     return validation
   }, [formData.amount, formData.category_id, formData.description])
 
-  const handleSubmit = async (e: any) => {
-    setIsLoading(true)
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true)
 
     const transactionV2: PostTransactionTypeV2 = {
       amount: formData.amount ?? 0,
@@ -163,9 +164,12 @@ export const AddIncome = () => {
               <Input
                 id="amount"
                 type="number"
-                value={formData.amount}
+                value={formData.amount ?? ''}
                 onChange={(e) =>
-                  setFormData({ ...formData, amount: Number(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    amount: e.target.value ? Number(e.target.value) : undefined,
+                  })
                 }
                 required
               />
@@ -184,9 +188,9 @@ export const AddIncome = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {isLoadingCategories ? (
-                    <SelectItem value="" disabled>
+                    <div className="px-2 py-1.5 text-sm text-muted-foreground">
                       Loading categories...
-                    </SelectItem>
+                    </div>
                   ) : (
                     categories?.map((category) => (
                       <SelectItem key={category.id} value={String(category.id)}>
@@ -210,9 +214,9 @@ export const AddIncome = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {isLoadingSubcategories ? (
-                    <SelectItem value="" disabled>
+                    <div className="px-2 py-1.5 text-sm text-muted-foreground">
                       Loading subcategories...
-                    </SelectItem>
+                    </div>
                   ) : (
                     subcategories?.map((subcategory) => (
                       <SelectItem key={subcategory.id} value={String(subcategory.id)}>
@@ -228,7 +232,7 @@ export const AddIncome = () => {
               <Label>Date</Label>
               <Input
                 type="date"
-                value={formData.date?.toISOString().split('T')[0] ?? ''}
+                value={formData.date ? format(formData.date, 'yyyy-MM-dd') : ''}
                 onChange={(e) => {
                   const date = new Date(e.target.value + 'T00:00:00')
                   if (!isNaN(date.getTime())) {

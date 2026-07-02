@@ -16,7 +16,7 @@ export function LatestTransactions() {
       <ul>
         {transactions?.map((transaction, index) => (
           <Transaction
-            key={transaction.amount + index + transaction.amount}
+            key={transaction.id}
             transaction={transaction}
             categories={categories}
             index={index}

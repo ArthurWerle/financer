@@ -4,8 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { usePathname } from 'next/navigation'
 import { AddExpense } from './add-expense'
 import { AddIncome } from './add-income'
@@ -27,7 +26,7 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md z-50">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between py-4 px-6">
+        <div className="flex items-center justify-between py-4 px-4 sm:px-6">
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
               <Image
@@ -59,13 +58,18 @@ const Header = () => {
           </nav>
 
           <div className="flex items-center space-x-4">
-            <AddIncome />
-            <AddExpense />
-            <Avatar>
-              <AvatarImage src="/placeholder.svg" alt="User" />
+            <div className="hidden sm:flex items-center space-x-4">
+              <AddIncome />
+              <AddExpense />
+            </div>
+            <Avatar className="hidden sm:block">
               <AvatarFallback>AW</AvatarFallback>
             </Avatar>
-            <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
+            <button
+              className="md:hidden p-1"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
+            >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -95,9 +99,10 @@ const Header = () => {
                     {item.label}
                   </Link>
                 ))}
-                <Button variant="default" className="mt-4">
-                  Add Transaction
-                </Button>
+                <div className="flex gap-2 mt-4 sm:hidden">
+                  <AddIncome />
+                  <AddExpense />
+                </div>
               </nav>
             </motion.div>
           )}

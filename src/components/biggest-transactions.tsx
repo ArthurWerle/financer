@@ -16,7 +16,7 @@ export function BiggestTransactions() {
       <ul>
         {transactions?.map((transaction, index) => (
           <Transaction
-            key={transaction.amount + index + transaction.amount}
+            key={transaction.id}
             categories={categories}
             transaction={transaction}
             index={index}

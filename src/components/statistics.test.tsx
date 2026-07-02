@@ -1,7 +1,9 @@
 import { render, screen, waitFor } from '../utils/test-utils'
 import { Statistics } from '@/components/statistics'
-import { server } from '../mocks/server'
+import { server } from '../tests/mocks/server'
 import { rest } from 'msw'
+
+const BFF_BASE_URL = 'http://localhost:8082/api/bff'
 
 describe('Statistics', () => {
   it('should render loading state initially', () => {
@@ -11,126 +13,38 @@ describe('Statistics', () => {
   })
 
   it('should render financial data after loading', async () => {
-    server.use(
-      rest.get('/api/bff/overview/by-month', (req, res, ctx) => {
-        return res(
-          ctx.json({
-            income: {
-              currentMonth: 5000.0,
-              lastMonth: 4500.0,
-              percentageVariation: 11.11,
-            },
-            expense: {
-              currentMonth: 1500.75,
-              lastMonth: 1800.5,
-              percentageVariation: -16.67,
-            },
-          })
-        )
-      }),
-      rest.get('/api/bff/monthly-expenses-by-category', (req, res, ctx) => {
-        return res(ctx.json({}))
-      }),
-      rest.get('/api/combined-transactions/latest/3', (req, res, ctx) => {
-        return res(ctx.json([]))
-      }),
-      rest.get('/api/combined-transactions/biggest/3', (req, res, ctx) => {
-        return res(ctx.json([]))
-      }),
-      rest.get('/api/bff/expense-comparsion-history', (req, res, ctx) => {
-        return res(ctx.json([]))
-      })
-    )
-
     render(<Statistics />)
 
     await waitFor(() => {
       expect(screen.getByText(/R\$ 5\.000,00/)).toBeInTheDocument()
       expect(screen.getByText(/R\$ 1\.500,75/)).toBeInTheDocument()
-      expect(screen.getByText(/11% from last month/)).toBeInTheDocument()
-      expect(screen.getByText(/17% from last month/)).toBeInTheDocument()
+      expect(screen.getByText(/11% from average month/)).toBeInTheDocument()
+      expect(screen.getByText(/17% from average month/)).toBeInTheDocument()
     })
   })
 
-  it('should render expense comparison history', async () => {
-    server.use(
-      rest.get('/api/bff/overview/by-month', (req, res, ctx) => {
-        return res(
-          ctx.json({
-            income: {
-              currentMonth: 5000.0,
-              lastMonth: 4500.0,
-              percentageVariation: 11.11,
-            },
-            expense: {
-              currentMonth: 1500.75,
-              lastMonth: 1800.5,
-              percentageVariation: -16.67,
-            },
-          })
-        )
-      }),
-      rest.get('/api/bff/monthly-expenses-by-category', (req, res, ctx) => {
-        return res(ctx.json({}))
-      }),
-      rest.get('/api/combined-transactions/latest/3', (req, res, ctx) => {
-        return res(ctx.json([]))
-      }),
-      rest.get('/api/combined-transactions/biggest/3', (req, res, ctx) => {
-        return res(ctx.json([]))
-      }),
-      rest.get('/api/bff/expense-comparsion-history', (req, res, ctx) => {
-        return res(
-          ctx.json([
-            { month: 'Jan', currentYear: 1200, lastYear: 1000 },
-            { month: 'Feb', currentYear: 1500, lastYear: 1300 },
-            { month: 'Mar', currentYear: 1300, lastYear: 1200 },
-          ])
-        )
-      })
-    )
-
+  it('should render historical data chart', async () => {
     render(<Statistics />)
 
     await waitFor(() => {
-      expect(screen.getByText('Expense Comparison')).toBeInTheDocument()
+      expect(screen.getByText('Historical Data')).toBeInTheDocument()
     })
   })
 
   it('should render expense categories', async () => {
+    render(<Statistics />)
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Monthly expenses by category')
+      ).toBeInTheDocument()
+    })
+  })
+
+  it('should render an error message when the overview request fails', async () => {
     server.use(
-      rest.get('/api/bff/overview/by-month', (req, res, ctx) => {
-        return res(
-          ctx.json({
-            income: {
-              currentMonth: 5000.0,
-              lastMonth: 4500.0,
-              percentageVariation: 11.11,
-            },
-            expense: {
-              currentMonth: 1500.75,
-              lastMonth: 1800.5,
-              percentageVariation: -16.67,
-            },
-          })
-        )
-      }),
-      rest.get('/api/bff/monthly-expenses-by-category', (req, res, ctx) => {
-        return res(
-          ctx.json({
-            Food: 800.5,
-            Transportation: 700.25,
-          })
-        )
-      }),
-      rest.get('/api/combined-transactions/latest/3', (req, res, ctx) => {
-        return res(ctx.json([]))
-      }),
-      rest.get('/api/combined-transactions/biggest/3', (req, res, ctx) => {
-        return res(ctx.json([]))
-      }),
-      rest.get('/api/bff/expense-comparsion-history', (req, res, ctx) => {
-        return res(ctx.json([]))
+      rest.get(`${BFF_BASE_URL}/overview/by-month`, (req, res, ctx) => {
+        return res(ctx.status(500))
       })
     )
 
@@ -138,7 +52,7 @@ describe('Statistics', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Monthly expenses by category')
+        screen.getByText('Error loading financial data')
       ).toBeInTheDocument()
     })
   })

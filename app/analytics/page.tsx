@@ -16,8 +16,8 @@ export default function Analytics() {
   const endDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : undefined
 
   return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold mb-8">Analytics</h1>
+    <div>
+      <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8">Analytics</h1>
       <div className="mb-8">
         <CategoryComparisonHistory />
       </div>
@@ -25,7 +25,7 @@ export default function Analytics() {
       <div className="mb-6">
         <DatePickerWithRange selected={dateRange} onSelect={setDateRange} />
       </div>
-      <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
+      <Card className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
         <AverageByCategoryChart startDate={startDate} endDate={endDate} />
       </Card>
     </div>

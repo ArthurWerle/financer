@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useTransactions } from '@/queries/transactions/useTransactions'
 import { useFilters } from '@/hooks/useFilters'
 import { Filters } from './components/filters'
 import { useCategories } from '@/queries/categories/useCategories'
 import { TransactionsTable } from './components/transactions-table'
+import { numberToCurrency } from '@/utils/number-to-currency'
 
 const LIMIT = 50
 
@@ -41,18 +43,21 @@ export default function Transactions() {
   const totalPages = Math.max(1, Math.ceil(total / LIMIT))
   const currentPage = Math.floor(offset / LIMIT) + 1
 
-  const formattedSum = new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(sum)
+  const formattedSum = numberToCurrency(sum)
 
   return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold mb-8">Transactions</h1>
-      <Card className="p-6 bg-white shadow-lg rounded-2xl">
+    <div>
+      <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8">
+        Transactions
+      </h1>
+      <Card className="p-4 sm:p-6 bg-white shadow-lg rounded-2xl">
         <Filters />
         {isLoading || isLoadingCategories ? (
-          '...Loading'
+          <div className="space-y-3">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-10 w-full" />
+            ))}
+          </div>
         ) : (
           <>
             <p className="text-sm text-gray-500 mb-3">

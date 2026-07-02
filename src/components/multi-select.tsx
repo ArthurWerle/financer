@@ -42,7 +42,7 @@ function MultiSelect<T extends Option>({
   }
 
   return (
-    <div className="max-w-xs space-y-2">
+    <div className="w-full sm:w-64 space-y-2">
       {value.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-2">
           {value.map((selectedValue) => {

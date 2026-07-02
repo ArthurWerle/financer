@@ -3,6 +3,7 @@
 import { Statistics } from '@/components/statistics'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useMonthOverview } from '@/queries/transactions/useMonthOverview'
+import { numberToCurrency } from '@/utils/number-to-currency'
 
 export default function Home() {
   const { data: response, isLoading } = useMonthOverview()
@@ -16,19 +17,16 @@ export default function Home() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-4xl font-bold">Hello, Arthur</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold">Hello, Arthur</h1>
           <p className="text-muted-foreground">This is your finance report</p>
         </div>
         <div className="flex gap-12">
-          <div className="text-right">
+          <div className="sm:text-right">
             <p className="text-sm text-muted-foreground">Total Balance</p>
             <p className="text-3xl font-bold">
-              {new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL',
-              }).format(totalBalance)}
+              {numberToCurrency(totalBalance)}
             </p>
           </div>
         </div>

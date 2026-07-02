@@ -17,7 +17,13 @@ const COLORS = [
   '#ef4444',
 ]
 
-const CustomTooltip = ({ active, payload }) => {
+const CustomTooltip = ({
+  active,
+  payload,
+}: {
+  active?: boolean
+  payload?: { name: string; value: number; payload: { rawValue: number } }[]
+}) => {
   if (active && payload && payload.length) {
     return (
       <Card>
@@ -53,7 +59,7 @@ export function ExpenseCategories() {
       : []
 
   return (
-    <div>
+    <div className="w-full lg:w-[420px] lg:shrink-0">
       <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">
         Monthly expenses by category
       </h3>
@@ -61,7 +67,7 @@ export function ExpenseCategories() {
         {isLoading || isLoadingMonthlyCategoriesExpense ? (
           <div className="h-24 bg-gray-100 rounded-lg" />
         ) : (
-          <div className="w-[500px] h-[500px]">
+          <div className="w-full max-w-[500px] aspect-square mx-auto">
             <PieChart
               style={{
                 width: '100%',
@@ -77,7 +83,7 @@ export function ExpenseCategories() {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                outerRadius={180}
+                outerRadius="75%"
                 fill="#8884d8"
                 dataKey="value"
               >
