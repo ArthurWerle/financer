@@ -7,10 +7,12 @@ export type CategoryAverage = {
   category_name: string
   average: number
   total_spent: number
+  percent_of_income?: number
 }
 
 type AverageByCategoryResponse = {
   averageByCategory: CategoryAverage[]
+  total_income: number
 }
 
 export const KEY = 'transactions/average/by-category'

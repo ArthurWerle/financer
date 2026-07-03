@@ -28,6 +28,7 @@ import { format } from 'date-fns'
 import { addDate } from '../utils/add-date'
 import { TransactionType } from '@/enums/enums'
 import { LocationCombobox } from '@/components/ui/location-combobox'
+import { Switch } from '@/components/ui/switch'
 
 type FormData = {
   amount: number | undefined
@@ -37,11 +38,8 @@ type FormData = {
   description: string
   location: string
   date: Date
-  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly' | undefined
-  startDate: Date
+  isRecurring: boolean
   installments: number | undefined
-  endDate: Date | undefined
-  lastOccurrence: string | undefined
 }
 
 export const AddExpense = () => {
@@ -54,11 +52,8 @@ export const AddExpense = () => {
     description: '',
     location: '',
     date: today,
-    frequency: undefined,
-    startDate: today,
+    isRecurring: false,
     installments: undefined,
-    endDate: undefined,
-    lastOccurrence: undefined,
   })
 
   const queryClient = useQueryClient()
@@ -111,9 +106,12 @@ export const AddExpense = () => {
 
     setIsLoading(true)
 
-    const endDate = formData.installments
-      ? addDate(formData.date, formData.installments)
-      : undefined
+    // N monthly installments starting on `date` end N-1 months later
+    // (the first installment is the starting month itself).
+    const endDate =
+      formData.isRecurring && formData.installments
+        ? addDate(formData.date, formData.installments - 1)
+        : undefined
 
     const transactionV2: PostTransactionTypeV2 = {
       amount: formData.amount,
@@ -121,10 +119,15 @@ export const AddExpense = () => {
       subcategory_id: formData.subcategoryId,
       description: formData.description,
       type: TransactionType.Expense,
-      date: formData.date.toISOString(),
-      frequency: formData.frequency,
-      end_date: endDate?.toISOString().split('T')[0],
+      is_recurring: formData.isRecurring,
       location: formData.location.trim() || undefined,
+      ...(formData.isRecurring
+        ? {
+            frequency: 'monthly' as const,
+            start_date: format(formData.date, 'yyyy-MM-dd'),
+            end_date: endDate ? format(endDate, 'yyyy-MM-dd') : undefined,
+          }
+        : { date: formData.date.toISOString() }),
     }
 
     await addTransactionV2(transactionV2)
@@ -165,11 +168,8 @@ export const AddExpense = () => {
             description: '',
             location: '',
             date: now,
-            frequency: undefined,
-            startDate: now,
+            isRecurring: false,
             installments: undefined,
-            endDate: undefined,
-            lastOccurrence: undefined,
           })
         }
         setIsDialogOpen(open)
@@ -294,39 +294,30 @@ export const AddExpense = () => {
               />
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="frequency">Frequency</Label>
-              <Select
-                onValueChange={(value) =>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="is-recurring">Recurring (monthly)</Label>
+              <Switch
+                id="is-recurring"
+                checked={formData.isRecurring}
+                onCheckedChange={(checked) =>
                   setFormData({
                     ...formData,
-                    frequency: value as
-                      | 'daily'
-                      | 'weekly'
-                      | 'monthly'
-                      | 'yearly'
-                      | undefined,
+                    isRecurring: checked,
+                    installments: checked ? formData.installments : undefined,
                   })
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select frequency" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                  <SelectItem value="yearly">Yearly</SelectItem>
-                </SelectContent>
-              </Select>
+              />
             </div>
 
-            {formData.frequency && (
+            {formData.isRecurring && (
               <div className="grid gap-2">
-                <Label htmlFor="installments">Installments</Label>
+                <Label htmlFor="installments">
+                  Installments (leave empty for ongoing)
+                </Label>
                 <Input
                   id="installments"
                   type="number"
+                  min={1}
                   value={formData.installments ?? ''}
                   onChange={(e) =>
                     setFormData({

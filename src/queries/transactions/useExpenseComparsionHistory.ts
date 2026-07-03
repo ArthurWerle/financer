@@ -20,6 +20,5 @@ export const useIncomeAndExpenseComparsionHistory = () => {
         >(`${BFF_BASE_URL}/expense-comparsion-history`)
         .then((res) => res.data),
     refetchOnWindowFocus: false,
-    select: (data) => data.toReversed(),
   })
 }
