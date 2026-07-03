@@ -15,7 +15,6 @@ import {
   useAverageByCategory,
   CategoryAverage,
 } from '@/queries/transactions/useAverageByCategory'
-import { useTransactions } from '@/queries/transactions/useTransactions'
 import { numberToCurrency } from '@/utils/number-to-currency'
 
 const COLORS = [
@@ -82,22 +81,16 @@ export function AverageByCategoryChart({ startDate, endDate }: Props) {
     end_date: endDate,
   })
 
-  const { data: incomeData } = useTransactions({
-    filters: { type: 'income', start_date: startDate, end_date: endDate },
-    limit: 1,
-    offset: 0,
-  })
-  const totalIncome = incomeData?.sum ?? 0
-
+  // percent_of_income comes from the backend, computed over the full income
+  // of the same period (one-offs plus recurring, month by month).
   const sorted: CategoryAverageWithPercent[] = data
     ? [...data]
         .sort((a, b) => b.average - a.average)
         .map((item) => ({
           ...item,
-          incomePercent:
-            totalIncome > 0
-              ? Number(((item.total_spent / totalIncome) * 100).toFixed(1))
-              : 0,
+          incomePercent: item.percent_of_income
+            ? Number(item.percent_of_income.toFixed(1))
+            : 0,
         }))
     : []
 

@@ -89,7 +89,6 @@ export function Transaction({
     category_id: transaction.category_id,
     location: transaction.location?.name ?? '',
     date: new Date(transaction.date),
-    frequency: transaction.frequency,
     end_date: transaction.end_date ? new Date(transaction.end_date) : undefined as Date | undefined,
   })
 
@@ -116,8 +115,8 @@ export function Transaction({
       amount: editData.amount,
       description: editData.description,
       category_id: editData.category_id,
-      date: editData.date.toISOString(),
-      frequency: editData.frequency,
+      // A recurring transaction is a schedule; only one-offs carry a date.
+      date: transaction.is_recurring ? undefined : editData.date.toISOString(),
       end_date: editData.end_date ? format(editData.end_date, 'yyyy-MM-dd') : undefined,
       // Always send so clearing the field removes the location on the backend.
       location: editData.location.trim(),
@@ -159,7 +158,6 @@ export function Transaction({
       category_id: transaction.category_id,
       location: transaction.location?.name ?? '',
       date: new Date(transaction.date),
-      frequency: transaction.frequency,
       end_date: transaction.end_date ? new Date(transaction.end_date) : undefined,
     })
     setIsEditOpen(true)
@@ -203,7 +201,6 @@ export function Transaction({
     (category) => category.id === transaction.category_id
   )?.name
   const endDate = transaction.end_date
-  const frequency = transaction.frequency
   const isRecurringTransaction = transaction.is_recurring
   const type = transaction.type
 
@@ -258,10 +255,7 @@ export function Transaction({
                 )}
                 {isRecurringTransaction && (
                   <p className="text-sm text-gray-500">
-                    {getLeftPayments(
-                      endDate,
-                      frequency as 'daily' | 'weekly' | 'monthly' | 'yearly'
-                    )}
+                    {getLeftPayments(endDate)}
                   </p>
                 )}
               </div>
@@ -443,58 +437,37 @@ export function Transaction({
                 />
               </div>
 
-              <div className="grid gap-2">
-                <Label>Date</Label>
-                <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="justify-start text-left font-normal"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {editData.date
-                        ? format(editData.date, 'PPP')
-                        : 'Pick a date'}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={editData.date}
-                      onSelect={(date) => {
-                        if (date) {
-                          setEditData({ ...editData, date })
-                          setDatePickerOpen(false)
-                        }
-                      }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor={`frequency-${transaction.id}`}>Frequency</Label>
-                <Select
-                  value={editData.frequency || ''}
-                  onValueChange={(value) =>
-                    setEditData({
-                      ...editData,
-                      frequency: value || undefined,
-                    })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select frequency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="daily">Daily</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
-                    <SelectItem value="yearly">Yearly</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {!transaction.is_recurring && (
+                <div className="grid gap-2">
+                  <Label>Date</Label>
+                  <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="justify-start text-left font-normal"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {editData.date
+                          ? format(editData.date, 'PPP')
+                          : 'Pick a date'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={editData.date}
+                        onSelect={(date) => {
+                          if (date) {
+                            setEditData({ ...editData, date })
+                            setDatePickerOpen(false)
+                          }
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
 
               {transaction.is_recurring && (
                 <div className="grid gap-2">
