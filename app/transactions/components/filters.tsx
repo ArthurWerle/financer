@@ -45,7 +45,7 @@ export function Filters() {
   const activeType = filters.type ?? 'expense'
 
   return (
-    <div className="flex gap-2 mb-10 flex-wrap">
+    <div className="flex gap-2 mb-6 sm:mb-10 flex-wrap">
       <div className="flex rounded-lg border border-input overflow-hidden">
         <Button
           onClick={() => setUrl('type', 'expense')}
@@ -78,17 +78,19 @@ export function Filters() {
           Current month
         </Button>
       </div>
-      <div>
+      <div className="w-full sm:w-auto">
         <MultiSelect
           options={categories.map((category: Category) => ({ value: String(category.id), label: category.name }))}
           value={filters.category ? filters.category.split(',') : []}
-          onChange={(selected) => setUrl('category', selected.join(','))}
+          onChange={(selected) =>
+            setUrl('category', selected.length ? selected.join(',') : null)
+          }
         />
       </div>
-      <div>
+      <div className="w-full sm:w-auto">
         <DatePickerWithRange selected={localDateRange} onSelect={handleDateRangeChange} />
       </div>
-      <div>
+      <div className="w-full sm:w-auto">
         <Input
           placeholder="Search transactions..."
           value={searchValue}
@@ -97,7 +99,7 @@ export function Filters() {
           onKeyDown={(e) => {
             if (e.key === 'Enter') applySearch()
           }}
-          className="w-64"
+          className="w-full sm:w-64"
         />
       </div>
     </div>

@@ -65,4 +65,4 @@ export const useFilters = (): UseFiltersReturn => {
   }, [setFilters])
 
   return { filters, setUrl, setMultipleUrl, clearFilters }
-};
+}

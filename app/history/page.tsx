@@ -90,13 +90,13 @@ export default function HistoryPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-4xl font-bold">History</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold">History</h1>
           <p className="text-muted-foreground">Review your finances month by month</p>
         </div>
         <select
-          className="border border-gray-200 rounded-lg px-4 py-2 text-sm font-medium bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full sm:w-auto border border-gray-200 rounded-lg px-4 py-2 text-sm font-medium bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
           value={`${selected.year}-${selected.month}`}
           onChange={(e) => {
             const found = monthOptions.find(
@@ -152,8 +152,8 @@ export default function HistoryPage() {
       </div>
 
       {/* Expenses by category + Biggest transactions */}
-      <Card className="p-6 bg-white shadow-lg rounded-2xl flex justify-between gap-8">
-        <div>
+      <Card className="p-4 sm:p-6 bg-white shadow-lg rounded-2xl flex flex-col gap-8 lg:flex-row lg:justify-between">
+        <div className="w-full lg:w-[420px] lg:shrink-0">
           <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">
             Expenses by category
           </h3>
@@ -162,9 +162,9 @@ export default function HistoryPage() {
           ) : categoryData.length === 0 ? (
             <p className="text-muted-foreground text-sm">No expense data for this month.</p>
           ) : (
-            <div className="w-[500px] h-[500px]">
+            <div className="w-full max-w-[500px] aspect-square mx-auto">
               <PieChart style={{ width: '100%', height: '100%', maxWidth: '500px', maxHeight: '80vh', aspectRatio: 1 }} responsive>
-                <Pie data={categoryData} cx="50%" cy="50%" labelLine={false} outerRadius={180} fill="#8884d8" dataKey="value">
+                <Pie data={categoryData} cx="50%" cy="50%" labelLine={false} outerRadius="75%" fill="#8884d8" dataKey="value">
                   {categoryData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
@@ -190,7 +190,7 @@ export default function HistoryPage() {
             <ul>
               {biggestTransactions.map((transaction, index) => (
                 <Transaction
-                  key={transaction.amount + index + transaction.amount}
+                  key={transaction.id}
                   categories={categories}
                   transaction={transaction}
                   index={index}

@@ -60,6 +60,7 @@ import {
 import { endTransaction } from '@/queries/transactions/endTransaction'
 import { humanReadableDate } from '@/utils/format-date'
 import { getLeftPayments } from '@/utils/get-left-payments'
+import { numberToCurrency } from '@/utils/number-to-currency'
 
 export default function TransactionDetailPage({
   params,
@@ -186,11 +187,7 @@ export default function TransactionDetailPage({
       })
   }
 
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(amount)
+  const formatCurrency = numberToCurrency
 
   const handleDelete = async () => {
     if (!transaction) return
@@ -250,17 +247,19 @@ export default function TransactionDetailPage({
   }
 
   return (
-    <div className="p-8 max-w-2xl">
+    <div className="max-w-2xl">
       <Button variant="ghost" className="mb-4" onClick={() => router.back()}>
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back
       </Button>
 
-      <Card className="p-6 bg-white shadow-lg rounded-2xl space-y-6">
-        <div className="flex items-center justify-between">
+      <Card className="p-4 sm:p-6 bg-white shadow-lg rounded-2xl space-y-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold">{transaction.description}</h1>
-            <div className="flex items-center gap-2 mt-1">
+            <h1 className="text-2xl font-bold break-words">
+              {transaction.description}
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mt-1">
               {categoryName && (
                 <Badge variant="secondary">{categoryName}</Badge>
               )}
@@ -285,7 +284,7 @@ export default function TransactionDetailPage({
               )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {transaction.type === 'expense' ? (
               <ArrowUpRight className="h-6 w-6 text-red-400" />
             ) : (
@@ -297,7 +296,7 @@ export default function TransactionDetailPage({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
             <p className="text-gray-500">Type</p>
             <p className="font-medium capitalize">{transaction.type}</p>
@@ -397,7 +396,7 @@ export default function TransactionDetailPage({
           </div>
         </div>
 
-        <div className="flex gap-2 pt-2">
+        <div className="flex flex-wrap gap-2 pt-2">
           <Button variant="outline" onClick={handleEditOpen}>
             <Pencil className="h-4 w-4 mr-2" />
             Edit

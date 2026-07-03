@@ -49,6 +49,7 @@ export function getLeftPayments(
 
       return `${totalMonths} payments left`
     case 'yearly':
-      return `${Math.ceil(diffDays / 365)} payments left`
+      // 365.25 accounts for leap days so exact multi-year spans don't round up
+      return `${Math.ceil(diffDays / 365.25)} payments left`
   }
 }

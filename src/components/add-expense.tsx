@@ -24,6 +24,7 @@ import {
 } from '../queries/transactions/addTransaction'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
+import { format } from 'date-fns'
 import { addDate } from '../utils/add-date'
 import { TransactionType } from '@/enums/enums'
 import { LocationCombobox } from '@/components/ui/location-combobox'
@@ -103,15 +104,16 @@ export const AddExpense = () => {
     return validation
   }, [formData.amount, formData.categoryId, formData.description])
 
-  const handleSubmit = async (e: any) => {
-    setIsLoading(true)
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!formData.amount || !formData.categoryId) return
+
+    setIsLoading(true)
 
     const endDate = formData.installments
       ? addDate(formData.date, formData.installments)
       : undefined
-
-    if (!formData.amount || !formData.categoryId) return
 
     const transactionV2: PostTransactionTypeV2 = {
       amount: formData.amount,
@@ -193,9 +195,12 @@ export const AddExpense = () => {
               <Input
                 id="amount"
                 type="number"
-                value={formData.amount}
+                value={formData.amount ?? ''}
                 onChange={(e) =>
-                  setFormData({ ...formData, amount: Number(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    amount: e.target.value ? Number(e.target.value) : undefined,
+                  })
                 }
                 required
               />
@@ -214,9 +219,9 @@ export const AddExpense = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {isLoadingCategories ? (
-                    <SelectItem value="" disabled>
+                    <div className="px-2 py-1.5 text-sm text-muted-foreground">
                       Loading categories...
-                    </SelectItem>
+                    </div>
                   ) : (
                     categories?.map((category) => (
                       <SelectItem key={category.id} value={String(category.id)}>
@@ -240,9 +245,9 @@ export const AddExpense = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {isLoadingSubcategories ? (
-                    <SelectItem value="" disabled>
+                    <div className="px-2 py-1.5 text-sm text-muted-foreground">
                       Loading subcategories...
-                    </SelectItem>
+                    </div>
                   ) : (
                     subcategories?.map((subcategory) => (
                       <SelectItem key={subcategory.id} value={String(subcategory.id)}>
@@ -258,7 +263,7 @@ export const AddExpense = () => {
               <Label>Date</Label>
               <Input
                 type="date"
-                value={formData.date.toISOString().split('T')[0]}
+                value={format(formData.date, 'yyyy-MM-dd')}
                 onChange={(e) => {
                   const date = new Date(e.target.value + 'T00:00:00')
                   if (!isNaN(date.getTime())) {
@@ -322,11 +327,13 @@ export const AddExpense = () => {
                 <Input
                   id="installments"
                   type="number"
-                  value={formData.installments}
+                  value={formData.installments ?? ''}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      installments: Number(e.target.value),
+                      installments: e.target.value
+                        ? Number(e.target.value)
+                        : undefined,
                     })
                   }
                 />

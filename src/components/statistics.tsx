@@ -29,7 +29,7 @@ export function MonthlyOverview() {
 
   if (isLoadingOverview || isLoadingAverage) {
     return (
-      <div className="flex gap-12">
+      <div className="flex flex-col gap-6 sm:flex-row sm:gap-12">
         <div className="space-y-2">
           <Skeleton data-testid="skeleton" className="h-4 w-24" />
           <Skeleton data-testid="skeleton" className="h-6 w-32" />
@@ -45,7 +45,7 @@ export function MonthlyOverview() {
   }
 
   return (
-    <div className="flex gap-12">
+    <div className="flex flex-col gap-6 sm:flex-row sm:gap-12">
       <div className="space-y-2">
         <p className="text-3xl font-bold text-gray-900 flex items-center gap-2">
           <ArrowDownLeft className="h-6 w-6 text-green-400" />
@@ -109,7 +109,7 @@ export function MonthlyOverview() {
 export function Statistics() {
   return (
     <div className="space-y-8">
-      <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
+      <Card className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-gray-800">
             Financial Overview
@@ -118,7 +118,7 @@ export function Statistics() {
         <MonthlyOverview />
       </Card>
 
-      <Card className="p-6 bg-white shadow-lg rounded-2xl flex justify-between">
+      <Card className="p-4 sm:p-6 bg-white shadow-lg rounded-2xl flex flex-col gap-10 lg:flex-row lg:justify-between">
         <ExpenseCategories />
         <div className="flex flex-col flex-1 gap-10">
           <LatestTransactions />

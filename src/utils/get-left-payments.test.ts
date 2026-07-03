@@ -18,20 +18,20 @@ describe('getLeftPayments', () => {
   })
 
   describe('when endDate is in the past', () => {
-    it('should return "0 payments left" for daily', () => {
-      expect(getLeftPayments('2024-03-10', 'daily')).toBe('0 payments left')
+    it('should return "No payments left" for daily', () => {
+      expect(getLeftPayments('2024-03-10', 'daily')).toBe('No payments left')
     })
 
-    it('should return "0 payments left" for weekly', () => {
-      expect(getLeftPayments('2024-03-01', 'weekly')).toBe('0 payments left')
+    it('should return "No payments left" for weekly', () => {
+      expect(getLeftPayments('2024-03-01', 'weekly')).toBe('No payments left')
     })
 
-    it('should return "0 payments left" for monthly', () => {
-      expect(getLeftPayments('2024-02-15', 'monthly')).toBe('0 payments left')
+    it('should return "No payments left" for monthly', () => {
+      expect(getLeftPayments('2024-02-15', 'monthly')).toBe('No payments left')
     })
 
-    it('should return "0 payments left" for yearly', () => {
-      expect(getLeftPayments('2023-03-15', 'yearly')).toBe('0 payments left')
+    it('should return "No payments left" for yearly', () => {
+      expect(getLeftPayments('2023-03-15', 'yearly')).toBe('No payments left')
     })
   })
 
@@ -46,8 +46,8 @@ describe('getLeftPayments', () => {
     })
 
     it('should calculate days correctly across years', () => {
-      // From Mar 15, 2024 to Mar 15, 2025 = 366 days (2024 is leap year)
-      expect(getLeftPayments('2025-03-15', 'daily')).toBe('366 payments left')
+      // From Mar 15, 2024 to Mar 15, 2025 = 365 days (Feb 29, 2024 is before the range)
+      expect(getLeftPayments('2025-03-15', 'daily')).toBe('365 payments left')
     })
   })
 
@@ -131,9 +131,9 @@ describe('getLeftPayments', () => {
     })
 
     it('should handle today as end date', () => {
-      // Same day should be 0 payments left
-      expect(getLeftPayments('2024-03-15', 'monthly')).toBe('0 payments left')
-      expect(getLeftPayments('2024-03-15', 'daily')).toBe('0 payments left')
+      // The last payment happens today
+      expect(getLeftPayments('2024-03-15', 'monthly')).toBe('Last payment 🎉')
+      expect(getLeftPayments('2024-03-15', 'daily')).toBe('Last payment 🎉')
     })
   })
 })
