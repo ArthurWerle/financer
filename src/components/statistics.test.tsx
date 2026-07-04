@@ -18,8 +18,8 @@ describe('Statistics', () => {
     await waitFor(() => {
       expect(screen.getByText(/R\$ 5\.000,00/)).toBeInTheDocument()
       expect(screen.getByText(/R\$ 1\.500,75/)).toBeInTheDocument()
-      expect(screen.getByText(/11% from average month/)).toBeInTheDocument()
-      expect(screen.getByText(/17% from average month/)).toBeInTheDocument()
+      expect(screen.getByText(/11% from 6-month average/)).toBeInTheDocument()
+      expect(screen.getByText(/17% from 6-month average/)).toBeInTheDocument()
     })
   })
 

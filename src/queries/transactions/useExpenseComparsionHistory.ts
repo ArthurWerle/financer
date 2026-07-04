@@ -8,6 +8,7 @@ type ExpenseComparsionHistoryResponse = {
   month: string
   income: number
   expense: number
+  balance: number
 }
 
 export const useIncomeAndExpenseComparsionHistory = () => {

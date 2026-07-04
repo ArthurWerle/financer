@@ -1,6 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { useCategoriesMonthyExpense } from '../queries/categories/useCategoriesMonthlyExpense'
-import { useMonthOverview } from '../queries/transactions/useMonthOverview'
 import { Cell, Legend, Pie, PieChart, Tooltip } from 'recharts'
 import { numberToCurrency } from '../utils/number-to-currency'
 
@@ -22,15 +21,15 @@ const CustomTooltip = ({
   payload,
 }: {
   active?: boolean
-  payload?: { name: string; value: number; payload: { rawValue: number } }[]
+  payload?: { name: string; value: number; payload: { percent: number } }[]
 }) => {
   if (active && payload && payload.length) {
     return (
       <Card>
         <CardContent className="flex flex-col justify-center items-center px-3 py-1 text-[12px]">
           <p className="font-bold">{payload[0].name}</p>
-          <p>{numberToCurrency(payload[0]?.payload?.rawValue)}</p>
-          <p className="italic">{payload[0].value}% of total</p>
+          <p>{numberToCurrency(payload[0].value)}</p>
+          <p className="italic">{payload[0].payload.percent}% of total</p>
         </CardContent>
       </Card>
     )
@@ -44,17 +43,17 @@ export function ExpenseCategories() {
     data: expenseCategories,
     isLoading: isLoadingMonthlyCategoriesExpense,
   } = useCategoriesMonthyExpense()
-  const { data: response, isLoading } = useMonthOverview()
-  const { expense } = response || {}
 
+  // Slices carry the raw amounts and percentages of the slice total, so the
+  // chart always reconciles to 100% regardless of any other endpoint.
+  const entries = expenseCategories ? Object.entries(expenseCategories) : []
+  const totalExpenses = entries.reduce((acc, [, value]) => acc + value, 0)
   const data =
-    expenseCategories && expense?.currentMonth
-      ? Object.keys(expenseCategories).map((key) => ({
-          name: key,
-          value: Number(
-            ((expenseCategories[key] / expense.currentMonth) * 100).toFixed(0)
-          ),
-          rawValue: expenseCategories[key],
+    totalExpenses > 0
+      ? entries.map(([name, value]) => ({
+          name,
+          value,
+          percent: Number(((value / totalExpenses) * 100).toFixed(1)),
         }))
       : []
 
@@ -64,7 +63,7 @@ export function ExpenseCategories() {
         Monthly expenses by category
       </h3>
       <div>
-        {isLoading || isLoadingMonthlyCategoriesExpense ? (
+        {isLoadingMonthlyCategoriesExpense ? (
           <div className="h-24 bg-gray-100 rounded-lg" />
         ) : (
           <div className="w-full max-w-[500px] aspect-square mx-auto">

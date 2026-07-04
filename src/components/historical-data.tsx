@@ -63,6 +63,10 @@ export function HistoricalData() {
             label: 'Expense',
             color: 'hsl(var(--border))',
           },
+          balance: {
+            label: 'Balance',
+            color: 'hsl(var(--primary))',
+          },
         }}
         className="h-[300px] w-full"
       >
@@ -101,6 +105,15 @@ export function HistoricalData() {
               dot={true}
               activeDot={{ r: 8 }}
               stroke="rgb(248 113 113)"
+            />
+            <Line
+              type="monotone"
+              dataKey="balance"
+              name="Balance"
+              strokeWidth={2}
+              strokeDasharray="6 3"
+              dot={false}
+              stroke="#60a5fa"
             />
           </LineChart>
         </ResponsiveContainer>

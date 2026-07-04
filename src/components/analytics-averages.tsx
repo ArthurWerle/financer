@@ -18,25 +18,25 @@ export function AnalyticsAverages() {
 
   const cards = [
     {
-      label: 'Avg Monthly Income',
+      label: 'Avg Monthly Income (6 mo)',
       displayValue: numberToCurrency(avgIncome),
       icon: <ArrowDownLeft className="h-5 w-5 text-green-400" />,
       valueColor: 'text-gray-900',
     },
     {
-      label: 'Avg Monthly Spent',
+      label: 'Avg Monthly Spent (6 mo)',
       displayValue: numberToCurrency(avgExpense),
       icon: <ArrowUpRight className="h-5 w-5 text-red-400" />,
       valueColor: 'text-gray-900',
     },
     {
-      label: 'Avg Monthly Balance',
+      label: 'Avg Monthly Balance (6 mo)',
       displayValue: numberToCurrency(avgBalance),
       icon: <TrendingUp className="h-5 w-5 text-blue-400" />,
       valueColor: avgBalance >= 0 ? 'text-green-600' : 'text-red-600',
     },
     {
-      label: 'Avg % Saved',
+      label: 'Avg % Saved (6 mo)',
       displayValue: `${avgSavedPercent.toFixed(1)}%`,
       icon: <PiggyBank className="h-5 w-5 text-blue-400" />,
       valueColor: avgSavedPercent >= 0 ? 'text-green-600' : 'text-red-600',
