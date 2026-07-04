@@ -9,7 +9,6 @@ import { useFilters } from '@/hooks/useFilters'
 import { Filters } from './components/filters'
 import { useCategories } from '@/queries/categories/useCategories'
 import { TransactionsTable } from './components/transactions-table'
-import { numberToCurrency } from '@/utils/number-to-currency'
 
 const LIMIT = 50
 
@@ -39,11 +38,8 @@ export default function Transactions() {
 
   const transactions = data?.transactions || []
   const total = data?.total ?? 0
-  const sum = data?.sum ?? 0
   const totalPages = Math.max(1, Math.ceil(total / LIMIT))
   const currentPage = Math.floor(offset / LIMIT) + 1
-
-  const formattedSum = numberToCurrency(sum)
 
   return (
     <div>
@@ -61,8 +57,8 @@ export default function Transactions() {
         ) : (
           <>
             <p className="text-sm text-gray-500 mb-3">
-              Showing {transactions.length} of {total} transaction{total !== 1 ? 's' : ''} · Total:{' '}
-              {formattedSum}
+              Showing {transactions.length} of {total} transaction
+              {total !== 1 ? 's' : ''}
             </p>
             <TransactionsTable
               transactions={transactions}

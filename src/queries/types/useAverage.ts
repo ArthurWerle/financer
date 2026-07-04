@@ -12,10 +12,10 @@ export const useAverage = () => {
         .then((res) => res.data),
     select: (data) => {
       const expense = data.averageByType.find(
-        (average) => average.TypeName === Types.Expense
+        (average) => average.type_name === Types.Expense
       )
       const income = data.averageByType.find(
-        (average) => average.TypeName === Types.Income
+        (average) => average.type_name === Types.Income
       )
 
       return {

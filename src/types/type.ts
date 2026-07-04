@@ -15,10 +15,9 @@ export type Type = {
 }
 
 export type TypeAverage = {
-  TypeID: number
-  TypeName: Types
+  type_name: Types
 } & Average
 
 export type TypeAverageResponse = {
-  averageByType: Omit<TypeAverage, 'TypeID'>[]
+  averageByType: TypeAverage[]
 }

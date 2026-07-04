@@ -1,3 +1,3 @@
 export type Average = {
-  Average: number
+  average: number
 }
