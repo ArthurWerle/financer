@@ -65,21 +65,21 @@ export function MonthlyOverview() {
           {numberToCurrency(monthOverview?.income?.currentMonth ?? 0)}
         </p>
         {!!monthOverview?.income?.currentMonth &&
-          !!averageByType?.income?.Average && (
+          !!averageByType?.income?.average && (
             <p
-              className={`text-sm ${monthOverview?.income?.currentMonth > averageByType?.income?.Average ? 'text-green-600' : 'text-red-600'} flex items-center`}
+              className={`text-sm ${monthOverview?.income?.currentMonth > averageByType?.income?.average ? 'text-green-600' : 'text-red-600'} flex items-center`}
             >
               {monthOverview?.income?.currentMonth >
-              averageByType?.income?.Average ? (
+              averageByType?.income?.average ? (
                 <ArrowUp className="w-4 h-4 mr-1" />
               ) : (
                 <ArrowDown className="w-4 h-4 mr-1" />
               )}
               {Math.abs(
-                averageByType?.income?.Average > 0
+                averageByType?.income?.average > 0
                   ? ((monthOverview?.income?.currentMonth -
-                      averageByType?.income?.Average) /
-                      averageByType?.income?.Average) *
+                      averageByType?.income?.average) /
+                      averageByType?.income?.average) *
                       100
                   : 0
               ).toFixed(0)}
@@ -93,21 +93,21 @@ export function MonthlyOverview() {
           {numberToCurrency(monthOverview?.expense?.currentMonth ?? 0)}
         </p>
         {!!monthOverview?.expense?.currentMonth &&
-          !!averageByType?.expense?.Average && (
+          !!averageByType?.expense?.average && (
             <p
-              className={`text-sm ${monthOverview?.expense?.currentMonth > averageByType?.expense?.Average ? 'text-red-600' : 'text-green-600'} flex items-center`}
+              className={`text-sm ${monthOverview?.expense?.currentMonth > averageByType?.expense?.average ? 'text-red-600' : 'text-green-600'} flex items-center`}
             >
               {monthOverview?.expense?.currentMonth >
-              averageByType?.expense?.Average ? (
+              averageByType?.expense?.average ? (
                 <ArrowUp className="w-4 h-4 mr-1" />
               ) : (
                 <ArrowDown className="w-4 h-4 mr-1" />
               )}
               {Math.abs(
-                averageByType?.expense?.Average > 0
+                averageByType?.expense?.average > 0
                   ? ((monthOverview?.expense?.currentMonth -
-                      averageByType?.expense?.Average) /
-                      averageByType?.expense?.Average) *
+                      averageByType?.expense?.average) /
+                      averageByType?.expense?.average) *
                       100
                   : 0
               ).toFixed(0)}

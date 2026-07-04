@@ -35,8 +35,8 @@ export const handlers = [
     return res(
       ctx.json({
         averageByType: [
-          { TypeName: 'income', Average: 4500 },
-          { TypeName: 'expense', Average: 1800 },
+          { type_name: 'income', average: 4500 },
+          { type_name: 'expense', average: 1800 },
         ],
       })
     )

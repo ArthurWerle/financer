@@ -9,8 +9,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 export function AnalyticsAverages() {
   const { data, isLoading } = useAverage()
 
-  const avgIncome = data?.income?.Average ?? 0
-  const avgExpense = data?.expense?.Average ?? 0
+  const avgIncome = data?.income?.average ?? 0
+  const avgExpense = data?.expense?.average ?? 0
   const avgBalance = avgIncome - avgExpense
   const avgSavedPercent = avgIncome > 0
     ? ((avgIncome - avgExpense) / avgIncome) * 100
