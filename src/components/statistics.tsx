@@ -2,7 +2,14 @@
 
 import React from 'react'
 import { Card } from '@/components/ui/card'
-import { ArrowUp, ArrowDown, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
+import {
+  ArrowUp,
+  ArrowDown,
+  ArrowUpRight,
+  ArrowDownLeft,
+  TrendingUp,
+  PiggyBank,
+} from 'lucide-react'
 import { useMonthOverview } from '../queries/transactions/useMonthOverview'
 import { Skeleton } from '@/components/ui/skeleton'
 import { HistoricalData } from './historical-data'
@@ -11,6 +18,7 @@ import { LatestTransactions } from './latest-transactions'
 import { BiggestTransactions } from './biggest-transactions'
 import { numberToCurrency } from '@/utils/number-to-currency'
 import { useAverage } from '@/queries/types/useAverage'
+import { useMonthProjection } from '@/queries/transactions/useMonthProjection'
 export function MonthlyOverview() {
   const {
     data: averageByType,
@@ -22,6 +30,11 @@ export function MonthlyOverview() {
     isLoading: isLoadingOverview,
     error: errorOverview,
   } = useMonthOverview()
+  const { data: projection } = useMonthProjection()
+
+  const income = monthOverview?.income?.currentMonth ?? 0
+  const expense = monthOverview?.expense?.currentMonth ?? 0
+  const savedPercent = income > 0 ? ((income - expense) / income) * 100 : null
 
   if (errorOverview || errorAverage) {
     return <p className="text-red-600">Error loading financial data</p>
@@ -70,7 +83,7 @@ export function MonthlyOverview() {
                       100
                   : 0
               ).toFixed(0)}
-              % from average month
+              % from 6-month average
             </p>
           )}
       </div>
@@ -98,10 +111,37 @@ export function MonthlyOverview() {
                       100
                   : 0
               ).toFixed(0)}
-              % from average month
+              % from 6-month average
             </p>
           )}
       </div>
+      {savedPercent !== null && (
+        <div className="space-y-2">
+          <p className="text-3xl font-bold flex items-center gap-2">
+            <PiggyBank
+              className={`h-6 w-6 ${savedPercent >= 0 ? 'text-green-400' : 'text-red-400'}`}
+            />
+            <span
+              className={savedPercent >= 0 ? 'text-gray-900' : 'text-red-600'}
+            >
+              {savedPercent.toFixed(0)}%
+            </span>
+          </p>
+          <p className="text-sm text-gray-500">saved this month</p>
+        </div>
+      )}
+      {!!projection?.projected_total && (
+        <div className="space-y-2">
+          <p className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <TrendingUp className="h-6 w-6 text-blue-400" />
+            {numberToCurrency(projection.projected_total)}
+          </p>
+          <p className="text-sm text-gray-500">
+            projected month spend ·{' '}
+            {numberToCurrency(projection.recurring_committed)} recurring
+          </p>
+        </div>
+      )}
     </div>
   )
 }
