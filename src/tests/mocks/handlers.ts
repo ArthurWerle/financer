@@ -11,7 +11,44 @@ const emptyTransactionResponse = {
   transactions: [],
 }
 
+export const mockUser = {
+  id: 1,
+  name: 'Arthur Werle',
+  email: 'arthur@example.com',
+  enabled: true,
+}
+
 export const handlers = [
+  // Mock login endpoint
+  rest.post(`${BFF_BASE_URL}/auth/login`, async (req, res, ctx) => {
+    const { email, password } = await req.json()
+
+    if (email === mockUser.email && password === 'correct-password') {
+      return res(ctx.json({ user: mockUser }))
+    }
+
+    return res(
+      ctx.status(401),
+      ctx.json({ error: 'login_failed', message: 'invalid email or password' })
+    )
+  }),
+
+  // Mock logout endpoint
+  rest.post(`${BFF_BASE_URL}/auth/logout`, (req, res, ctx) => {
+    return res(ctx.json({ message: 'Logged out successfully' }))
+  }),
+
+  // Mock current user endpoint
+  rest.get(`${BFF_BASE_URL}/auth/me`, (req, res, ctx) => {
+    return res(ctx.json(mockUser))
+  }),
+
+  // Mock feature flag check endpoint
+  rest.get(`${BFF_BASE_URL}/feature-flags/check`, (req, res, ctx) => {
+    const key = req.url.searchParams.get('key')
+    return res(ctx.json({ enabled: key === 'enabled-flag' }))
+  }),
+
   // Mock month overview endpoint
   rest.get(`${BFF_BASE_URL}/overview/by-month`, (req, res, ctx) => {
     return res(
