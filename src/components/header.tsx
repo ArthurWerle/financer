@@ -3,16 +3,52 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { LogOut, Menu, X } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { usePathname } from 'next/navigation'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { usePathname, useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import { AddExpense } from './add-expense'
 import { AddIncome } from './add-income'
+import { useMe } from '@/queries/auth/useMe'
+import { logout } from '@/queries/auth/logout'
 import Image from 'next/image'
+
+const getInitials = (name?: string) => {
+  if (!name?.trim()) return '?'
+  const parts = name.trim().split(/\s+/)
+  const first = parts[0]?.[0] ?? ''
+  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : ''
+  return (first + last).toUpperCase()
+}
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+  const queryClient = useQueryClient()
+  const { data: user } = useMe()
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+    } finally {
+      queryClient.clear()
+      router.push('/login')
+      router.refresh()
+    }
+  }
+
+  if (pathname === '/login') {
+    return null
+  }
 
   const menuItems = [
     { href: '/', label: 'Dashboard' },
@@ -62,9 +98,33 @@ const Header = () => {
               <AddIncome />
               <AddExpense />
             </div>
-            <Avatar className="hidden sm:block">
-              <AvatarFallback>AW</AvatarFallback>
-            </Avatar>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="hidden sm:block rounded-full"
+                  aria-label="User menu"
+                >
+                  <Avatar>
+                    <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col">
+                    <span>{user?.name ?? 'Signed in'}</span>
+                    <span className="text-xs font-normal text-gray-500">
+                      {user?.email}
+                    </span>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <button
               className="md:hidden p-1"
               onClick={() => setIsOpen(!isOpen)}
@@ -103,6 +163,13 @@ const Header = () => {
                   <AddIncome />
                   <AddExpense />
                 </div>
+                <button
+                  className="flex items-center gap-2 py-2 mt-4 text-sm font-medium text-gray-600 hover:text-gray-900 sm:hidden"
+                  onClick={handleLogout}
+                >
+                  <LogOut size={16} />
+                  Log out
+                </button>
               </nav>
             </motion.div>
           )}
