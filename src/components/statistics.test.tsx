@@ -20,6 +20,9 @@ describe('Statistics', () => {
       expect(screen.getByText(/R\$ 1\.500,75/)).toBeInTheDocument()
       expect(screen.getByText(/11% from 6-month average/)).toBeInTheDocument()
       expect(screen.getByText(/17% from 6-month average/)).toBeInTheDocument()
+      expect(
+        screen.getByText(/R\$ 405,75 \(27%\) recurring/)
+      ).toBeInTheDocument()
     })
   })
 
