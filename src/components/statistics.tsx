@@ -11,6 +11,7 @@ import { LatestTransactions } from './latest-transactions'
 import { BiggestTransactions } from './biggest-transactions'
 import { numberToCurrency } from '@/utils/number-to-currency'
 import { useAverage } from '@/queries/types/useAverage'
+import { useRecurringExpenseTotal } from '../queries/transactions/useRecurringExpenseTotal'
 export function MonthlyOverview() {
   const {
     data: averageByType,
@@ -22,6 +23,13 @@ export function MonthlyOverview() {
     isLoading: isLoadingOverview,
     error: errorOverview,
   } = useMonthOverview()
+  const { data: recurringExpense } = useRecurringExpenseTotal()
+
+  const currentExpense = monthOverview?.expense?.currentMonth ?? 0
+  const recurringPercent =
+    !!recurringExpense && currentExpense > 0
+      ? Math.round((recurringExpense / currentExpense) * 100)
+      : 0
 
   if (errorOverview || errorAverage) {
     return <p className="text-red-600">Error loading financial data</p>
@@ -101,6 +109,11 @@ export function MonthlyOverview() {
               % from 6-month average
             </p>
           )}
+        {!!recurringExpense && currentExpense > 0 && (
+          <p className="text-sm text-gray-500">
+            {numberToCurrency(recurringExpense)} ({recurringPercent}%) recurring
+          </p>
+        )}
       </div>
     </div>
   )

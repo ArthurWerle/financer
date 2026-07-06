@@ -103,6 +103,58 @@ export const handlers = [
     }
   ),
 
+  // Mock transactions list endpoint (used for the recurring expense total)
+  rest.get(`${BFF_BASE_URL}/transactions`, (req, res, ctx) => {
+    const transactions = [
+      {
+        id: 1,
+        is_prepaid: false,
+        is_recurring: true,
+        category_id: 1,
+        amount: 300,
+        type: 'expense',
+        description: 'Rent',
+        date: '2026-07-01',
+        created_at: '2026-07-01',
+        updated_at: '2026-07-01',
+      },
+      {
+        id: 2,
+        is_prepaid: false,
+        is_recurring: true,
+        category_id: 2,
+        amount: 105.75,
+        type: 'expense',
+        description: 'Streaming',
+        date: '2026-07-01',
+        created_at: '2026-07-01',
+        updated_at: '2026-07-01',
+      },
+      {
+        id: 3,
+        is_prepaid: false,
+        is_recurring: false,
+        category_id: 3,
+        amount: 200,
+        type: 'expense',
+        description: 'Groceries',
+        date: '2026-07-02',
+        created_at: '2026-07-02',
+        updated_at: '2026-07-02',
+      },
+    ]
+
+    return res(
+      ctx.json({
+        count: transactions.length,
+        total: transactions.length,
+        limit: 1000,
+        offset: 0,
+        transactions,
+      })
+    )
+  }),
+
   // Mock latest transactions endpoint
   rest.get(`${BFF_BASE_URL}/transactions/latest`, (req, res, ctx) => {
     return res(ctx.json(emptyTransactionResponse))
