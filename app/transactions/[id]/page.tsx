@@ -382,6 +382,12 @@ export default function TransactionDetailPage({
               </p>
             </div>
           )}
+          {transaction.created_by_name && (
+            <div>
+              <p className="text-gray-500">Created by</p>
+              <p className="font-medium">{transaction.created_by_name}</p>
+            </div>
+          )}
           <div>
             <p className="text-gray-500">Created at</p>
             <p className="font-medium">
