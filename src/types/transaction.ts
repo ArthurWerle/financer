@@ -6,6 +6,7 @@ export type TransactionOrigin = 'web' | 'api' | 'mcp'
 export interface Transaction {
   id: number
   created_by_id?: number
+  created_by_name?: string
   is_prepaid: boolean
   is_recurring?: boolean
   category_id: number
