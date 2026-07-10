@@ -20,6 +20,9 @@ class ResizeObserverMock {
 
 global.ResizeObserver = ResizeObserverMock
 
+// jsdom does not implement scrollTo
+Element.prototype.scrollTo = () => {}
+
 // Mock framer-motion
 jest.mock('framer-motion', () => ({
   motion: {
