@@ -4,6 +4,7 @@ import { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { KeyboardNavigationProvider } from './keyboard-nav-provider'
 import { ToastContainer, toast } from 'react-toastify'
+import ChatWidget from '@/components/chat/chat-widget'
 
 interface ProvidersProps {
   children: ReactNode
@@ -17,6 +18,7 @@ export default function AppProvider({ children }: ProvidersProps) {
       <KeyboardNavigationProvider>
         {children}
       </KeyboardNavigationProvider>
+      <ChatWidget />
       <ToastContainer />
     </QueryClientProvider>
   )

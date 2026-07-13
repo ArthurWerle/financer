@@ -9,6 +9,12 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata = {
   title: 'Financer',
   description: 'Manage your personal finances with ease',
+  applicationName: 'Financer',
+  appleWebApp: {
+    capable: true,
+    title: 'Financer',
+    statusBarStyle: 'default' as const,
+  },
   icons: {
     icon: [
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
@@ -19,6 +25,13 @@ export const metadata = {
     ],
   },
   manifest: '/site.webmanifest',
+}
+
+export const viewport = {
+  themeColor: '#ffffff',
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover' as const,
 }
 
 export default function RootLayout({
