@@ -1,5 +1,6 @@
 import { useCallback } from "react"
 import { toast } from "react-toastify"
+import { useQueryClient } from "@tanstack/react-query"
 import { useChatStore } from "@/stores/useChatStore"
 import {
   askQuestion,
@@ -7,6 +8,7 @@ import {
   scanReceipt,
   MessagePart,
 } from "@/queries/chat/sendChat"
+import { KEY as CHATS_KEY } from "@/queries/chat/useChats"
 
 export type Attachment = {
   file: File
@@ -27,6 +29,7 @@ const createId = () => {
 export const useSendChat = () => {
   const addMessage = useChatStore((state) => state.addMessage)
   const updateMessage = useChatStore((state) => state.updateMessage)
+  const queryClient = useQueryClient()
 
   return useCallback(
     async (text: string, attachment: Attachment | null) => {
@@ -70,12 +73,28 @@ export const useSendChat = () => {
             })
           }
         } else {
-          const result = await askQuestion(trimmed)
+          // Continue the widget's persisted conversation when one exists.
+          const chatId = useChatStore.getState().chatId ?? undefined
+          const result = await askQuestion(
+            [{ type: "text", content: trimmed }],
+            chatId
+          )
+
+          if (result.success && result.chatId) {
+            useChatStore.getState().setChatId(result.chatId)
+            // The conversation now exists server-side — surface it in the
+            // chat page's sidebar.
+            queryClient.invalidateQueries({ queryKey: [CHATS_KEY] })
+          } else if (!result.success) {
+            // Stale chat (deleted elsewhere / foreign): start fresh next send.
+            useChatStore.getState().setChatId(null)
+          }
+
           updateMessage(assistantId, {
             pending: false,
             error: !result.success,
             text:
-              result.data?.answer ??
+              result.answer ??
               result.error ??
               "Something went wrong. Please try again.",
           })
@@ -90,6 +109,6 @@ export const useSendChat = () => {
         })
       }
     },
-    [addMessage, updateMessage]
+    [addMessage, updateMessage, queryClient]
   )
 }

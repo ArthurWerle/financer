@@ -23,11 +23,12 @@ global.ResizeObserver = ResizeObserverMock
 // jsdom does not implement scrollTo
 Element.prototype.scrollTo = () => {}
 
-// Mock framer-motion
+// Mock framer-motion: motion.<tag> renders as the plain tag
 jest.mock('framer-motion', () => ({
-  motion: {
-    div: 'div',
-  },
+  motion: new Proxy(
+    {},
+    { get: (_target, tag: string) => tag }
+  ),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
 }))
 

@@ -12,8 +12,9 @@ const ChatWidget = () => {
   const toggle = useChatStore((state) => state.toggle)
   const close = useChatStore((state) => state.close)
 
-  // Mirror the header: no assistant on the login screen.
-  if (pathname === "/login") return null
+  // Mirror the header: no assistant on the login screen. Also hidden on the
+  // full chat page, which is the same assistant with its own composer.
+  if (pathname === "/login" || pathname.startsWith("/chat")) return null
 
   return (
     <>

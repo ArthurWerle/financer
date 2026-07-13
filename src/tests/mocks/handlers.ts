@@ -188,6 +188,11 @@ export const handlers = [
     )
   }),
 
+  // Mock chats list endpoint (assistant page sidebar)
+  rest.get(`${BFF_BASE_URL}/ai/chats`, (req, res, ctx) => {
+    return res(ctx.json({ success: true, data: [] }))
+  }),
+
   // Mock categories endpoint
   rest.get(`${BFF_BASE_URL}/categories`, (req, res, ctx) => {
     return res(

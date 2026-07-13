@@ -2,10 +2,14 @@ import { useRef, useState, useEffect } from "react"
 import { FileAudio, Paperclip, Send, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { useSendChat, Attachment } from "./useSendChat"
+import { Attachment } from "./useSendChat"
 
-export const ChatComposer = () => {
-  const send = useSendChat()
+type ChatComposerProps = {
+  onSend: (text: string, attachment: Attachment | null) => void
+  disabled?: boolean
+}
+
+export const ChatComposer = ({ onSend, disabled }: ChatComposerProps) => {
   const [text, setText] = useState("")
   const [attachment, setAttachment] = useState<Attachment | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -36,8 +40,9 @@ export const ChatComposer = () => {
   }
 
   const handleSend = () => {
+    if (disabled) return
     if (!text.trim() && !attachment) return
-    send(text, attachment)
+    onSend(text, attachment)
     setText("")
     setAttachment(null)
   }
@@ -113,7 +118,7 @@ export const ChatComposer = () => {
           size="icon"
           className="shrink-0 rounded-full"
           onClick={handleSend}
-          disabled={!text.trim() && !attachment}
+          disabled={disabled || (!text.trim() && !attachment)}
           aria-label="Send message"
         >
           <Send className="h-4 w-4" />

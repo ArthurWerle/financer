@@ -44,6 +44,7 @@ const EmptyState = () => {
 export const ChatPanel = () => {
   const messages = useChatStore((state) => state.messages)
   const close = useChatStore((state) => state.close)
+  const send = useSendChat()
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -84,7 +85,7 @@ export const ChatPanel = () => {
         )}
       </div>
 
-      <ChatComposer />
+      <ChatComposer onSend={send} />
     </div>
   )
 }

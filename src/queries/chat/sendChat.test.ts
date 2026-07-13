@@ -52,15 +52,52 @@ describe('sendChat', () => {
     ).rejects.toBeTruthy()
   })
 
-  it('askQuestion returns the answer payload', async () => {
+  it('askQuestion posts the message parts and returns the answer payload', async () => {
+    let body: Record<string, unknown> | undefined
+    server.use(
+      rest.post(`${BFF}/ai/ask`, async (req, res, ctx) => {
+        body = await req.json()
+        return res(ctx.json({ success: true, chatId: 'chat-1', answer: '42' }))
+      })
+    )
+
+    const result = await askQuestion([
+      { type: 'text', content: 'how much did I spend?' },
+    ])
+
+    expect(body).toEqual({
+      messages: [{ type: 'text', content: 'how much did I spend?' }],
+    })
+    expect(result.answer).toBe('42')
+    expect(result.chatId).toBe('chat-1')
+  })
+
+  it('askQuestion forwards the chatId when continuing a conversation', async () => {
+    let body: Record<string, unknown> | undefined
+    server.use(
+      rest.post(`${BFF}/ai/ask`, async (req, res, ctx) => {
+        body = await req.json()
+        return res(ctx.json({ success: true, chatId: 'chat-1', answer: 'ok' }))
+      })
+    )
+
+    await askQuestion([{ type: 'text', content: 'and yesterday?' }], 'chat-1')
+
+    expect(body).toMatchObject({ chatId: 'chat-1' })
+  })
+
+  it('askQuestion surfaces a 404 (deleted chat) as a failed result', async () => {
     server.use(
       rest.post(`${BFF}/ai/ask`, (_req, res, ctx) =>
-        res(ctx.json({ success: true, data: { answer: '42' } }))
+        res(ctx.status(404), ctx.json({ success: false, error: 'Chat not found' }))
       )
     )
 
-    const result = await askQuestion('how much did I spend?')
-    expect(result.data?.answer).toBe('42')
+    const result = await askQuestion(
+      [{ type: 'text', content: 'hi' }],
+      'deleted-chat'
+    )
+    expect(result).toEqual({ success: false, error: 'Chat not found' })
   })
 
   it('fileToBase64 strips the data-url prefix', async () => {
