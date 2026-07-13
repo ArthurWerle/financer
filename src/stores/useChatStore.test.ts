@@ -1,6 +1,7 @@
 import { useChatStore } from './useChatStore'
 
-const resetStore = () => useChatStore.setState({ isOpen: false, messages: [] })
+const resetStore = () =>
+  useChatStore.setState({ isOpen: false, messages: [], chatId: null })
 
 describe('useChatStore', () => {
   beforeEach(resetStore)
@@ -36,9 +37,16 @@ describe('useChatStore', () => {
     expect(useChatStore.getState().messages[0].text).toBe('hi')
   })
 
-  it('reset clears the conversation', () => {
+  it('tracks the persisted chat id', () => {
+    useChatStore.getState().setChatId('chat-1')
+    expect(useChatStore.getState().chatId).toBe('chat-1')
+  })
+
+  it('reset clears the conversation and its chat id', () => {
     useChatStore.getState().addMessage({ id: 'a', role: 'user', text: 'hi' })
+    useChatStore.getState().setChatId('chat-1')
     useChatStore.getState().reset()
     expect(useChatStore.getState().messages).toHaveLength(0)
+    expect(useChatStore.getState().chatId).toBeNull()
   })
 })

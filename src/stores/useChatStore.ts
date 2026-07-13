@@ -27,17 +27,22 @@ export type ChatMessage = {
 type ChatState = {
   isOpen: boolean
   messages: ChatMessage[]
+  // Server-side chat the widget conversation is persisted to; null until the
+  // first successful /ask response creates one.
+  chatId: string | null
   open: () => void
   close: () => void
   toggle: () => void
   addMessage: (message: ChatMessage) => void
   updateMessage: (id: string, patch: Partial<ChatMessage>) => void
+  setChatId: (chatId: string | null) => void
   reset: () => void
 }
 
 export const useChatStore = create<ChatState>((set) => ({
   isOpen: false,
   messages: [],
+  chatId: null,
 
   open: () => set({ isOpen: true }),
   close: () => set({ isOpen: false }),
@@ -53,5 +58,7 @@ export const useChatStore = create<ChatState>((set) => ({
       ),
     })),
 
-  reset: () => set({ messages: [] }),
+  setChatId: (chatId) => set({ chatId }),
+
+  reset: () => set({ messages: [], chatId: null }),
 }))

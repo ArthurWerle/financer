@@ -14,7 +14,10 @@ export type ScanResult =
 
 export type AskResult = {
   success: boolean
-  data?: { answer: string }
+  chatId?: string
+  intent?: string
+  answer?: string
+  transactions?: ScannedTransaction[]
   error?: string
 }
 
@@ -38,12 +41,28 @@ export const scanReceipt = async (
   }
 }
 
-// General finance Q&A: stateless single prompt -> answer.
-export const askQuestion = async (prompt: string): Promise<AskResult> => {
-  const { data } = await api.post<AskResult>(`${BFF_BASE_URL}/ai/ask`, {
-    prompt,
-  })
-  return data
+// Conversational Q&A. ai-internal persists both sides of the exchange in a
+// chat: without a chatId it creates one (auto-titled from the first message)
+// and returns its id; with a chatId it appends to that conversation. A 404
+// (deleted/foreign chat) comes back as { success:false, error } instead of
+// throwing so callers can recover by starting a fresh chat.
+export const askQuestion = async (
+  messages: MessagePart[],
+  chatId?: string
+): Promise<AskResult> => {
+  try {
+    const { data } = await api.post<AskResult>(`${BFF_BASE_URL}/ai/ask`, {
+      messages,
+      ...(chatId ? { chatId } : {}),
+    })
+    return data
+  } catch (error) {
+    const data = (error as { response?: { data?: AskResult } })?.response?.data
+    if (data && data.success === false) {
+      return data
+    }
+    throw error
+  }
 }
 
 // Reads a File into a base64 string with the "data:...;base64," prefix

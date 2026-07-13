@@ -57,7 +57,11 @@ const Header = () => {
     { href: '/locations', label: 'Locations' },
     { href: '/analytics', label: 'Analytics' },
     { href: '/history', label: 'History' },
+    { href: '/chat', label: 'Assistant' },
   ]
+
+  const isActive = (href: string) =>
+    pathname === href || (href !== '/' && pathname.startsWith(`${href}/`))
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md z-50">
@@ -83,7 +87,7 @@ const Header = () => {
                 key={item.href}
                 href={item.href}
                 className={`text-sm font-medium transition-colors ${
-                  pathname === item.href
+                  isActive(item.href)
                     ? 'text-primary'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
@@ -150,7 +154,7 @@ const Header = () => {
                     key={item.href}
                     href={item.href}
                     className={`py-2 text-sm font-medium transition-colors ${
-                      pathname === item.href
+                      isActive(item.href)
                         ? 'text-primary'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
