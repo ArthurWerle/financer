@@ -193,6 +193,20 @@ export const handlers = [
     return res(ctx.json({ success: true, data: [] }))
   }),
 
+  // Mock spending insight endpoint (header analysis banner)
+  rest.get(`${BFF_BASE_URL}/ai/insights`, (req, res, ctx) => {
+    return res(
+      ctx.json({
+        success: true,
+        insight:
+          'Good work! You reduced your grocery spending by 23% compared to last month!',
+        periodKey: '2026-07',
+        generatedAt: '2026-07-14T12:00:00.000Z',
+        cached: true,
+      })
+    )
+  }),
+
   // Mock categories endpoint
   rest.get(`${BFF_BASE_URL}/categories`, (req, res, ctx) => {
     return res(
