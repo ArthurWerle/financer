@@ -65,9 +65,9 @@ export const askQuestion = async (
   }
 }
 
-// Reads a File into a base64 string with the "data:...;base64," prefix
+// Reads a File/Blob into a base64 string with the "data:...;base64," prefix
 // stripped, matching the shape ai-internal expects for image/audio parts.
-export const fileToBase64 = (file: File): Promise<string> =>
+export const fileToBase64 = (file: Blob): Promise<string> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => {
