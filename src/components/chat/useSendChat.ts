@@ -8,6 +8,7 @@ import {
   scanReceipt,
   MessagePart,
 } from "@/queries/chat/sendChat"
+import { compressImage } from "@/utils/compressImage"
 import { KEY as CHATS_KEY } from "@/queries/chat/useChats"
 
 export type Attachment = {
@@ -51,7 +52,13 @@ export const useSendChat = () => {
 
       try {
         if (attachment) {
-          const base64 = await fileToBase64(attachment.file)
+          // Shrink photos before base64-encoding so the JSON payload stays
+          // within server body limits; audio is sent as-is.
+          const payloadBlob =
+            attachment.kind === "image"
+              ? await compressImage(attachment.file)
+              : attachment.file
+          const base64 = await fileToBase64(payloadBlob)
           const messages: MessagePart[] = [
             { type: "text", content: trimmed || "Please scan this receipt." },
             { type: attachment.kind, content: base64 },

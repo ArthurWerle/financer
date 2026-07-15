@@ -3,13 +3,16 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useSendChat } from './useSendChat'
 import { useChatStore } from '@/stores/useChatStore'
 import { scanReceipt, askQuestion, fileToBase64 } from '@/queries/chat/sendChat'
+import { compressImage } from '@/utils/compressImage'
 
 jest.mock('@/queries/chat/sendChat')
+jest.mock('@/utils/compressImage')
 jest.mock('react-toastify', () => ({ toast: { error: jest.fn() } }))
 
 const mockedScan = scanReceipt as jest.Mock
 const mockedAsk = askQuestion as jest.Mock
 const mockedToBase64 = fileToBase64 as jest.Mock
+const mockedCompress = compressImage as jest.Mock
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={new QueryClient()}>
@@ -88,6 +91,8 @@ describe('useSendChat', () => {
   })
 
   it('routes an attachment to scanReceipt and stores transactions', async () => {
+    const compressed = new Blob(['tiny'], { type: 'image/jpeg' })
+    mockedCompress.mockResolvedValue(compressed)
     mockedToBase64.mockResolvedValue('BASE64')
     mockedScan.mockResolvedValue({
       success: true,
@@ -101,6 +106,8 @@ describe('useSendChat', () => {
       await result.current('', { file, kind: 'image', previewUrl: 'data:preview' })
     })
 
+    expect(mockedCompress).toHaveBeenCalledWith(file)
+    expect(mockedToBase64).toHaveBeenCalledWith(compressed)
     expect(mockedScan).toHaveBeenCalledWith([
       { type: 'text', content: 'Please scan this receipt.' },
       { type: 'image', content: 'BASE64' },
@@ -112,7 +119,22 @@ describe('useSendChat', () => {
     expect(messages[1].transactions).toHaveLength(1)
   })
 
+  it('sends audio attachments without compressing them', async () => {
+    mockedToBase64.mockResolvedValue('AUDIO64')
+    mockedScan.mockResolvedValue({ success: true, summary: 'ok', transactions: [] })
+
+    const file = new File(['x'], 'note.webm', { type: 'audio/webm' })
+    const { result } = renderHook(() => useSendChat(), { wrapper })
+    await act(async () => {
+      await result.current('', { file, kind: 'audio' })
+    })
+
+    expect(mockedCompress).not.toHaveBeenCalled()
+    expect(mockedToBase64).toHaveBeenCalledWith(file)
+  })
+
   it('marks the assistant message as an error when the scan fails', async () => {
+    mockedCompress.mockImplementation(async (file: File) => file)
     mockedToBase64.mockResolvedValue('BASE64')
     mockedScan.mockResolvedValue({ success: false, error: 'no transactions found' })
 
