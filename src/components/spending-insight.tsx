@@ -51,13 +51,12 @@ export function SpendingInsight() {
         variants={sentence}
         initial="hidden"
         animate="visible"
-        className="text-[12.5px] leading-[1.55] text-muted-foreground"
+        className="text-[14.5px] leading-[1.55] text-muted-foreground"
       >
         <span className="font-medium text-foreground">Monthly insight — </span>
         {insight.split(/\s+/).map((token, index) => (
           <motion.span key={index} variants={word} className="inline-block">
-            {token}
-            {' '}
+            {token}&nbsp;
           </motion.span>
         ))}
       </motion.p>
