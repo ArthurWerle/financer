@@ -8,8 +8,8 @@ const BFF_BASE_URL = 'http://localhost:8082/api/bff'
 describe('Statistics', () => {
   it('should render loading state initially', () => {
     render(<Statistics />)
-    expect(screen.getByText('Financial Overview')).toBeInTheDocument()
-    expect(screen.getAllByTestId('skeleton')).toHaveLength(6)
+    expect(screen.getByText('Income')).toBeInTheDocument()
+    expect(screen.getAllByTestId('skeleton')).toHaveLength(4)
   })
 
   it('should render financial data after loading', async () => {
@@ -20,9 +20,7 @@ describe('Statistics', () => {
       expect(screen.getByText(/R\$ 1\.500,75/)).toBeInTheDocument()
       expect(screen.getByText(/11% from 6-month average/)).toBeInTheDocument()
       expect(screen.getByText(/17% from 6-month average/)).toBeInTheDocument()
-      expect(
-        screen.getByText(/R\$ 405,75 \(27%\) recurring/)
-      ).toBeInTheDocument()
+      expect(screen.getByText(/27% of expenses/)).toBeInTheDocument()
     })
   })
 
@@ -30,7 +28,7 @@ describe('Statistics', () => {
     render(<Statistics />)
 
     await waitFor(() => {
-      expect(screen.getByText('Historical Data')).toBeInTheDocument()
+      expect(screen.getByText('Income vs expenses')).toBeInTheDocument()
     })
   })
 
@@ -38,9 +36,7 @@ describe('Statistics', () => {
     render(<Statistics />)
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Monthly expenses by category')
-      ).toBeInTheDocument()
+      expect(screen.getByText('Expenses by category')).toBeInTheDocument()
     })
   })
 

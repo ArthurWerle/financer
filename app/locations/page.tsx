@@ -3,11 +3,12 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
+import { PageHeader } from '@/components/page-header'
 import { useLocations } from '@/queries/locations/useLocations'
 import { updateLocation } from '@/queries/locations/updateLocation'
 import { deleteLocation } from '@/queries/locations/deleteLocation'
 import { mergeLocations } from '@/queries/locations/mergeLocations'
-import { MoreVertical, Pencil, Trash2, Merge } from 'lucide-react'
+import { MapPin, MoreVertical, Pencil, Trash2, Merge } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import {
@@ -93,37 +94,39 @@ function LocationItem({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: index * 0.05 }}
+        className="flex items-center justify-between gap-3 rounded-md px-2 py-2 -mx-2 transition-colors hover:bg-panel2"
       >
-        <div className="flex justify-between items-center mb-2">
-          <p className="font-medium">{location.name}</p>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                disabled={isDeleting}
-              >
-                <MoreVertical className="h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleEditOpen}>
-                <Pencil className="h-4 w-4" />
-                Rename
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleDelete}
-                className="text-red-600 focus:text-red-600"
-              >
-                <Trash2 className="h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="flex items-center gap-2.5">
+          <MapPin size={13} strokeWidth={1.8} className="text-faint" />
+          <p className="text-[13px] font-medium">{location.name}</p>
         </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="p-1 rounded-[5px] text-faint hover:text-foreground hover:bg-panel2 transition-colors"
+              disabled={isDeleting}
+            >
+              <MoreVertical className="h-3.5 w-3.5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleEditOpen}>
+              <Pencil className="h-4 w-4" />
+              Rename
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={handleDelete}
+              className="text-destructive focus:text-destructive"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </motion.div>
 
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Rename Location</DialogTitle>
           </DialogHeader>
@@ -177,18 +180,22 @@ function MergeLocations({ locations }: { locations: Location[] }) {
 
   return (
     <>
-      <Button variant="secondary" onClick={() => setIsOpen(true)}>
-        <Merge className="h-4 w-4" />
+      <Button
+        variant="outline"
+        onClick={() => setIsOpen(true)}
+        className="h-[30px] rounded-[7px] px-3 text-[12.5px] font-medium"
+      >
+        <Merge className="h-3 w-3" />
         Merge duplicates
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Merge Locations</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleMerge} className="space-y-4">
-            <p className="text-sm text-gray-500">
+            <p className="text-[12.5px] text-muted-foreground">
               All transactions from the first location move to the second, then
               the first is removed.
             </p>
@@ -250,37 +257,37 @@ export default function Locations() {
   const { data: locations = [], isLoading } = useLocations()
 
   return (
-    <div>
-      <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8">
-        Locations
-      </h1>
-      <Card className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
-        <div className="flex flex-wrap justify-between items-center gap-2 mb-6">
-          <h2 className="text-2xl font-bold">Places</h2>
+    <div className="flex flex-col gap-5">
+      <PageHeader title="Locations" subtitle="Places where you spend" />
+      <Card className="rounded-[10px] border-border p-0 shadow-none">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-5 py-4">
+          <h2 className="text-[14px] font-semibold">Places</h2>
           {locations.length > 1 && <MergeLocations locations={locations} />}
         </div>
-        {isLoading ? (
-          <div className="space-y-4">
-            {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </div>
-        ) : locations.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            No locations yet. They are created automatically when you add a
-            place to a transaction.
-          </p>
-        ) : (
-          <div className="space-y-4">
-            {locations.map((location, index) => (
-              <LocationItem
-                key={location.id}
-                location={location}
-                index={index}
-              />
-            ))}
-          </div>
-        )}
+        <div className="px-5 py-3">
+          {isLoading ? (
+            <div className="space-y-4">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
+            </div>
+          ) : locations.length === 0 ? (
+            <p className="py-2 text-[12.5px] text-muted-foreground">
+              No locations yet. They are created automatically when you add a
+              place to a transaction.
+            </p>
+          ) : (
+            <div>
+              {locations.map((location, index) => (
+                <LocationItem
+                  key={location.id}
+                  location={location}
+                  index={index}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </Card>
     </div>
   )

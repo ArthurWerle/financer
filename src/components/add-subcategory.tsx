@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Plus } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -46,9 +47,12 @@ export const AddSubcategory = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="default">Add Subcategory</Button>
+        <Button variant="outline" className="h-[30px] rounded-[7px] px-3 text-[12.5px] font-medium">
+          <Plus size={12} />
+          Add subcategory
+        </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Subcategory</DialogTitle>
         </DialogHeader>

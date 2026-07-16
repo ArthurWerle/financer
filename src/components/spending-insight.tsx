@@ -2,14 +2,8 @@
 
 import { motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
-import { Space_Grotesk } from 'next/font/google'
 import { usePathname } from 'next/navigation'
 import { useSpendingInsight } from '@/queries/insights/useSpendingInsight'
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-})
 
 const sentence = {
   hidden: {},
@@ -47,27 +41,23 @@ export function SpendingInsight() {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      className={`${spaceGrotesk.className} mb-6 flex items-start gap-2.5 rounded-xl border border-violet-100 bg-gradient-to-r from-violet-50 via-white to-sky-50 px-4 py-3 shadow-sm`}
+      className="flex items-start gap-2.5 rounded-[9px] border border-border bg-card px-3.5 py-[11px]"
     >
-      <motion.span
-        initial={{ scale: 0, rotate: -30 }}
-        animate={{ scale: 1, rotate: 0 }}
-        transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 18 }}
-        className="mt-0.5 shrink-0"
+      <Sparkles
+        className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground"
         aria-hidden="true"
-      >
-        <Sparkles className="h-4 w-4 text-violet-500" />
-      </motion.span>
+      />
       <motion.p
         variants={sentence}
         initial="hidden"
         animate="visible"
-        className="text-sm font-medium leading-relaxed text-gray-800"
+        className="text-[12.5px] leading-[1.55] text-muted-foreground"
       >
+        <span className="font-medium text-foreground">Monthly insight — </span>
         {insight.split(/\s+/).map((token, index) => (
           <motion.span key={index} variants={word} className="inline-block">
             {token}
-            {' '}
+            {' '}
           </motion.span>
         ))}
       </motion.p>

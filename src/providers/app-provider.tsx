@@ -33,7 +33,11 @@ export default function AppProvider({ children }: ProvidersProps) {
         {children}
       </KeyboardNavigationProvider>
       <ChatWidget />
-      <ToastContainer />
+      <ToastContainer
+        theme="colored"
+        toastClassName="!rounded-[9px] !border !border-border !bg-card !text-foreground !shadow-none !font-sans !text-[13px] !min-h-0 !p-3"
+        progressClassName="!bg-faint"
+      />
     </QueryClientProvider>
   )
 }

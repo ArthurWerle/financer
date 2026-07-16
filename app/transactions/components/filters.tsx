@@ -45,39 +45,37 @@ export function Filters() {
   const activeType = filters.type ?? 'expense'
 
   return (
-    <div className="flex gap-2 mb-6 sm:mb-10 flex-wrap">
-      <div className="flex rounded-lg border border-input overflow-hidden">
+    <div className="flex flex-wrap items-center gap-2 border-b border-border pb-3.5">
+      <div className="flex overflow-hidden rounded-[7px] border border-border">
         <Button
           onClick={() => setUrl('type', 'expense')}
           variant="ghost"
-          className={`rounded-none ${activeType === 'expense' ? 'bg-muted font-semibold' : ''}`}
+          className={`h-[30px] rounded-none px-3 text-[12.5px] ${activeType === 'expense' ? 'bg-panel2 font-semibold text-foreground' : 'text-muted-foreground'}`}
         >
           Expense
         </Button>
         <Button
           onClick={() => setUrl('type', 'income')}
           variant="ghost"
-          className={`rounded-none border-l ${activeType === 'income' ? 'bg-muted font-semibold' : ''}`}
+          className={`h-[30px] rounded-none border-l border-border px-3 text-[12.5px] ${activeType === 'income' ? 'bg-panel2 font-semibold text-foreground' : 'text-muted-foreground'}`}
         >
           Income
         </Button>
       </div>
-      <div>
-        <Button
-          onClick={() => {
-            if (filters.currentMonth === 'true') {
-              setUrl('currentMonth', null)
-              return
-            }
+      <Button
+        onClick={() => {
+          if (filters.currentMonth === 'true') {
+            setUrl('currentMonth', null)
+            return
+          }
 
-            setUrl('currentMonth', 'true')
-          }}
-          variant="outline"
-          className={`rounded-lg ${filters?.currentMonth === 'true' ? 'border-blue-400' : ''}`}
-        >
-          Current month
-        </Button>
-      </div>
+          setUrl('currentMonth', 'true')
+        }}
+        variant="outline"
+        className={`h-[30px] rounded-[7px] px-3 text-[12.5px] font-medium ${filters?.currentMonth === 'true' ? 'bg-panel2 text-foreground' : 'text-muted-foreground'}`}
+      >
+        Current month
+      </Button>
       <div className="w-full sm:w-auto">
         <MultiSelect
           options={categories.map((category: Category) => ({ value: String(category.id), label: category.name }))}
@@ -90,16 +88,16 @@ export function Filters() {
       <div className="w-full sm:w-auto">
         <DatePickerWithRange selected={localDateRange} onSelect={handleDateRangeChange} />
       </div>
-      <div className="w-full sm:w-auto">
+      <div className="w-full sm:ml-auto sm:w-auto">
         <Input
-          placeholder="Search transactions..."
+          placeholder="Search transactions…"
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           onBlur={applySearch}
           onKeyDown={(e) => {
             if (e.key === 'Enter') applySearch()
           }}
-          className="w-full sm:w-64"
+          className="h-[30px] w-full rounded-[7px] bg-background text-[12.5px] sm:w-64"
         />
       </div>
     </div>

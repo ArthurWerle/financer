@@ -2,35 +2,25 @@
 
 import { Statistics } from '@/components/statistics'
 import { Skeleton } from '@/components/ui/skeleton'
+import { PageHeader } from '@/components/page-header'
 import { useMonthOverview } from '@/queries/transactions/useMonthOverview'
-import { numberToCurrency } from '@/utils/number-to-currency'
+import { useMe } from '@/queries/auth/useMe'
 
 export default function Home() {
-  const { data: response, isLoading } = useMonthOverview()
-  const { income, expense } = response || {}
-  const totalBalance =
-    (income?.currentMonth ?? 0) - (expense?.currentMonth ?? 0)
+  const { isLoading } = useMonthOverview()
+  const { data: user } = useMe()
+  const firstName = user?.name?.split(' ')[0] ?? 'there'
 
   if (isLoading) {
     return <LoadingSkeleton />
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-bold">Hello, Arthur</h1>
-          <p className="text-muted-foreground">This is your finance report</p>
-        </div>
-        <div className="flex gap-12">
-          <div className="sm:text-right">
-            <p className="text-sm text-muted-foreground">Total Balance</p>
-            <p className="text-3xl font-bold">
-              {numberToCurrency(totalBalance)}
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="flex flex-col gap-5">
+      <PageHeader
+        title={`Hello, ${firstName}`}
+        subtitle="This is your finance report"
+      />
       <Statistics />
     </div>
   )

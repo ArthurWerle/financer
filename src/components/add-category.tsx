@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Plus } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -38,9 +39,12 @@ export const AddCategory = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default">Add Category</Button>
+        <Button variant="outline" className="h-[30px] rounded-[7px] px-3 text-[12.5px] font-medium">
+          <Plus size={12} />
+          Add category
+        </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Add</DialogTitle>
         </DialogHeader>

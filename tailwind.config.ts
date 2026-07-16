@@ -44,18 +44,20 @@ export default {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
-  			chart: {
-  				'1': 'hsl(var(--chart-1))',
-  				'2': 'hsl(var(--chart-2))',
-  				'3': 'hsl(var(--chart-3))',
-  				'4': 'hsl(var(--chart-4))',
-  				'5': 'hsl(var(--chart-5))'
-  			}
+  			panel2: 'var(--panel2)',
+  			border2: 'var(--border2)',
+  			faint: 'var(--faint)',
+  			green: 'var(--green)',
+  			red: 'var(--red)'
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
+  		},
+  		fontFamily: {
+  			sans: ['var(--font-geist)', 'system-ui', 'sans-serif'],
+  			mono: ['var(--font-geist-mono)', 'ui-monospace', 'monospace']
   		}
   	}
   },

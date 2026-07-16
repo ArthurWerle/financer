@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { PageHeader } from '@/components/page-header'
 import { useTransactions } from '@/queries/transactions/useTransactions'
 import { useFilters } from '@/hooks/useFilters'
 import { Filters } from './components/filters'
@@ -42,47 +43,52 @@ export default function Transactions() {
   const currentPage = Math.floor(offset / LIMIT) + 1
 
   return (
-    <div>
-      <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8">
-        Transactions
-      </h1>
-      <Card className="p-4 sm:p-6 bg-white shadow-lg rounded-2xl">
-        <Filters />
+    <div className="flex flex-col gap-5">
+      <PageHeader
+        title="Transactions"
+        subtitle={`${total} transaction${total !== 1 ? 's' : ''} this month`}
+      />
+      <Card className="rounded-[10px] border-border p-0 shadow-none">
+        <div className="px-4 pt-3.5 sm:px-5">
+          <Filters />
+        </div>
         {isLoading || isLoadingCategories ? (
-          <div className="space-y-3">
+          <div className="space-y-3 p-4 sm:p-5">
             {[...Array(6)].map((_, i) => (
               <Skeleton key={i} className="h-10 w-full" />
             ))}
           </div>
         ) : (
           <>
-            <p className="text-sm text-gray-500 mb-3">
+            <p className="px-4 pb-1 pt-2.5 font-mono text-[11px] text-faint sm:px-5">
               Showing {transactions.length} of {total} transaction
               {total !== 1 ? 's' : ''}
             </p>
-            <TransactionsTable
-              transactions={transactions}
-              categories={categories}
-            />
-            <div className="flex items-center justify-center gap-4 mt-4">
+            <div className="px-4 sm:px-5">
+              <TransactionsTable
+                transactions={transactions}
+                categories={categories}
+              />
+            </div>
+            <div className="flex items-center justify-center gap-3.5 p-3.5">
               <Button
                 variant="outline"
-                size="sm"
                 onClick={() => setOffset(offset - LIMIT)}
                 disabled={offset === 0}
+                className="h-7 rounded-md px-2.5 font-mono text-xs text-muted-foreground"
               >
-                &lt; Previous
+                ← Prev
               </Button>
-              <span className="text-sm text-gray-500">
-                Page {currentPage} of {totalPages}
+              <span className="font-mono text-[11.5px] text-muted-foreground">
+                Page {currentPage} / {totalPages}
               </span>
               <Button
                 variant="outline"
-                size="sm"
                 onClick={() => setOffset(offset + LIMIT)}
                 disabled={offset + LIMIT >= total}
+                className="h-7 rounded-md px-2.5 font-mono text-xs text-muted-foreground"
               >
-                Next &gt;
+                Next →
               </Button>
             </div>
           </>

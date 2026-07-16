@@ -29,6 +29,7 @@ import { addDate } from '../utils/add-date'
 import { TransactionType } from '@/enums/enums'
 import { LocationCombobox } from '@/components/ui/location-combobox'
 import { Switch } from '@/components/ui/switch'
+import { Plus } from 'lucide-react'
 
 type FormData = {
   amount: number | undefined
@@ -180,21 +181,25 @@ export const AddExpense = () => {
           variant="default"
           id="add-expense-button"
           onClick={() => setIsDialogOpen(true)}
+          className="h-8 rounded-[7px] px-3 text-[12.5px] font-semibold"
         >
-          New Expense
+          <Plus size={13} />
+          New expense
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add</DialogTitle>
+          <DialogTitle>New expense</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid gap-4">
-            <div className="grid gap-2">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
+          <div className="flex flex-col gap-3.5">
+            <div className="grid gap-1.5">
               <Label htmlFor="amount">Amount</Label>
               <Input
                 id="amount"
                 type="number"
+                placeholder="0.00"
+                className="font-mono"
                 value={formData.amount ?? ''}
                 onChange={(e) =>
                   setFormData({
@@ -206,41 +211,58 @@ export const AddExpense = () => {
               />
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="category">Category</Label>
-              <Select
-                onValueChange={(value) =>
-                  setFormData({ ...formData, categoryId: Number(value) })
-                }
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {isLoadingCategories ? (
-                    <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                      Loading categories...
-                    </div>
-                  ) : (
-                    categories?.map((category) => (
-                      <SelectItem key={category.id} value={String(category.id)}>
-                        {category.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid gap-1.5">
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, categoryId: Number(value) })
+                  }
+                  required
+                >
+                  <SelectTrigger id="category">
+                    <SelectValue placeholder="Select…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {isLoadingCategories ? (
+                      <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                        Loading categories...
+                      </div>
+                    ) : (
+                      categories?.map((category) => (
+                        <SelectItem key={category.id} value={String(category.id)}>
+                          {category.name}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid gap-1.5">
+                <Label>Date</Label>
+                <Input
+                  type="date"
+                  className="font-mono text-[12.5px]"
+                  value={format(formData.date, 'yyyy-MM-dd')}
+                  onChange={(e) => {
+                    const date = new Date(e.target.value + 'T00:00:00')
+                    if (!isNaN(date.getTime())) {
+                      setFormData({ ...formData, date })
+                    }
+                  }}
+                />
+              </div>
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-1.5">
               <Label htmlFor="subcategory">Subcategory</Label>
               <Select
                 onValueChange={(value) =>
                   setFormData({ ...formData, subcategoryId: Number(value) })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger id="subcategory">
                   <SelectValue placeholder="Select subcategory (optional)" />
                 </SelectTrigger>
                 <SelectContent>
@@ -259,24 +281,11 @@ export const AddExpense = () => {
               </Select>
             </div>
 
-            <div className="grid gap-2">
-              <Label>Date</Label>
-              <Input
-                type="date"
-                value={format(formData.date, 'yyyy-MM-dd')}
-                onChange={(e) => {
-                  const date = new Date(e.target.value + 'T00:00:00')
-                  if (!isNaN(date.getTime())) {
-                    setFormData({ ...formData, date })
-                  }
-                }}
-              />
-            </div>
-
-            <div className="grid gap-2">
+            <div className="grid gap-1.5">
               <Label htmlFor="description">Description</Label>
               <Input
                 id="description"
+                placeholder="What was it?"
                 value={formData.description}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
@@ -285,7 +294,7 @@ export const AddExpense = () => {
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-1.5">
               <Label htmlFor="location">Where? (optional)</Label>
               <LocationCombobox
                 id="location"
@@ -294,8 +303,10 @@ export const AddExpense = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="is-recurring">Recurring (monthly)</Label>
+            <div className="flex items-center justify-between py-0.5">
+              <Label htmlFor="is-recurring" className="text-[12.5px] font-medium text-foreground">
+                Recurring (monthly)
+              </Label>
               <Switch
                 id="is-recurring"
                 checked={formData.isRecurring}
@@ -310,7 +321,7 @@ export const AddExpense = () => {
             </div>
 
             {formData.isRecurring && (
-              <div className="grid gap-2">
+              <div className="grid gap-1.5">
                 <Label htmlFor="installments">
                   Installments (leave empty for ongoing)
                 </Label>
@@ -334,7 +345,7 @@ export const AddExpense = () => {
 
           <Button
             type="submit"
-            className="w-full"
+            className="mt-1 h-9 w-full rounded-[7px] text-[13px] font-semibold"
             disabled={isLoading || !formValidation.isValid}
           >
             {isLoading ? 'Loading...' : 'Create'}
@@ -342,7 +353,7 @@ export const AddExpense = () => {
           {!formValidation.isValid && (
             <ul>
               {formValidation.invalidFields.map((invalidField) => (
-                <li key={invalidField} className="text-red-500 text-[11px]">
+                <li key={invalidField} className="text-[11px] text-destructive">
                   Field &quot;{invalidField}&quot; is missing
                 </li>
               ))}

@@ -24,24 +24,26 @@ export function HistoricalData() {
 
   if (isError) {
     return (
-      <Card className="p-6 bg-white shadow-lg rounded-2xl">
-        <h3 className="text-xl font-semibold text-gray-800 mb-6">
-          Historical Data
+      <Card className="rounded-[10px] border-border p-5 shadow-none">
+        <h3 className="mb-4 text-[14px] font-semibold">
+          Income vs expenses
         </h3>
-        <p className="text-red-600">Error loading historical data</p>
+        <p className="text-[12.5px] text-destructive">
+          Error loading historical data
+        </p>
       </Card>
     )
   }
 
   if (isLoading) {
     return (
-      <Card className="p-6 bg-white shadow-lg rounded-2xl">
-        <h3 className="text-xl font-semibold text-gray-800 mb-6">
-          Historical Data
+      <Card className="rounded-[10px] border-border p-5 shadow-none">
+        <h3 className="mb-4 text-[14px] font-semibold">
+          Income vs expenses
         </h3>
         <div className="h-[300px]">
           <div className="animate-pulse flex items-center justify-center h-full">
-            <div className="w-2/3 h-2/3 bg-gray-200 rounded-lg" />
+            <div className="w-2/3 h-2/3 rounded-lg bg-panel2" />
           </div>
         </div>
       </Card>
@@ -49,23 +51,21 @@ export function HistoricalData() {
   }
 
   return (
-    <Card className="p-6 bg-white shadow-lg rounded-2xl">
-      <h3 className="text-xl font-semibold text-gray-800 mb-6">
-        Historical Data
-      </h3>
+    <Card className="rounded-[10px] border-border p-5 shadow-none">
+      <h3 className="mb-4 text-[14px] font-semibold">Income vs expenses</h3>
       <ChartContainer
         config={{
           income: {
             label: 'Income',
-            color: 'hsl(var(--primary))',
+            color: 'var(--green)',
           },
           expense: {
             label: 'Expense',
-            color: 'hsl(var(--border))',
+            color: 'var(--red)',
           },
           balance: {
             label: 'Balance',
-            color: 'hsl(var(--primary))',
+            color: 'var(--faint)',
           },
         }}
         className="h-[300px] w-full"
@@ -74,17 +74,19 @@ export function HistoricalData() {
           <LineChart data={incomeAndExpenseComparsion} responsive>
             <XAxis
               dataKey="month"
-              stroke="#888888"
-              fontSize={10}
+              stroke="var(--faint)"
+              fontSize={10.5}
+              fontFamily="var(--font-geist-mono)"
               tickLine={false}
-              axisLine={false}
+              axisLine={{ stroke: 'var(--border)' }}
             />
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid strokeDasharray="3 4" stroke="var(--border)" />
             <YAxis
-              stroke="#888888"
-              fontSize={10}
+              stroke="var(--faint)"
+              fontSize={10.5}
+              fontFamily="var(--font-geist-mono)"
               tickLine={false}
-              axisLine={false}
+              axisLine={{ stroke: 'var(--border)' }}
               tickFormatter={(value) => `${value}`}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
@@ -95,7 +97,7 @@ export function HistoricalData() {
               name="Income"
               strokeWidth={2}
               dot={true}
-              stroke="#4ade80"
+              stroke="var(--green)"
             />
             <Line
               type="monotone"
@@ -104,16 +106,16 @@ export function HistoricalData() {
               strokeWidth={2}
               dot={true}
               activeDot={{ r: 8 }}
-              stroke="rgb(248 113 113)"
+              stroke="var(--red)"
             />
             <Line
               type="monotone"
               dataKey="balance"
               name="Balance"
-              strokeWidth={2}
-              strokeDasharray="6 3"
+              strokeWidth={1.5}
+              strokeDasharray="6 4"
               dot={false}
-              stroke="#60a5fa"
+              stroke="var(--faint)"
             />
           </LineChart>
         </ResponsiveContainer>

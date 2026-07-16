@@ -95,14 +95,14 @@ export const KeyboardNavigationProvider = ({ children }: { children: ReactNode }
   return (
     <>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <ul>
             {options.map((option, index) => (
               <li
                 tabIndex={-1}
                 key={option.id}
                 className={`p-2 my-1 rounded cursor-pointer transition-colors ${
-                  index === focusedOptionIndex ? "bg-gray-100" : ""
+                  index === focusedOptionIndex ? "bg-panel2" : ""
                 }`}
                 onClick={() => {
                   option.action()

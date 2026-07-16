@@ -1,48 +1,17 @@
-import { Card, CardContent } from '@/components/ui/card'
 import { useCategoriesMonthyExpense } from '../queries/categories/useCategoriesMonthlyExpense'
-import { Cell, Legend, Pie, PieChart, Tooltip } from 'recharts'
+import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts'
 import { numberToCurrency } from '../utils/number-to-currency'
+import { CHART_RAMP } from '../utils/chart-colors'
 
-const COLORS = [
-  '#3b82f6',
-  '#f97316',
-  '#22c55e',
-  '#eab308',
-  '#14b8a6',
-  '#60a5fa',
-  '#818cf8',
-  '#a78bfa',
-  '#f472b6',
-  '#ef4444',
-]
-
-const CustomTooltip = ({
-  active,
-  payload,
-}: {
-  active?: boolean
-  payload?: { name: string; value: number; payload: { percent: number } }[]
-}) => {
-  if (active && payload && payload.length) {
-    return (
-      <Card>
-        <CardContent className="flex flex-col justify-center items-center px-3 py-1 text-[12px]">
-          <p className="font-bold">{payload[0].name}</p>
-          <p>{numberToCurrency(payload[0].value)}</p>
-          <p className="italic">{payload[0].payload.percent}% of total</p>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  return null
+type ExpenseCategoriesProps = {
+  month?: number
+  year?: number
 }
 
-export function ExpenseCategories() {
-  const {
-    data: expenseCategories,
-    isLoading: isLoadingMonthlyCategoriesExpense,
-  } = useCategoriesMonthyExpense()
+export function ExpenseCategories({ month, year }: ExpenseCategoriesProps = {}) {
+  const { data: expenseCategories, isLoading } = useCategoriesMonthyExpense(
+    month && year ? { month, year } : undefined
+  )
 
   // Slices carry the raw amounts and percentages of the slice total, so the
   // chart always reconciles to 100% regardless of any other endpoint.
@@ -50,55 +19,79 @@ export function ExpenseCategories() {
   const totalExpenses = entries.reduce((acc, [, value]) => acc + value, 0)
   const data =
     totalExpenses > 0
-      ? entries.map(([name, value]) => ({
-          name,
-          value,
-          percent: Number(((value / totalExpenses) * 100).toFixed(1)),
-        }))
+      ? entries
+          .map(([name, value]) => ({
+            name,
+            value,
+            percent: Number(((value / totalExpenses) * 100).toFixed(1)),
+          }))
+          .sort((a, b) => b.value - a.value)
       : []
 
   return (
-    <div className="w-full lg:w-[420px] lg:shrink-0">
-      <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">
-        Monthly expenses by category
-      </h3>
-      <div>
-        {isLoadingMonthlyCategoriesExpense ? (
-          <div className="h-24 bg-gray-100 rounded-lg" />
-        ) : (
-          <div className="w-full max-w-[500px] aspect-square mx-auto">
-            <PieChart
-              style={{
-                width: '100%',
-                height: '100%',
-                maxWidth: '500px',
-                maxHeight: '80vh',
-                aspectRatio: 1,
-              }}
-              responsive
-            >
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius="75%"
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-              <Legend />
-            </PieChart>
+    <div className="rounded-[10px] border border-border bg-card p-5">
+      <h2 className="mb-4 text-[14px] font-semibold">Expenses by category</h2>
+      {isLoading ? (
+        <div className="h-[170px] w-[170px] mx-auto rounded-full bg-panel2 animate-pulse" />
+      ) : data.length === 0 ? (
+        <p className="py-8 text-center text-[12.5px] text-muted-foreground">
+          No expense data for this period.
+        </p>
+      ) : (
+        <>
+          <div className="relative flex justify-center py-1.5 pb-4">
+            <div className="h-[170px] w-[170px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={data}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={62}
+                    outerRadius={70}
+                    startAngle={90}
+                    endAngle={-270}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {data.map((_, index) => (
+                      <Cell key={index} fill={CHART_RAMP[index % CHART_RAMP.length]} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-0.5">
+              <span className="font-mono text-[16px] font-semibold">
+                {numberToCurrency(totalExpenses).split(',')[0]}
+              </span>
+              <span className="text-[10.5px] uppercase tracking-[.06em] text-faint">
+                total spent
+              </span>
+            </div>
           </div>
-        )}
-      </div>
+          <div className="flex flex-col gap-[9px]">
+            {data.map((entry, index) => (
+              <div
+                key={entry.name}
+                className="grid grid-cols-[10px_1fr_auto_auto] items-center gap-[9px]"
+              >
+                <span
+                  className="h-2 w-2 rounded-[2px]"
+                  style={{ backgroundColor: CHART_RAMP[index % CHART_RAMP.length] }}
+                />
+                <span className="truncate text-[12.5px]">{entry.name}</span>
+                <span className="font-mono text-[12px] text-muted-foreground">
+                  {numberToCurrency(entry.value)}
+                </span>
+                <span className="w-[42px] text-right font-mono text-[11px] text-faint">
+                  {entry.percent}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }

@@ -189,10 +189,10 @@ function ActionsCell({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
-            className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-1 rounded-[5px] text-faint hover:text-foreground hover:bg-panel2 transition-colors"
             disabled={isDeleting || isPrepaying}
           >
-            <MoreVertical className="h-4 w-4" />
+            <MoreVertical className="h-3.5 w-3.5" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -232,7 +232,7 @@ function ActionsCell({
           )}
           <DropdownMenuItem
             onClick={handleDelete}
-            className="text-red-600 focus:text-red-600"
+            className="text-destructive focus:text-destructive"
           >
             <Trash2 className="h-4 w-4" />
             {isDeleting ? 'Deleting...' : 'Delete'}
@@ -241,7 +241,7 @@ function ActionsCell({
       </DropdownMenu>
 
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Transaction</DialogTitle>
           </DialogHeader>
@@ -412,7 +412,7 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
               <TooltipTrigger asChild>
                 <Link
                   href={`/transactions/${row.original.id}`}
-                  className="font-medium hover:underline truncate block"
+                  className="block truncate text-[13px] font-medium hover:underline"
                 >
                   {row.original.description}
                 </Link>
@@ -424,7 +424,7 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
           </TooltipProvider>
           {row.original.prepaid_from_id && (
             <Link href={`/transactions/${row.original.prepaid_from_id}`} className="shrink-0">
-              <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium hover:bg-blue-200">
+              <span className="font-mono text-[10px] text-muted-foreground bg-panel2 border border-border rounded px-[5px] py-px hover:text-foreground">
                 Prepaid
               </span>
             </Link>
@@ -434,9 +434,9 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
     },
     {
       accessorKey: 'amount',
-      header: 'Amount',
+      header: () => <div className="text-right">Amount</div>,
       cell: ({ row }) => (
-        <span className="font-medium whitespace-nowrap">
+        <span className="block text-right font-mono text-[12.5px] whitespace-nowrap">
           {numberToCurrency(row.original.amount)}
         </span>
       ),
@@ -445,7 +445,7 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
       accessorKey: 'date',
       header: 'Date',
       cell: ({ row }) => (
-        <span className="text-sm text-gray-600 whitespace-nowrap">
+        <span className="font-mono text-[11.5px] text-muted-foreground whitespace-nowrap">
           {row.original.date ? humanReadableDate(row.original.date) : '—'}
         </span>
       ),
@@ -462,7 +462,7 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-sm text-gray-500 max-w-[120px] truncate block">
+                <span className="block max-w-[120px] truncate text-xs text-muted-foreground">
                   {name}
                 </span>
               </TooltipTrigger>
@@ -482,19 +482,17 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
       cell: ({ row }) => {
         const isExpense = row.original.type === 'expense'
         return (
-          <div className="flex items-center gap-1.5">
+          <div
+            className={`flex items-center gap-1.5 text-xs ${isExpense ? 'text-red' : 'text-green'}`}
+          >
             {isExpense ? (
-              <ArrowUpRight className="h-4 w-4 text-red-400" />
+              <ArrowUpRight className="h-3 w-3" />
             ) : (
-              <ArrowDownLeft className="h-4 w-4 text-green-400" />
+              <ArrowDownLeft className="h-3 w-3" />
             )}
-            <span
-              className={`text-sm font-medium capitalize ${isExpense ? 'text-red-500' : 'text-green-600'}`}
-            >
-              {row.original.type}
-            </span>
+            <span className="capitalize">{row.original.type}</span>
             {row.original.is_recurring && (
-              <RefreshCw className="h-3.5 w-3.5 text-gray-400" />
+              <RefreshCw className="h-2.5 w-2.5 text-faint" />
             )}
           </div>
         )
@@ -505,9 +503,9 @@ function getColumns(categories: Category[]): ColumnDef<Transaction>[] {
       header: 'Payments left',
       cell: ({ row }) => {
         if (!row.original.is_recurring)
-          return <span className="text-gray-300">—</span>
+          return <span className="font-mono text-[11.5px] text-faint">—</span>
         return (
-          <span className="text-sm text-gray-600">
+          <span className="font-mono text-[11.5px] text-muted-foreground">
             {getLeftPayments(
               row.original.end_date,
               row.original.frequency as
@@ -551,7 +549,9 @@ export function TransactionsTable({
 
   if (transactions.length === 0) {
     return (
-      <p className="text-center text-gray-500 py-8">No transactions found.</p>
+      <p className="py-8 text-center text-[12.5px] text-muted-foreground">
+        No transactions found.
+      </p>
     )
   }
 

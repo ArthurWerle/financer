@@ -6,6 +6,7 @@ import { PanelLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { ChatComposer } from "@/components/chat/chat-composer"
+import { PageHeader } from "@/components/page-header"
 import { useChats } from "@/queries/chat/useChats"
 import { useChat } from "@/queries/chat/useChat"
 import { toUiMessage } from "@/queries/chat/mapServerMessage"
@@ -44,7 +45,9 @@ const ChatPage = () => {
   )
 
   return (
-    <div className="flex h-[calc(100dvh-130px)] min-h-[400px] overflow-hidden rounded-xl border border-border bg-background">
+    <div className="flex flex-col gap-5">
+      <PageHeader title="Assistant" subtitle="Ask anything about your money" />
+      <div className="flex h-[calc(100dvh-140px)] max-md:h-[calc(100dvh-196px)] min-h-[400px] overflow-hidden rounded-[10px] border border-border bg-card">
       <aside className="hidden w-72 shrink-0 flex-col border-r border-border md:flex">
         {sidebar}
       </aside>
@@ -60,7 +63,7 @@ const ChatPage = () => {
           >
             <PanelLeft className="h-5 w-5" />
           </Button>
-          <span className="truncate text-sm font-medium">
+          <span className="truncate text-[13px] font-medium">
             {activeChatId ? (activeChat?.title ?? "New chat") : "New chat"}
           </span>
         </div>
@@ -90,6 +93,7 @@ const ChatPage = () => {
           {sidebar}
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   )
 }

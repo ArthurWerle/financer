@@ -212,23 +212,23 @@ export function Transaction({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: (index || 1) * 0.1 }}
       >
-        <div className="flex justify-between items-center mb-2">
+        <div className="flex items-center justify-between gap-3 rounded-md px-2 py-1.5 -mx-2 transition-colors hover:bg-panel2">
           <div>
-            <Link href={`/transactions/${transaction.id}`} className="font-medium hover:underline">
+            <Link href={`/transactions/${transaction.id}`} className="text-[13px] font-medium hover:underline">
               {description}
             </Link>
             <div className="flex items-center gap-1.5">
               {categoryName && (
-                <p className="text-sm text-gray-500">{categoryName}</p>
+                <p className="text-[11.5px] text-faint">{categoryName}</p>
               )}
               {transaction.location?.name && (
-                <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full font-medium">
+                <span className="font-mono text-[10px] text-muted-foreground border border-border rounded px-[5px] py-px">
                   {transaction.location.name}
                 </span>
               )}
               {transaction.prepaid_from_id && (
                 <Link href={`/transactions/${transaction.prepaid_from_id}`}>
-                  <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium hover:bg-blue-200">
+                  <span className="font-mono text-[10px] text-muted-foreground bg-panel2 border border-border rounded px-[5px] py-px hover:text-foreground">
                     Prepaid
                   </span>
                 </Link>
@@ -239,22 +239,22 @@ export function Transaction({
             <div>
               <div className="flex gap-2 justify-end">
                 {type === 'expense' ? (
-                  <ArrowUpRight className="h-5 w-5 text-red-400" />
+                  <ArrowUpRight className="h-4 w-4 text-red" />
                 ) : (
-                  <ArrowDownLeft className="h-5 w-5 text-green-400" />
+                  <ArrowDownLeft className="h-4 w-4 text-green" />
                 )}
-                <span className="font-medium">
+                <span className="font-mono text-[13px] font-medium whitespace-nowrap">
                   {numberToCurrency(amount)}
                 </span>
               </div>
               <div className="flex gap-2 justify-end">
                 {!isRecurringTransaction && (
-                  <p className="text-xs text-gray-500">
+                  <p className="font-mono text-[10.5px] text-faint">
                     {`${humanReadableDate(date)}`}
                   </p>
                 )}
                 {isRecurringTransaction && (
-                  <p className="text-sm text-gray-500">
+                  <p className="font-mono text-[10.5px] text-faint">
                     {getLeftPayments(endDate)}
                   </p>
                 )}
@@ -263,10 +263,10 @@ export function Transaction({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="p-1 rounded-[5px] text-faint hover:text-foreground hover:bg-panel2 transition-colors"
                   disabled={isDeleting || isPrepaying}
                 >
-                  <MoreVertical className="h-4 w-4" />
+                  <MoreVertical className="h-3.5 w-3.5" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -305,7 +305,7 @@ export function Transaction({
                 )}
                 <DropdownMenuItem
                   onClick={handleDelete}
-                  className="text-red-600 focus:text-red-600"
+                  className="text-destructive focus:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
                   Delete
@@ -317,7 +317,7 @@ export function Transaction({
       </motion.div>
 
       <Dialog open={isMarkFinishedOpen} onOpenChange={setIsMarkFinishedOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Mark as Finished</DialogTitle>
           </DialogHeader>
@@ -361,7 +361,7 @@ export function Transaction({
       </Dialog>
 
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Transaction</DialogTitle>
           </DialogHeader>

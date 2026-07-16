@@ -1,29 +1,16 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, TrendingUp } from 'lucide-react'
 import { useMonthOverview } from '@/queries/transactions/useMonthOverview'
-import { useCategoriesMonthyExpense } from '@/queries/categories/useCategoriesMonthlyExpense'
 import { useBiggestTransactions } from '@/queries/transactions/useBiggestTransactions'
 import { useCategories } from '@/queries/categories/useCategories'
 import { numberToCurrency } from '@/utils/number-to-currency'
 import { Transaction } from '@/components/transaction'
-import { Cell, Legend, Pie, PieChart, Tooltip } from 'recharts'
 import { Skeleton } from '@/components/ui/skeleton'
-
-const COLORS = [
-  '#3b82f6',
-  '#f97316',
-  '#22c55e',
-  '#eab308',
-  '#14b8a6',
-  '#60a5fa',
-  '#818cf8',
-  '#a78bfa',
-  '#f472b6',
-  '#ef4444',
-]
+import { PageHeader } from '@/components/page-header'
+import { StatTile } from '@/components/stat-tile'
+import { ExpenseCategories } from '@/components/expense-categories'
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -47,21 +34,6 @@ function buildMonthOptions() {
   return options.reverse()
 }
 
-const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: { name: string; value: number; payload: { rawValue: number } }[] }) => {
-  if (active && payload && payload.length) {
-    return (
-      <Card>
-        <CardContent className="flex flex-col justify-center items-center px-3 py-1 text-[12px]">
-          <p className="font-bold">{payload[0].name}</p>
-          <p>{numberToCurrency(payload[0]?.payload?.rawValue)}</p>
-          <p className="italic">{payload[0].value}% of total</p>
-        </CardContent>
-      </Card>
-    )
-  }
-  return null
-}
-
 export default function HistoryPage() {
   const monthOptions = useMemo(() => buildMonthOptions(), [])
   const [selected, setSelected] = useState(monthOptions[0])
@@ -69,7 +41,6 @@ export default function HistoryPage() {
   const params = { month: selected.month, year: selected.year }
 
   const { data: overview, isLoading: isLoadingOverview } = useMonthOverview(params)
-  const { data: expenseCategories, isLoading: isLoadingCategories } = useCategoriesMonthyExpense(params)
   const { data: biggestData, isLoading: isLoadingBiggest } = useBiggestTransactions(params)
   const { data: categories = [] } = useCategories()
 
@@ -77,26 +48,17 @@ export default function HistoryPage() {
   const expense = overview?.expense?.currentMonth ?? 0
   const balance = income - expense
 
-  const categoryData =
-    expenseCategories && expense > 0
-      ? Object.keys(expenseCategories).map((key) => ({
-          name: key,
-          value: Number(((expenseCategories[key] / expense) * 100).toFixed(0)),
-          rawValue: expenseCategories[key],
-        }))
-      : []
-
   const biggestTransactions = biggestData?.transactions ?? []
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-bold">History</h1>
-          <p className="text-muted-foreground">Review your finances month by month</p>
-        </div>
+    <div className="flex flex-col gap-5">
+      <PageHeader
+        title="History"
+        subtitle="Review your finances month by month"
+      />
+      <div className="flex justify-end">
         <select
-          className="w-full sm:w-auto border border-gray-200 rounded-lg px-4 py-2 text-sm font-medium bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          className="h-8 rounded-[7px] border border-border bg-card px-2.5 text-[12.5px] font-medium text-foreground outline-none w-full sm:w-auto"
           value={`${selected.year}-${selected.month}`}
           onChange={(e) => {
             const found = monthOptions.find(
@@ -113,79 +75,58 @@ export default function HistoryPage() {
         </select>
       </div>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
-          <p className="text-sm text-muted-foreground mb-1">Income</p>
-          {isLoadingOverview ? (
-            <Skeleton className="h-8 w-36" />
-          ) : (
-            <p className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-              <ArrowDownLeft className="h-6 w-6 text-green-400" />
-              {numberToCurrency(income)}
-            </p>
-          )}
-        </Card>
-
-        <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
-          <p className="text-sm text-muted-foreground mb-1">Expenses</p>
-          {isLoadingOverview ? (
-            <Skeleton className="h-8 w-36" />
-          ) : (
-            <p className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-              <ArrowUpRight className="h-6 w-6 text-red-400" />
-              {numberToCurrency(expense)}
-            </p>
-          )}
-        </Card>
-
-        <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
-          <p className="text-sm text-muted-foreground mb-1">Total Balance</p>
-          {isLoadingOverview ? (
-            <Skeleton className="h-8 w-36" />
-          ) : (
-            <p className={`text-3xl font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {numberToCurrency(balance)}
-            </p>
-          )}
-        </Card>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-3">
+        {isLoadingOverview ? (
+          ['Income', 'Expenses', 'Balance'].map((label) => (
+            <div
+              key={label}
+              className="flex flex-col gap-2 rounded-[10px] border border-border bg-card p-4"
+            >
+              <span className="text-[11px] font-medium uppercase tracking-[.06em] text-muted-foreground">
+                {label}
+              </span>
+              <Skeleton className="h-5 w-24" />
+            </div>
+          ))
+        ) : (
+          <>
+            <StatTile
+              label="Income"
+              icon={<ArrowDownLeft size={14} className="text-green" />}
+              value={numberToCurrency(income)}
+            />
+            <StatTile
+              label="Expenses"
+              icon={<ArrowUpRight size={14} className="text-red" />}
+              value={numberToCurrency(expense)}
+            />
+            <StatTile
+              label="Balance"
+              icon={<TrendingUp size={14} className="text-muted-foreground" />}
+              value={numberToCurrency(balance)}
+              valueClassName={balance >= 0 ? 'text-green' : 'text-red'}
+            />
+          </>
+        )}
       </div>
 
-      {/* Expenses by category + Biggest transactions */}
-      <Card className="p-4 sm:p-6 bg-white shadow-lg rounded-2xl flex flex-col gap-8 lg:flex-row lg:justify-between">
-        <div className="w-full lg:w-[420px] lg:shrink-0">
-          <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">
-            Expenses by category
-          </h3>
-          {isLoadingCategories ? (
-            <div className="h-[300px] w-[300px] bg-gray-100 rounded-lg" />
-          ) : categoryData.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No expense data for this month.</p>
-          ) : (
-            <div className="w-full max-w-[500px] aspect-square mx-auto">
-              <PieChart style={{ width: '100%', height: '100%', maxWidth: '500px', maxHeight: '80vh', aspectRatio: 1 }} responsive>
-                <Pie data={categoryData} cx="50%" cy="50%" labelLine={false} outerRadius="75%" fill="#8884d8" dataKey="value">
-                  {categoryData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-              </PieChart>
-            </div>
-          )}
-        </div>
+      <div className="grid grid-cols-1 gap-3 items-start lg:grid-cols-[5fr_7fr]">
+        <ExpenseCategories month={selected.month} year={selected.year} />
 
-        <div className="flex-1">
-          <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">
+        <div className="rounded-[10px] border border-border bg-card p-5">
+          <h2 className="mb-3 text-[14px] font-semibold">
             Biggest transactions
-          </h3>
+          </h2>
           {isLoadingBiggest ? (
             <div className="space-y-2">
-              {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full" />
+              ))}
             </div>
           ) : biggestTransactions.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No transactions for this month.</p>
+            <p className="text-[12.5px] text-muted-foreground">
+              No transactions for this month.
+            </p>
           ) : (
             <ul>
               {biggestTransactions.map((transaction, index) => (
@@ -199,7 +140,7 @@ export default function HistoryPage() {
             </ul>
           )}
         </div>
-      </Card>
+      </div>
     </div>
   )
 }

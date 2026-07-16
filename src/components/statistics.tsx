@@ -1,14 +1,21 @@
 'use client'
 
 import React from 'react'
-import { Card } from '@/components/ui/card'
-import { ArrowUp, ArrowDown, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
+import {
+  ArrowUp,
+  ArrowDown,
+  ArrowUpRight,
+  ArrowDownLeft,
+  TrendingUp,
+  RefreshCw,
+} from 'lucide-react'
 import { useMonthOverview } from '../queries/transactions/useMonthOverview'
 import { Skeleton } from '@/components/ui/skeleton'
 import { HistoricalData } from './historical-data'
 import { ExpenseCategories } from './expense-categories'
 import { LatestTransactions } from './latest-transactions'
 import { BiggestTransactions } from './biggest-transactions'
+import { StatTile } from './stat-tile'
 import { numberToCurrency } from '@/utils/number-to-currency'
 import { useAverage } from '@/queries/types/useAverage'
 import { useRecurringExpenseTotal } from '../queries/transactions/useRecurringExpenseTotal'
@@ -32,113 +39,117 @@ export function MonthlyOverview() {
       : 0
 
   if (errorOverview || errorAverage) {
-    return <p className="text-red-600">Error loading financial data</p>
+    return <p className="text-destructive">Error loading financial data</p>
   }
 
   if (isLoadingOverview || isLoadingAverage) {
     return (
-      <div className="flex flex-col gap-6 sm:flex-row sm:gap-12">
-        <div className="space-y-2">
-          <Skeleton data-testid="skeleton" className="h-4 w-24" />
-          <Skeleton data-testid="skeleton" className="h-6 w-32" />
-          <Skeleton data-testid="skeleton" className="h-4 w-24" />
-        </div>
-        <div className="space-y-2">
-          <Skeleton data-testid="skeleton" className="h-4 w-24" />
-          <Skeleton data-testid="skeleton" className="h-6 w-32" />
-          <Skeleton data-testid="skeleton" className="h-4 w-24" />
-        </div>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-3">
+        {['Income', 'Expenses', 'Balance', 'Recurring'].map((label) => (
+          <div
+            key={label}
+            className="flex flex-col gap-2 rounded-[10px] border border-border bg-card p-4"
+          >
+            <span className="text-[11px] font-medium uppercase tracking-[.06em] text-muted-foreground">
+              {label}
+            </span>
+            <Skeleton data-testid="skeleton" className="h-5 w-24" />
+          </div>
+        ))}
       </div>
     )
   }
 
+  const income = monthOverview?.income?.currentMonth ?? 0
+  const expense = monthOverview?.expense?.currentMonth ?? 0
+  const balance = income - expense
+  const incomeAverage = averageByType?.income?.average ?? 0
+  const expenseAverage = averageByType?.expense?.average ?? 0
+  const incomeSavedPercent = income > 0 ? (balance / income) * 100 : 0
+
+  const incomeAboveAverage = income > incomeAverage
+  const incomePercentDelta = Math.abs(
+    incomeAverage > 0 ? ((income - incomeAverage) / incomeAverage) * 100 : 0
+  ).toFixed(0)
+
+  const expenseAboveAverage = expense > expenseAverage
+  const expensePercentDelta = Math.abs(
+    expenseAverage > 0 ? ((expense - expenseAverage) / expenseAverage) * 100 : 0
+  ).toFixed(0)
+
   return (
-    <div className="flex flex-col gap-6 sm:flex-row sm:gap-12">
-      <div className="space-y-2">
-        <p className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <ArrowDownLeft className="h-6 w-6 text-green-400" />
-          {numberToCurrency(monthOverview?.income?.currentMonth ?? 0)}
-        </p>
-        {!!monthOverview?.income?.currentMonth &&
-          !!averageByType?.income?.average && (
-            <p
-              className={`text-sm ${monthOverview?.income?.currentMonth > averageByType?.income?.average ? 'text-green-600' : 'text-red-600'} flex items-center`}
-            >
-              {monthOverview?.income?.currentMonth >
-              averageByType?.income?.average ? (
-                <ArrowUp className="w-4 h-4 mr-1" />
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-3">
+      <StatTile
+        label="Income"
+        icon={<ArrowDownLeft size={14} className="text-green" />}
+        value={numberToCurrency(income)}
+        footnote={
+          !!income && !!incomeAverage ? (
+            <span className={incomeAboveAverage ? 'text-green' : 'text-red'}>
+              {incomeAboveAverage ? (
+                <ArrowUp className="mr-1 inline h-3 w-3" />
               ) : (
-                <ArrowDown className="w-4 h-4 mr-1" />
+                <ArrowDown className="mr-1 inline h-3 w-3" />
               )}
-              {Math.abs(
-                averageByType?.income?.average > 0
-                  ? ((monthOverview?.income?.currentMonth -
-                      averageByType?.income?.average) /
-                      averageByType?.income?.average) *
-                      100
-                  : 0
-              ).toFixed(0)}
-              % from 6-month average
-            </p>
-          )}
-      </div>
-      <div className="space-y-2">
-        <p className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <ArrowUpRight className="h-6 w-6 text-red-400" />
-          {numberToCurrency(monthOverview?.expense?.currentMonth ?? 0)}
-        </p>
-        {!!monthOverview?.expense?.currentMonth &&
-          !!averageByType?.expense?.average && (
-            <p
-              className={`text-sm ${monthOverview?.expense?.currentMonth > averageByType?.expense?.average ? 'text-red-600' : 'text-green-600'} flex items-center`}
-            >
-              {monthOverview?.expense?.currentMonth >
-              averageByType?.expense?.average ? (
-                <ArrowUp className="w-4 h-4 mr-1" />
+              {incomePercentDelta}% from 6-month average
+            </span>
+          ) : undefined
+        }
+      />
+      <StatTile
+        label="Expenses"
+        icon={<ArrowUpRight size={14} className="text-red" />}
+        value={numberToCurrency(expense)}
+        footnote={
+          !!expense && !!expenseAverage ? (
+            <span className={expenseAboveAverage ? 'text-red' : 'text-green'}>
+              {expenseAboveAverage ? (
+                <ArrowUp className="mr-1 inline h-3 w-3" />
               ) : (
-                <ArrowDown className="w-4 h-4 mr-1" />
+                <ArrowDown className="mr-1 inline h-3 w-3" />
               )}
-              {Math.abs(
-                averageByType?.expense?.average > 0
-                  ? ((monthOverview?.expense?.currentMonth -
-                      averageByType?.expense?.average) /
-                      averageByType?.expense?.average) *
-                      100
-                  : 0
-              ).toFixed(0)}
-              % from 6-month average
-            </p>
-          )}
-        {!!recurringExpense && currentExpense > 0 && (
-          <p className="text-sm text-gray-500">
-            {numberToCurrency(recurringExpense)} ({recurringPercent}%) recurring
-          </p>
-        )}
-      </div>
+              {expensePercentDelta}% from 6-month average
+            </span>
+          ) : undefined
+        }
+      />
+      <StatTile
+        label="Balance"
+        icon={<TrendingUp size={14} className="text-muted-foreground" />}
+        value={numberToCurrency(balance)}
+        valueClassName={balance >= 0 ? 'text-green' : 'text-red'}
+        footnote={
+          income > 0
+            ? `${incomeSavedPercent.toFixed(0)}% of income saved`
+            : undefined
+        }
+      />
+      <StatTile
+        label="Recurring"
+        icon={<RefreshCw size={14} className="text-muted-foreground" />}
+        value={numberToCurrency(recurringExpense ?? 0)}
+        footnote={
+          !!recurringExpense && currentExpense > 0
+            ? `${recurringPercent}% of expenses`
+            : undefined
+        }
+      />
     </div>
   )
 }
 
 export function Statistics() {
   return (
-    <div className="space-y-8">
-      <Card className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">
-            Financial Overview
-          </h2>
-        </div>
-        <MonthlyOverview />
-      </Card>
-
-      <Card className="p-4 sm:p-6 bg-white shadow-lg rounded-2xl flex flex-col gap-10 lg:flex-row lg:justify-between">
+    <div className="flex flex-col gap-4">
+      <MonthlyOverview />
+      <HistoricalData />
+      <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-[5fr_7fr]">
         <ExpenseCategories />
-        <div className="flex flex-col flex-1 gap-10">
+        <div className="flex flex-col gap-3">
           <LatestTransactions />
           <BiggestTransactions />
         </div>
-      </Card>
-      <HistoricalData />
+      </div>
     </div>
   )
 }

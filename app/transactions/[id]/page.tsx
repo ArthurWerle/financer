@@ -233,7 +233,7 @@ export default function TransactionDetailPage({
   if (isError || !transaction) {
     return (
       <div className="p-8">
-        <p className="text-red-500">Error loading transaction.</p>
+        <p className="text-destructive">Error loading transaction.</p>
         <Button
           variant="outline"
           className="mt-4"
@@ -253,7 +253,7 @@ export default function TransactionDetailPage({
         Back
       </Button>
 
-      <Card className="p-4 sm:p-6 bg-white shadow-lg rounded-2xl space-y-6">
+      <Card className="rounded-[10px] border-border p-4 sm:p-6 space-y-6 shadow-none">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold break-words">
@@ -273,11 +273,11 @@ export default function TransactionDetailPage({
                 <Badge variant="outline">Recurring</Badge>
               )}
               {transaction.is_prepaid && (
-                <Badge className="bg-green-100 text-green-700">Prepaid</Badge>
+                <Badge className="bg-panel2 text-foreground border-border">Prepaid</Badge>
               )}
               {transaction.prepaid_from_id && (
                 <Link href={`/transactions/${transaction.prepaid_from_id}`}>
-                  <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 cursor-pointer">
+                  <Badge className="bg-panel2 text-foreground border-border hover:bg-panel2/80 cursor-pointer">
                     Prepaid
                   </Badge>
                 </Link>
@@ -286,11 +286,11 @@ export default function TransactionDetailPage({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {transaction.type === 'expense' ? (
-              <ArrowUpRight className="h-6 w-6 text-red-400" />
+              <ArrowUpRight className="h-6 w-6 text-red" />
             ) : (
-              <ArrowDownLeft className="h-6 w-6 text-green-400" />
+              <ArrowDownLeft className="h-6 w-6 text-green" />
             )}
-            <span className="text-2xl font-bold">
+            <span className="font-mono text-2xl font-bold">
               {formatCurrency(transaction.amount)}
             </span>
           </div>
@@ -298,30 +298,30 @@ export default function TransactionDetailPage({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="text-gray-500">Type</p>
+            <p className="text-muted-foreground">Type</p>
             <p className="font-medium capitalize">{transaction.type}</p>
           </div>
           {transaction.origin && (
             <div>
-              <p className="text-gray-500">Origin</p>
+              <p className="text-muted-foreground">Origin</p>
               <p className="font-medium capitalize">{transaction.origin}</p>
             </div>
           )}
           <div>
-            <p className="text-gray-500">Date</p>
+            <p className="text-muted-foreground">Date</p>
             <p className="font-medium">
               {humanReadableDate(transaction.date, true)}
             </p>
           </div>
           {transaction.frequency && (
             <div>
-              <p className="text-gray-500">Frequency</p>
+              <p className="text-muted-foreground">Frequency</p>
               <p className="font-medium capitalize">{transaction.frequency}</p>
             </div>
           )}
           {transaction.is_recurring && (
             <div>
-              <p className="text-gray-500">Payments left</p>
+              <p className="text-muted-foreground">Payments left</p>
               <p className="font-medium">
                 {getLeftPayments(
                   transaction.end_date,
@@ -336,7 +336,7 @@ export default function TransactionDetailPage({
           )}
           {transaction.is_recurring && transaction.total_paid !== undefined && (
             <div>
-              <p className="text-gray-500">Total paid</p>
+              <p className="text-muted-foreground">Total paid</p>
               <p className="font-medium">
                 {formatCurrency(transaction.total_paid)}
               </p>
@@ -344,7 +344,7 @@ export default function TransactionDetailPage({
           )}
           {transaction.is_recurring && transaction.total_left !== undefined && (
             <div>
-              <p className="text-gray-500">Total left</p>
+              <p className="text-muted-foreground">Total left</p>
               <p className="font-medium">
                 {formatCurrency(transaction.total_left)}
               </p>
@@ -352,7 +352,7 @@ export default function TransactionDetailPage({
           )}
           {transaction.category_month_percent !== undefined && (
             <div>
-              <p className="text-gray-500">% of category this month</p>
+              <p className="text-muted-foreground">% of category this month</p>
               <p className="font-medium">
                 {transaction.category_month_percent.toFixed(1)}%
               </p>
@@ -360,7 +360,7 @@ export default function TransactionDetailPage({
           )}
           {transaction.total_month_percent !== undefined && (
             <div>
-              <p className="text-gray-500">% of total expenses this month</p>
+              <p className="text-muted-foreground">% of total expenses this month</p>
               <p className="font-medium">
                 {transaction.total_month_percent.toFixed(1)}%
               </p>
@@ -368,7 +368,7 @@ export default function TransactionDetailPage({
           )}
           {transaction.start_date && (
             <div>
-              <p className="text-gray-500">Start date</p>
+              <p className="text-muted-foreground">Start date</p>
               <p className="font-medium">
                 {humanReadableDate(transaction.start_date)}
               </p>
@@ -376,7 +376,7 @@ export default function TransactionDetailPage({
           )}
           {transaction.end_date && (
             <div>
-              <p className="text-gray-500">End date</p>
+              <p className="text-muted-foreground">End date</p>
               <p className="font-medium">
                 {humanReadableDate(transaction.end_date)}
               </p>
@@ -384,18 +384,18 @@ export default function TransactionDetailPage({
           )}
           {transaction.created_by_name && (
             <div>
-              <p className="text-gray-500">Created by</p>
+              <p className="text-muted-foreground">Created by</p>
               <p className="font-medium">{transaction.created_by_name}</p>
             </div>
           )}
           <div>
-            <p className="text-gray-500">Created at</p>
+            <p className="text-muted-foreground">Created at</p>
             <p className="font-medium">
               {humanReadableDate(transaction.created_at, true)}
             </p>
           </div>
           <div>
-            <p className="text-gray-500">Updated at</p>
+            <p className="text-muted-foreground">Updated at</p>
             <p className="font-medium">
               {humanReadableDate(transaction.updated_at)}
             </p>
@@ -460,7 +460,7 @@ export default function TransactionDetailPage({
       </Card>
 
       <Dialog open={isMarkFinishedOpen} onOpenChange={setIsMarkFinishedOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Mark as Finished</DialogTitle>
           </DialogHeader>
@@ -507,7 +507,7 @@ export default function TransactionDetailPage({
       </Dialog>
 
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Transaction</DialogTitle>
           </DialogHeader>

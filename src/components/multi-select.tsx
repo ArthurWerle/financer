@@ -56,7 +56,7 @@ function MultiSelect<T extends Option>({
                 {selectedItem?.label}
                 <button 
                   onClick={() => handleRemove(selectedValue)}
-                  className="ml-1 hover:text-red-500"
+                  className="ml-1 hover:text-destructive"
                 >
                   <X size={14} />
                 </button>

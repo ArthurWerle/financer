@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
+import { PageHeader } from '@/components/page-header'
 import { useCategories } from '@/queries/categories/useCategories'
 import { AddCategory } from '@/components/add-category'
 import { AddSubcategory } from '@/components/add-subcategory'
@@ -106,42 +107,47 @@ function CategoryItem({ category, index }: { category: Category; index: number }
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: index * 0.1 }}
+        className="flex items-center justify-between gap-3 rounded-md px-2 py-2 -mx-2 transition-colors hover:bg-panel2"
       >
-        <div className="flex justify-between items-center mb-2">
-          <div>
-            <p className="font-medium">{category.name}</p>
-            <p className="text-sm text-gray-500">
+        <div className="flex items-center gap-3">
+          <span
+            className="h-[9px] w-[9px] shrink-0 rounded-[3px]"
+            style={{ backgroundColor: category.color || 'var(--c3)' }}
+          />
+          <div className="flex flex-col gap-px">
+            <p className="text-[13px] font-medium">{category.name}</p>
+            <p className="text-[11.5px] text-faint">
               {category.description}
             </p>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                disabled={isDeleting}
-              >
-                <MoreVertical className="h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleEditOpen}>
-                <Pencil className="h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleDelete}
-                className="text-red-600 focus:text-red-600"
-              >
-                <Trash2 className="h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="p-1 rounded-[5px] text-faint hover:text-foreground hover:bg-panel2 transition-colors"
+              disabled={isDeleting}
+            >
+              <MoreVertical className="h-3.5 w-3.5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleEditOpen}>
+              <Pencil className="h-4 w-4" />
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={handleDelete}
+              className="text-destructive focus:text-destructive"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </motion.div>
 
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Category</DialogTitle>
           </DialogHeader>
@@ -274,40 +280,39 @@ function SubcategoryItem({ subcategory, index }: { subcategory: Subcategory; ind
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: index * 0.1 }}
+        className="flex items-center justify-between gap-3 rounded-md px-2 py-2 -mx-2 transition-colors hover:bg-panel2"
       >
-        <div className="flex justify-between items-center mb-2">
-          <div>
-            <p className="font-medium">{subcategory.name}</p>
-            <p className="text-sm text-gray-500">{subcategory.description}</p>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                disabled={isDeleting}
-              >
-                <MoreVertical className="h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleEditOpen}>
-                <Pencil className="h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleDelete}
-                className="text-red-600 focus:text-red-600"
-              >
-                <Trash2 className="h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="flex flex-col gap-px">
+          <p className="text-[13px] font-medium">{subcategory.name}</p>
+          <p className="text-[11.5px] text-faint">{subcategory.description}</p>
         </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="p-1 rounded-[5px] text-faint hover:text-foreground hover:bg-panel2 transition-colors"
+              disabled={isDeleting}
+            >
+              <MoreVertical className="h-3.5 w-3.5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleEditOpen}>
+              <Pencil className="h-4 w-4" />
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={handleDelete}
+              className="text-destructive focus:text-destructive"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </motion.div>
 
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Subcategory</DialogTitle>
           </DialogHeader>
@@ -379,48 +384,53 @@ export default function Categories() {
   const { data: subcategories = [], isLoading: isLoadingSubcategories } = useSubcategories()
 
   return (
-    <div>
-      <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8">
-        Categories
-      </h1>
-      <Card className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl">
-        <div className="flex flex-wrap justify-between items-center gap-2 mb-6">
-          <h2 className="text-2xl font-bold">Expense Categories</h2>
+    <div className="flex flex-col gap-5">
+      <PageHeader
+        title="Categories"
+        subtitle="Organize how your money is grouped"
+      />
+      <Card className="rounded-[10px] border-border p-0 shadow-none">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-5 py-4">
+          <h2 className="text-[14px] font-semibold">Expense categories</h2>
           <AddCategory />
         </div>
-        {isLoading ? (
-          <LoadingList />
-        ) : (
-          <div className="space-y-6">
-            {categories.map((category, index) => (
-              <CategoryItem
-                key={category.id}
-                category={category}
-                index={index}
-              />
-            ))}
-          </div>
-        )}
+        <div className="px-5 py-3">
+          {isLoading ? (
+            <LoadingList />
+          ) : (
+            <div>
+              {categories.map((category, index) => (
+                <CategoryItem
+                  key={category.id}
+                  category={category}
+                  index={index}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </Card>
 
-      <Card className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white shadow-lg rounded-2xl mt-8">
-        <div className="flex flex-wrap justify-between items-center gap-2 mb-6">
-          <h2 className="text-2xl font-bold">Sub Categories</h2>
+      <Card className="rounded-[10px] border-border p-0 shadow-none">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-5 py-4">
+          <h2 className="text-[14px] font-semibold">Subcategories</h2>
           <AddSubcategory />
         </div>
-        {isLoadingSubcategories ? (
-          <LoadingList />
-        ) : (
-          <div className="space-y-6">
-            {subcategories.map((subcategory, index) => (
-              <SubcategoryItem
-                key={subcategory.id}
-                subcategory={subcategory}
-                index={index}
-              />
-            ))}
-          </div>
-        )}
+        <div className="px-5 py-3">
+          {isLoadingSubcategories ? (
+            <LoadingList />
+          ) : (
+            <div>
+              {subcategories.map((subcategory, index) => (
+                <SubcategoryItem
+                  key={subcategory.id}
+                  subcategory={subcategory}
+                  index={index}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </Card>
     </div>
   )

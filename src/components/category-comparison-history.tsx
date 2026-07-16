@@ -12,19 +12,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-
-const COLORS = [
-  '#3b82f6',
-  '#f97316',
-  '#22c55e',
-  '#eab308',
-  '#14b8a6',
-  '#60a5fa',
-  '#818cf8',
-  '#a78bfa',
-  '#f472b6',
-  '#ef4444',
-]
 import { Card } from '@/components/ui/card'
 import {
   ChartContainer,
@@ -37,6 +24,7 @@ import MultiSelect from '@/components/multi-select'
 import { useCategories } from '@/queries/categories/useCategories'
 import { useCategoryComparisonHistory } from '@/queries/transactions/useCategoryComparisonHistory'
 import { Category } from '@/types/category'
+import { CHART_RAMP } from '@/utils/chart-colors'
 
 type Mode = 'expense' | 'income'
 
@@ -72,29 +60,29 @@ export function CategoryComparisonHistory() {
   const chartConfig = Object.fromEntries(
     (data ?? []).map((cat, index) => [
       cat.category_name,
-      { label: cat.category_name, color: COLORS[index % COLORS.length] },
+      { label: cat.category_name, color: CHART_RAMP[index % CHART_RAMP.length] },
     ])
   )
 
   return (
-    <Card className="p-6 bg-white shadow-lg rounded-2xl">
-      <h3 className="text-xl font-semibold text-gray-800 mb-6">
-        Category Comparison History
+    <Card className="rounded-[10px] border-border p-5 shadow-none">
+      <h3 className="mb-4 text-[14px] font-semibold">
+        Category comparison history
       </h3>
 
       <div className="flex flex-wrap gap-3 mb-6 items-start">
-        <div className="flex rounded-lg border border-input overflow-hidden">
+        <div className="flex rounded-md border border-border overflow-hidden">
           <Button
             onClick={() => setMode('expense')}
             variant="ghost"
-            className={`rounded-none ${mode === 'expense' ? 'bg-muted font-semibold' : ''}`}
+            className={`h-7 rounded-none px-2.5 text-xs ${mode === 'expense' ? 'bg-panel2 font-semibold text-foreground' : 'text-muted-foreground'}`}
           >
             Expense
           </Button>
           <Button
             onClick={() => setMode('income')}
             variant="ghost"
-            className={`rounded-none border-l ${mode === 'income' ? 'bg-muted font-semibold' : ''}`}
+            className={`h-7 rounded-none border-l border-border px-2.5 text-xs ${mode === 'income' ? 'bg-panel2 font-semibold text-foreground' : 'text-muted-foreground'}`}
           >
             Income
           </Button>
@@ -127,19 +115,21 @@ export function CategoryComparisonHistory() {
       </div>
 
       {isError && (
-        <p className="text-red-600">Error loading category comparison data</p>
+        <p className="text-[12.5px] text-destructive">
+          Error loading category comparison data
+        </p>
       )}
 
       {isLoading && (
         <div className="h-[300px]">
           <div className="animate-pulse flex items-center justify-center h-full">
-            <div className="w-2/3 h-2/3 bg-gray-200 rounded-lg" />
+            <div className="w-2/3 h-2/3 rounded-lg bg-panel2" />
           </div>
         </div>
       )}
 
       {!isLoading && !isError && data && data.length === 0 && (
-        <div className="h-[300px] flex items-center justify-center text-gray-500">
+        <div className="h-[300px] flex items-center justify-center text-[12.5px] text-muted-foreground">
           No data available for the selected filters
         </div>
       )}
@@ -150,17 +140,19 @@ export function CategoryComparisonHistory() {
             <LineChart data={mergedData}>
               <XAxis
                 dataKey="month"
-                stroke="#888888"
-                fontSize={10}
+                stroke="var(--faint)"
+                fontSize={10.5}
+                fontFamily="var(--font-geist-mono)"
                 tickLine={false}
-                axisLine={false}
+                axisLine={{ stroke: 'var(--border)' }}
               />
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 4" stroke="var(--border)" />
               <YAxis
-                stroke="#888888"
-                fontSize={10}
+                stroke="var(--faint)"
+                fontSize={10.5}
+                fontFamily="var(--font-geist-mono)"
                 tickLine={false}
-                axisLine={false}
+                axisLine={{ stroke: 'var(--border)' }}
               />
               <ChartTooltip content={<ChartTooltipContent />} />
               <Legend verticalAlign="top" height={36} />
@@ -171,7 +163,7 @@ export function CategoryComparisonHistory() {
                   dataKey={cat.category_name}
                   strokeWidth={2}
                   dot={true}
-                  stroke={COLORS[index % COLORS.length]}
+                  stroke={CHART_RAMP[index % CHART_RAMP.length]}
                 />
               ))}
             </LineChart>
