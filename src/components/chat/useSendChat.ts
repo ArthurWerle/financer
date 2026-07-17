@@ -5,7 +5,6 @@ import { useChatStore } from "@/stores/useChatStore"
 import {
   askQuestion,
   fileToBase64,
-  scanReceipt,
   MessagePart,
 } from "@/queries/chat/sendChat"
 import { compressImage } from "@/utils/compressImage"
@@ -25,8 +24,9 @@ const createId = () => {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`
 }
 
-// Owns the send + endpoint-routing logic: an image/audio attachment goes to
-// /scan (creates transactions), a text-only message goes to /ask (Q&A).
+// Owns the widget's send logic. Everything — text and attachments — goes
+// through /ask so the whole conversation (receipts included) is persisted
+// server-side and shows up in the Assistant page's chat list.
 export const useSendChat = () => {
   const addMessage = useChatStore((state) => state.addMessage)
   const updateMessage = useChatStore((state) => state.updateMessage)
@@ -51,6 +51,12 @@ export const useSendChat = () => {
       addMessage({ id: assistantId, role: "assistant", pending: true })
 
       try {
+        const messages: MessagePart[] = [
+          {
+            type: "text",
+            content: trimmed || "Please scan this receipt.",
+          },
+        ]
         if (attachment) {
           // Shrink photos before base64-encoding so the JSON payload stays
           // within server body limits; audio is sent as-is.
@@ -59,53 +65,31 @@ export const useSendChat = () => {
               ? await compressImage(attachment.file)
               : attachment.file
           const base64 = await fileToBase64(payloadBlob)
-          const messages: MessagePart[] = [
-            { type: "text", content: trimmed || "Please scan this receipt." },
-            { type: attachment.kind, content: base64 },
-          ]
-
-          const result = await scanReceipt(messages)
-
-          if (result.success) {
-            updateMessage(assistantId, {
-              pending: false,
-              text: result.summary,
-              transactions: result.transactions,
-            })
-          } else {
-            updateMessage(assistantId, {
-              pending: false,
-              error: true,
-              text: result.error,
-            })
-          }
-        } else {
-          // Continue the widget's persisted conversation when one exists.
-          const chatId = useChatStore.getState().chatId ?? undefined
-          const result = await askQuestion(
-            [{ type: "text", content: trimmed }],
-            chatId
-          )
-
-          if (result.success && result.chatId) {
-            useChatStore.getState().setChatId(result.chatId)
-            // The conversation now exists server-side — surface it in the
-            // chat page's sidebar.
-            queryClient.invalidateQueries({ queryKey: [CHATS_KEY] })
-          } else if (!result.success) {
-            // Stale chat (deleted elsewhere / foreign): start fresh next send.
-            useChatStore.getState().setChatId(null)
-          }
-
-          updateMessage(assistantId, {
-            pending: false,
-            error: !result.success,
-            text:
-              result.answer ??
-              result.error ??
-              "Something went wrong. Please try again.",
-          })
+          messages.push({ type: attachment.kind, content: base64 })
         }
+
+        // Continue the widget's persisted conversation when one exists.
+        const chatId = useChatStore.getState().chatId ?? undefined
+        const result = await askQuestion(messages, chatId)
+
+        if (result.success && result.chatId) {
+          useChatStore.getState().setChatId(result.chatId)
+          // The conversation now exists server-side — surface it in the
+          // chat page's sidebar.
+          queryClient.invalidateQueries({ queryKey: [CHATS_KEY] })
+        } else if (!result.success) {
+          // Stale chat (deleted elsewhere / foreign): start fresh next send.
+          useChatStore.getState().setChatId(null)
+        }
+
+        updateMessage(assistantId, {
+          pending: false,
+          error: !result.success,
+          text:
+            result.answer ??
+            result.error ??
+            "Something went wrong. Please try again.",
+        })
       } catch (error) {
         console.error(error)
         toast.error("Couldn't reach the assistant. Please try again.")
