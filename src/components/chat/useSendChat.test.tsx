@@ -90,14 +90,14 @@ describe('useSendChat', () => {
     })
   })
 
-  it('routes an attachment to scanReceipt and stores transactions', async () => {
+  it('routes an attachment through askQuestion so the chat is persisted', async () => {
     const compressed = new Blob(['tiny'], { type: 'image/jpeg' })
     mockedCompress.mockResolvedValue(compressed)
     mockedToBase64.mockResolvedValue('BASE64')
-    mockedScan.mockResolvedValue({
+    mockedAsk.mockResolvedValue({
       success: true,
-      summary: 'Added R$ 10',
-      transactions: [{ description: 'Coffee', amount: 10 }],
+      chatId: 'chat-9',
+      answer: 'Added R$ 10',
     })
 
     const file = new File(['x'], 'receipt.jpg', { type: 'image/jpeg' })
@@ -108,20 +108,24 @@ describe('useSendChat', () => {
 
     expect(mockedCompress).toHaveBeenCalledWith(file)
     expect(mockedToBase64).toHaveBeenCalledWith(compressed)
-    expect(mockedScan).toHaveBeenCalledWith([
-      { type: 'text', content: 'Please scan this receipt.' },
-      { type: 'image', content: 'BASE64' },
-    ])
+    expect(mockedAsk).toHaveBeenCalledWith(
+      [
+        { type: 'text', content: 'Please scan this receipt.' },
+        { type: 'image', content: 'BASE64' },
+      ],
+      undefined
+    )
+    expect(mockedScan).not.toHaveBeenCalled()
+    expect(useChatStore.getState().chatId).toBe('chat-9')
 
     const messages = useChatStore.getState().messages
     expect(messages[0]).toMatchObject({ imageDataUrl: 'data:preview' })
     expect(messages[1]).toMatchObject({ pending: false, text: 'Added R$ 10' })
-    expect(messages[1].transactions).toHaveLength(1)
   })
 
   it('sends audio attachments without compressing them', async () => {
     mockedToBase64.mockResolvedValue('AUDIO64')
-    mockedScan.mockResolvedValue({ success: true, summary: 'ok', transactions: [] })
+    mockedAsk.mockResolvedValue({ success: true, chatId: 'chat-1', answer: 'ok' })
 
     const file = new File(['x'], 'note.webm', { type: 'audio/webm' })
     const { result } = renderHook(() => useSendChat(), { wrapper })
@@ -136,7 +140,7 @@ describe('useSendChat', () => {
   it('marks the assistant message as an error when the scan fails', async () => {
     mockedCompress.mockImplementation(async (file: File) => file)
     mockedToBase64.mockResolvedValue('BASE64')
-    mockedScan.mockResolvedValue({ success: false, error: 'no transactions found' })
+    mockedAsk.mockResolvedValue({ success: false, error: 'no transactions found' })
 
     const file = new File(['x'], 'receipt.jpg', { type: 'image/jpeg' })
     const { result } = renderHook(() => useSendChat(), { wrapper })
