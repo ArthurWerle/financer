@@ -1,7 +1,7 @@
 "use client"
 
 import { AnimatePresence, motion } from "framer-motion"
-import { MessageCircle, X } from "lucide-react"
+import { MessageCircle } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { useChatStore } from "@/stores/useChatStore"
 import { ChatPanel } from "./chat-panel"
@@ -43,30 +43,24 @@ const ChatWidget = () => {
         ) : null}
       </AnimatePresence>
 
-      <motion.button
-        type="button"
-        onClick={toggle}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label={isOpen ? "Close assistant" : "Open assistant"}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-shadow hover:shadow-xl"
-      >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.span
-            key={isOpen ? "close" : "open"}
-            initial={{ opacity: 0, rotate: -90 }}
-            animate={{ opacity: 1, rotate: 0 }}
-            exit={{ opacity: 0, rotate: 90 }}
-            transition={{ duration: 0.15 }}
+      <AnimatePresence>
+        {!isOpen ? (
+          <motion.button
+            key="fab"
+            type="button"
+            onClick={toggle}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            aria-label="Open assistant"
+            className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-shadow hover:shadow-xl"
           >
-            {isOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <MessageCircle className="h-6 w-6" />
-            )}
-          </motion.span>
-        </AnimatePresence>
-      </motion.button>
+            <MessageCircle className="h-6 w-6" />
+          </motion.button>
+        ) : null}
+      </AnimatePresence>
     </>
   )
 }

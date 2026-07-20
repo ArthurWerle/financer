@@ -213,16 +213,16 @@ export function Transaction({
         transition={{ duration: 0.3, delay: (index || 1) * 0.1 }}
       >
         <div className="flex items-center justify-between gap-3 rounded-md px-2 py-1.5 -mx-2 transition-colors hover:bg-panel2">
-          <div>
-            <Link href={`/transactions/${transaction.id}`} className="text-[13px] font-medium hover:underline">
+          <div className="min-w-0 flex-1">
+            <Link href={`/transactions/${transaction.id}`} className="block truncate text-[13px] font-medium hover:underline">
               {description}
             </Link>
-            <div className="flex items-center gap-1.5">
+            <div className="flex min-w-0 items-center gap-1.5">
               {categoryName && (
-                <p className="text-[11.5px] text-faint">{categoryName}</p>
+                <p className="truncate text-[11.5px] text-faint">{categoryName}</p>
               )}
               {transaction.location?.name && (
-                <span className="font-mono text-[10px] text-muted-foreground border border-border rounded px-[5px] py-px">
+                <span className="truncate font-mono text-[10px] text-muted-foreground border border-border rounded px-[5px] py-px">
                   {transaction.location.name}
                 </span>
               )}
@@ -235,7 +235,7 @@ export function Transaction({
               )}
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-3">
             <div>
               <div className="flex gap-2 justify-end">
                 {type === 'expense' ? (
