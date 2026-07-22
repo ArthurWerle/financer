@@ -119,6 +119,7 @@ describe('ChatPage', () => {
         const body = await req.json()
         expect(body).toMatchObject({
           chatId: 'chat-1',
+          userId: '1',
           messages: [{ type: 'text', content: 'and this month?' }],
         })
         return res(

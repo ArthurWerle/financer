@@ -46,6 +46,25 @@ describe('useChats', () => {
     expect(result.current.data).toHaveLength(1)
     expect(result.current.data?.[0].title).toBe('Groceries')
   })
+
+  it('scopes the list to the logged-in user id', async () => {
+    let requestedUserId: string | null = null
+    server.use(
+      rest.get(`${BFF}/ai/chats`, (req, res, ctx) => {
+        requestedUserId = req.url.searchParams.get('userId')
+        return res(ctx.json({ success: true, data: [] }))
+      })
+    )
+
+    const { result } = renderHook(() => useChats(), {
+      wrapper: createWrapper(),
+    })
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    // useMe resolves to the default mock user (id 1), so the list refetches
+    // scoped to that owner — matching the id stamped on chats at creation.
+    await waitFor(() => expect(requestedUserId).toBe('1'))
+  })
 })
 
 describe('useChat', () => {

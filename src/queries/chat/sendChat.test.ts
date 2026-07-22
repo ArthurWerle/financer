@@ -72,6 +72,23 @@ describe('sendChat', () => {
     expect(result.chatId).toBe('chat-1')
   })
 
+  it('askQuestion stamps the userId in the body when provided', async () => {
+    let body: Record<string, unknown> | undefined
+    server.use(
+      rest.post(`${BFF}/ai/ask`, async (req, res, ctx) => {
+        body = await req.json()
+        return res(ctx.json({ success: true, chatId: 'chat-1', answer: 'ok' }))
+      })
+    )
+
+    await askQuestion([{ type: 'text', content: 'hi' }], undefined, '1')
+
+    expect(body).toEqual({
+      messages: [{ type: 'text', content: 'hi' }],
+      userId: '1',
+    })
+  })
+
   it('askQuestion forwards the chatId when continuing a conversation', async () => {
     let body: Record<string, unknown> | undefined
     server.use(

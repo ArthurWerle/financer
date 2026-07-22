@@ -15,6 +15,7 @@ import {
   ServerChatMessage,
 } from "@/queries/chat/types"
 import { Attachment } from "@/components/chat/useSendChat"
+import { useMe } from "@/queries/auth/useMe"
 
 const ATTACHMENT_ONLY_PROMPT = "Please describe this attachment."
 
@@ -40,6 +41,7 @@ type PendingState = {
 // pick up the new row / auto-generated title / reordering.
 export const useSendChatPage = (activeChatId?: string) => {
   const queryClient = useQueryClient()
+  const { data: user } = useMe()
   const [isSending, setIsSending] = useState(false)
   const [pending, setPending] = useState<PendingState | null>(null)
 
@@ -91,7 +93,9 @@ export const useSendChatPage = (activeChatId?: string) => {
           parts.push({ type: attachment.kind, content: base64 })
         }
 
-        const result = await askQuestion(parts, activeChatId)
+        // Stamp the chat with its owner so it lands in the user's scoped list.
+        const userId = user?.id != null ? String(user.id) : undefined
+        const result = await askQuestion(parts, activeChatId, userId)
 
         if (!result.success || !result.chatId) {
           failLocally(result.error)
@@ -173,7 +177,7 @@ export const useSendChatPage = (activeChatId?: string) => {
         setIsSending(false)
       }
     },
-    [activeChatId, chatKey, isSending, queryClient]
+    [activeChatId, chatKey, isSending, queryClient, user?.id]
   )
 
   return {

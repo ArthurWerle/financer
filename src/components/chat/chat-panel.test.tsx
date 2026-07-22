@@ -6,6 +6,10 @@ import { askQuestion } from '@/queries/chat/sendChat'
 
 jest.mock('@/queries/chat/sendChat')
 jest.mock('react-toastify', () => ({ toast: { error: jest.fn() } }))
+// Stable logged-in user so the widget stamps a deterministic owner id.
+jest.mock('@/queries/auth/useMe', () => ({
+  useMe: () => ({ data: { id: 1 } }),
+}))
 
 const mockedAsk = askQuestion as jest.Mock
 
@@ -66,7 +70,8 @@ describe('ChatPanel', () => {
 
     expect(mockedAsk).toHaveBeenCalledWith(
       [{ type: 'text', content: 'How much did I spend?' }],
-      undefined
+      undefined,
+      '1'
     )
     expect(
       useChatStore

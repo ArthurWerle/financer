@@ -9,6 +9,7 @@ import {
 } from "@/queries/chat/sendChat"
 import { compressImage } from "@/utils/compressImage"
 import { KEY as CHATS_KEY } from "@/queries/chat/useChats"
+import { useMe } from "@/queries/auth/useMe"
 
 export type Attachment = {
   file: File
@@ -31,6 +32,7 @@ export const useSendChat = () => {
   const addMessage = useChatStore((state) => state.addMessage)
   const updateMessage = useChatStore((state) => state.updateMessage)
   const queryClient = useQueryClient()
+  const { data: user } = useMe()
 
   return useCallback(
     async (text: string, attachment: Attachment | null) => {
@@ -70,7 +72,9 @@ export const useSendChat = () => {
 
         // Continue the widget's persisted conversation when one exists.
         const chatId = useChatStore.getState().chatId ?? undefined
-        const result = await askQuestion(messages, chatId)
+        // Stamp the chat with its owner so it lands in the user's scoped list.
+        const userId = user?.id != null ? String(user.id) : undefined
+        const result = await askQuestion(messages, chatId, userId)
 
         if (result.success && result.chatId) {
           useChatStore.getState().setChatId(result.chatId)
@@ -100,6 +104,6 @@ export const useSendChat = () => {
         })
       }
     },
-    [addMessage, updateMessage, queryClient]
+    [addMessage, updateMessage, queryClient, user?.id]
   )
 }
