@@ -8,6 +8,10 @@ import { compressImage } from '@/utils/compressImage'
 jest.mock('@/queries/chat/sendChat')
 jest.mock('@/utils/compressImage')
 jest.mock('react-toastify', () => ({ toast: { error: jest.fn() } }))
+// Stable logged-in user so the widget stamps a deterministic owner id.
+jest.mock('@/queries/auth/useMe', () => ({
+  useMe: () => ({ data: { id: 1 } }),
+}))
 
 const mockedScan = scanReceipt as jest.Mock
 const mockedAsk = askQuestion as jest.Mock
@@ -40,7 +44,8 @@ describe('useSendChat', () => {
 
     expect(mockedAsk).toHaveBeenCalledWith(
       [{ type: 'text', content: 'How much did I spend?' }],
-      undefined
+      undefined,
+      '1'
     )
     expect(mockedScan).not.toHaveBeenCalled()
 
@@ -70,7 +75,8 @@ describe('useSendChat', () => {
 
     expect(mockedAsk).toHaveBeenLastCalledWith(
       [{ type: 'text', content: 'second message' }],
-      'chat-1'
+      'chat-1',
+      '1'
     )
   })
 
@@ -113,7 +119,8 @@ describe('useSendChat', () => {
         { type: 'text', content: 'Please scan this receipt.' },
         { type: 'image', content: 'BASE64' },
       ],
-      undefined
+      undefined,
+      '1'
     )
     expect(mockedScan).not.toHaveBeenCalled()
     expect(useChatStore.getState().chatId).toBe('chat-9')

@@ -46,14 +46,20 @@ export const scanReceipt = async (
 // and returns its id; with a chatId it appends to that conversation. A 404
 // (deleted/foreign chat) comes back as { success:false, error } instead of
 // throwing so callers can recover by starting a fresh chat.
+//
+// userId stamps the chat with its owner so it shows up in that user's scoped
+// chat list (`GET /ai/chats?userId=...`). Without it a new chat is persisted
+// with a null owner and never appears in the Assistant page's list.
 export const askQuestion = async (
   messages: MessagePart[],
-  chatId?: string
+  chatId?: string,
+  userId?: string
 ): Promise<AskResult> => {
   try {
     const { data } = await api.post<AskResult>(`${BFF_BASE_URL}/ai/ask`, {
       messages,
       ...(chatId ? { chatId } : {}),
+      ...(userId ? { userId } : {}),
     })
     return data
   } catch (error) {
