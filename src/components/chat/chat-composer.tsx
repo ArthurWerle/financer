@@ -1,7 +1,12 @@
-import { useRef, useState, useEffect } from "react"
-import { FileAudio, Paperclip, Send, X } from "lucide-react"
+"use client"
+
+import { useCallback, useRef, useState, useEffect } from "react"
+import { FileAudio, Mic, Paperclip, Send, X } from "lucide-react"
+import { toast } from "react-toastify"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { cn } from "@/lib/utils"
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition"
 import { Attachment } from "./useSendChat"
 
 type ChatComposerProps = {
@@ -14,6 +19,39 @@ export const ChatComposer = ({ onSend, disabled }: ChatComposerProps) => {
   const [attachment, setAttachment] = useState<Attachment | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  // Text already in the box when dictation starts, so speech is appended to it.
+  const baseTextRef = useRef("")
+
+  const handleTranscript = useCallback((transcript: string) => {
+    const base = baseTextRef.current
+    setText(base ? `${base} ${transcript}` : transcript)
+  }, [])
+
+  const handleSpeechError = useCallback((error: string) => {
+    if (error === "not-allowed" || error === "service-not-allowed") {
+      toast.error("Permita o acesso ao microfone para gravar áudio.")
+    }
+  }, [])
+
+  const {
+    isSupported: isMicSupported,
+    isRecording,
+    start: startRecording,
+    stop: stopRecording,
+  } = useSpeechRecognition({
+    onResult: handleTranscript,
+    onError: handleSpeechError,
+  })
+
+  const handleMic = () => {
+    if (disabled) return
+    if (isRecording) {
+      stopRecording()
+      return
+    }
+    baseTextRef.current = text.trim()
+    startRecording()
+  }
 
   // Auto-grow the textarea up to a cap, then let it scroll.
   useEffect(() => {
@@ -42,6 +80,7 @@ export const ChatComposer = ({ onSend, disabled }: ChatComposerProps) => {
   const handleSend = () => {
     if (disabled) return
     if (!text.trim() && !attachment) return
+    if (isRecording) stopRecording()
     onSend(text, attachment)
     setText("")
     setAttachment(null)
@@ -112,6 +151,23 @@ export const ChatComposer = ({ onSend, disabled }: ChatComposerProps) => {
           placeholder="Ask a question or attach a receipt…"
           className="max-h-[120px] min-h-[40px] flex-1 resize-none border-0 bg-transparent px-1 py-2 shadow-none focus-visible:ring-0"
         />
+
+        {isMicSupported ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className={cn(
+              "shrink-0 text-muted-foreground",
+              isRecording && "animate-pulse text-destructive"
+            )}
+            onClick={handleMic}
+            disabled={disabled}
+            aria-label={isRecording ? "Stop recording" : "Record audio"}
+          >
+            <Mic className="h-5 w-5" />
+          </Button>
+        ) : null}
 
         <Button
           type="button"
