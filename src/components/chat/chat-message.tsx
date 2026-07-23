@@ -1,6 +1,7 @@
 import { motion } from "framer-motion"
 import { AlertCircle, FileAudio, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Markdown } from "@/components/markdown"
 import { ChatMessage, ScannedTransaction } from "@/stores/useChatStore"
 
 const currency = new Intl.NumberFormat("pt-BR", {
@@ -108,7 +109,11 @@ export const ChatMessageBubble = ({ message }: { message: ChatMessage }) => {
               </span>
             ) : null}
             {message.text ? (
-              <span className="whitespace-pre-wrap break-words">{message.text}</span>
+              isUser ? (
+                <span className="whitespace-pre-wrap break-words">{message.text}</span>
+              ) : (
+                <Markdown>{message.text}</Markdown>
+              )
             ) : null}
           </>
         )}

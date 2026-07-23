@@ -12,6 +12,11 @@ const config: Config = {
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    // react-markdown / remark-gfm are ESM-only and next/jest does not transform
+    // node_modules — stub them so the jsdom test env can load components that
+    // render markdown (tests assert on plain text content).
+    '^react-markdown$': '<rootDir>/src/tests/mocks/react-markdown.tsx',
+    '^remark-gfm$': '<rootDir>/src/tests/mocks/remark-gfm.ts',
   },
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',

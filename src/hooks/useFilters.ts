@@ -20,7 +20,11 @@ export const useFilters = (): UseFiltersReturn => {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search)
-    setFilters(Object.fromEntries(searchParams.entries()))
+    const entries = Object.fromEntries(searchParams.entries())
+    // Default the transactions view to the current month when the URL carries no
+    // filters, so opening the tab shows this month and the "Current month" toggle
+    // reads as active. Any explicit filter in the URL is respected as-is.
+    setFilters(Object.keys(entries).length ? entries : { currentMonth: 'true' })
   }, [setFilters])
 
   const setUrl = useCallback((key: string, value: string | null) => {
