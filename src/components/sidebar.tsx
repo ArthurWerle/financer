@@ -2,10 +2,9 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
-import { useTheme } from 'next-themes'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home,
@@ -15,14 +14,21 @@ import {
   BarChart2,
   History,
   MessageSquare,
-  Sun,
-  Moon,
+  Settings,
+  ChevronsUpDown,
   LogOut,
   Menu,
   X,
 } from 'lucide-react'
 import { useMe } from '@/queries/auth/useMe'
 import { logout } from '@/queries/auth/logout'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 const menuItems = [
   { href: '/', label: 'Dashboard', icon: Home },
@@ -93,13 +99,14 @@ const NavLinks = ({
 }
 
 const SidebarFooter = ({ onNavigate }: { onNavigate?: () => void }) => {
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
   const router = useRouter()
   const queryClient = useQueryClient()
   const { data: user } = useMe()
 
-  useEffect(() => setMounted(true), [])
+  const handleSettings = () => {
+    onNavigate?.()
+    router.push('/settings')
+  }
 
   const handleLogout = async () => {
     onNavigate?.()
@@ -112,41 +119,40 @@ const SidebarFooter = ({ onNavigate }: { onNavigate?: () => void }) => {
     }
   }
 
-  const isDark = mounted ? theme === 'dark' : true
-
   return (
-    <div className="mt-auto flex flex-col gap-0.5 border-t border-border pt-2.5">
-      <button
-        onClick={() => setTheme(isDark ? 'light' : 'dark')}
-        className="flex items-center gap-2.5 rounded-md px-[9px] py-[7px] text-[13px] font-medium text-muted-foreground transition-colors hover:bg-panel2 hover:text-foreground"
-      >
-        {isDark ? (
-          <Sun size={15} strokeWidth={1.8} />
-        ) : (
-          <Moon size={15} strokeWidth={1.8} />
-        )}
-        {isDark ? 'Light mode' : 'Dark mode'}
-      </button>
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-2.5 rounded-md px-[9px] py-[7px] text-[13px] font-medium text-muted-foreground transition-colors hover:bg-panel2 hover:text-foreground"
-      >
-        <LogOut size={15} strokeWidth={1.8} />
-        Log out
-      </button>
-      <div className="flex items-center gap-2.5 px-[9px] pb-0.5 pt-2">
-        <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full border border-border bg-panel2 font-mono text-[10px] font-semibold">
-          {getInitials(user?.name)}
-        </div>
-        <div className="flex min-w-0 flex-col">
-          <span className="truncate text-xs font-medium">
-            {user?.name ?? 'Signed in'}
-          </span>
-          <span className="truncate font-mono text-[10.5px] text-faint">
-            {user?.email}
-          </span>
-        </div>
-      </div>
+    <div className="mt-auto border-t border-border pt-2.5">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            aria-label="Open user menu"
+            className="flex w-full items-center gap-2.5 rounded-md px-[9px] py-2 text-left transition-colors hover:bg-panel2"
+          >
+            <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full border border-border bg-panel2 font-mono text-[10px] font-semibold">
+              {getInitials(user?.name)}
+            </div>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-xs font-medium">
+                {user?.name ?? 'Signed in'}
+              </span>
+              <span className="truncate font-mono text-[10.5px] text-faint">
+                {user?.email}
+              </span>
+            </div>
+            <ChevronsUpDown size={14} className="shrink-0 text-faint" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="top" align="start" className="w-[196px]">
+          <DropdownMenuItem onClick={handleSettings} className="cursor-pointer">
+            <Settings />
+            Settings
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+            <LogOut />
+            Log out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

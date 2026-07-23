@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '../utils/test-utils'
+import { fireEvent, render, screen, waitFor } from '../utils/test-utils'
 import { SpendingInsight } from '@/components/spending-insight'
 import { server } from '../tests/mocks/server'
 import { rest } from 'msw'
@@ -37,6 +37,33 @@ describe('SpendingInsight', () => {
     await waitFor(() => {
       expect(container).toBeEmptyDOMElement()
     })
+  })
+
+  it('shows the headline and reveals the detailed body on demand', async () => {
+    server.use(
+      rest.get(`${BFF_BASE_URL}/ai/insights`, (req, res, ctx) =>
+        res(
+          ctx.json({
+            success: true,
+            insight:
+              'Spending is up 12% this month.\n\n- Groceries are R$ 420,00 above average.',
+          })
+        )
+      )
+    )
+
+    render(<SpendingInsight />)
+
+    const banner = await screen.findByTestId('spending-insight')
+    expect(banner).toHaveTextContent('Spending is up 12% this month.')
+    // The detailed body stays hidden until the user expands it.
+    expect(banner).not.toHaveTextContent('Groceries are R$ 420,00 above average.')
+
+    fireEvent.click(screen.getByRole('button', { name: /show details/i }))
+
+    await waitFor(() =>
+      expect(banner).toHaveTextContent('Groceries are R$ 420,00 above average.')
+    )
   })
 
   it('renders nothing when the response has no insight', async () => {
