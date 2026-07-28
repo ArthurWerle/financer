@@ -67,6 +67,7 @@ describe('sendChat', () => {
 
     expect(body).toEqual({
       messages: [{ type: 'text', content: 'how much did I spend?' }],
+      origin: 'financer',
     })
     expect(result.answer).toBe('42')
     expect(result.chatId).toBe('chat-1')
@@ -85,6 +86,7 @@ describe('sendChat', () => {
 
     expect(body).toEqual({
       messages: [{ type: 'text', content: 'hi' }],
+      origin: 'financer',
       userId: '1',
     })
   })
@@ -100,7 +102,7 @@ describe('sendChat', () => {
 
     await askQuestion([{ type: 'text', content: 'and yesterday?' }], 'chat-1')
 
-    expect(body).toMatchObject({ chatId: 'chat-1' })
+    expect(body).toMatchObject({ chatId: 'chat-1', origin: 'financer' })
   })
 
   it('askQuestion surfaces a 404 (deleted chat) as a failed result', async () => {

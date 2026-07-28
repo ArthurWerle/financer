@@ -47,11 +47,13 @@ describe('useChats', () => {
     expect(result.current.data?.[0].title).toBe('Groceries')
   })
 
-  it('scopes the list to the logged-in user id', async () => {
+  it('scopes the list to the logged-in user id and financer origin', async () => {
     let requestedUserId: string | null = null
+    let requestedOrigin: string | null = null
     server.use(
       rest.get(`${BFF}/ai/chats`, (req, res, ctx) => {
         requestedUserId = req.url.searchParams.get('userId')
+        requestedOrigin = req.url.searchParams.get('origin')
         return res(ctx.json({ success: true, data: [] }))
       })
     )
@@ -64,6 +66,8 @@ describe('useChats', () => {
     // useMe resolves to the default mock user (id 1), so the list refetches
     // scoped to that owner — matching the id stamped on chats at creation.
     await waitFor(() => expect(requestedUserId).toBe('1'))
+    // origin keeps this list limited to chats created from financer.
+    expect(requestedOrigin).toBe('financer')
   })
 })
 
