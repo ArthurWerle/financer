@@ -1,5 +1,5 @@
 import api from "@/utils/api"
-import { BFF_BASE_URL } from "@/constants"
+import { BFF_BASE_URL, CHAT_ORIGIN } from "@/constants"
 import { ScannedTransaction } from "@/stores/useChatStore"
 
 export type MessagePart = {
@@ -58,6 +58,7 @@ export const askQuestion = async (
   try {
     const { data } = await api.post<AskResult>(`${BFF_BASE_URL}/ai/ask`, {
       messages,
+      origin: CHAT_ORIGIN,
       ...(chatId ? { chatId } : {}),
       ...(userId ? { userId } : {}),
     })

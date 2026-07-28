@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import api from "@/utils/api"
-import { BFF_BASE_URL } from "@/constants"
+import { BFF_BASE_URL, CHAT_ORIGIN } from "@/constants"
 import { useMe } from "@/queries/auth/useMe"
 import { ServerChat } from "./types"
 
@@ -12,8 +12,9 @@ type ChatsResponse = {
 }
 
 // All chats of the logged-in user, newest activity first (server-ordered).
-// The list is scoped by userId so it matches the owner stamped on chats at
-// creation time (see askQuestion) — otherwise widget/page chats never surface.
+// Scoped by userId (the owner stamped on chats at creation, see askQuestion) and
+// by origin so this list only shows chats created from financer — chats from
+// other services (e.g. uiless-financer) sharing the same user stay separate.
 export const useChats = () => {
   const { data: user } = useMe()
   const userId = user?.id != null ? String(user.id) : undefined
@@ -23,7 +24,7 @@ export const useChats = () => {
     queryFn: () =>
       api
         .get<ChatsResponse>(`${BFF_BASE_URL}/ai/chats`, {
-          params: userId ? { userId } : undefined,
+          params: { origin: CHAT_ORIGIN, ...(userId ? { userId } : {}) },
         })
         .then((res) => res.data.data),
     refetchOnWindowFocus: false,
