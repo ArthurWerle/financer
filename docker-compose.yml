@@ -16,3 +16,8 @@ services:
       - stack.env
     environment:
       - NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV:-production}
+    labels:
+      prometheus.io/scrape: "true"
+      prometheus.io/hostport: "${APP_PORT:-3001}"
+      prometheus.io/path: "/metrics"
+      environment: "production"
