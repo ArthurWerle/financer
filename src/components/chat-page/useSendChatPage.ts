@@ -98,7 +98,9 @@ export const useSendChatPage = (activeChatId?: string) => {
         const result = await askQuestion(parts, activeChatId, userId)
 
         if (!result.success || !result.chatId) {
-          failLocally(result.error)
+          // Prefer the human-readable answer (e.g. the credit-limit notice)
+          // over the raw error code so the bubble shows a clear message.
+          failLocally(result.answer ?? result.error)
           return
         }
 

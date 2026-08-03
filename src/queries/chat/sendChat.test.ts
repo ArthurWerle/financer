@@ -119,6 +119,32 @@ describe('sendChat', () => {
     expect(result).toEqual({ success: false, error: 'Chat not found' })
   })
 
+  it('askQuestion surfaces an insufficient-credits 402 as a failed result with the clear answer', async () => {
+    server.use(
+      rest.post(`${BFF}/ai/ask`, (_req, res, ctx) =>
+        res(
+          ctx.status(402),
+          ctx.json({
+            success: false,
+            chatId: 'chat-1',
+            intent: 'agent',
+            error: 'insufficient_credits',
+            errorCode: 'insufficient_credits',
+            answer:
+              "The AI assistant has reached its usage limit and can't answer right now. Please try again later.",
+          })
+        )
+      )
+    )
+
+    const result = await askQuestion([{ type: 'text', content: 'hi' }], 'chat-1')
+
+    expect(result.success).toBe(false)
+    expect(result.errorCode).toBe('insufficient_credits')
+    expect(result.chatId).toBe('chat-1')
+    expect(result.answer).toContain('usage limit')
+  })
+
   it('fileToBase64 strips the data-url prefix', async () => {
     const file = new File(['hello'], 'note.txt', { type: 'text/plain' })
     const base64 = await fileToBase64(file)

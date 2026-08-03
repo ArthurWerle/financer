@@ -19,6 +19,9 @@ export type AskResult = {
   answer?: string
   transactions?: ScannedTransaction[]
   error?: string
+  // Stable machine-readable failure code (e.g. "insufficient_credits" when
+  // ai-internal is out of OpenRouter credits) so the UI can react specifically.
+  errorCode?: string
 }
 
 // Receipt/audio scan. ai-internal answers 422 with { success:false, error }

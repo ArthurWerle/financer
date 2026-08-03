@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
 import { useSendChat } from './useSendChat'
 import { useChatStore } from '@/stores/useChatStore'
 import { scanReceipt, askQuestion, fileToBase64 } from '@/queries/chat/sendChat'
@@ -94,6 +95,35 @@ describe('useSendChat', () => {
       error: true,
       text: 'Chat not found',
     })
+  })
+
+  it('keeps the chat thread and surfaces the clear message when the AI usage limit is hit', async () => {
+    useChatStore.setState({ chatId: 'chat-1' })
+    mockedAsk.mockResolvedValue({
+      success: false,
+      chatId: 'chat-1',
+      error: 'insufficient_credits',
+      errorCode: 'insufficient_credits',
+      answer:
+        "The AI assistant has reached its usage limit and can't answer right now. Please try again later.",
+    })
+
+    const { result } = renderHook(() => useSendChat(), { wrapper })
+    await act(async () => {
+      await result.current('how much did I spend?', null)
+    })
+
+    // Unlike a deleted/foreign chat, a credit-limit failure still returns the
+    // chatId, so the thread is preserved instead of being reset.
+    expect(useChatStore.getState().chatId).toBe('chat-1')
+
+    const assistant = useChatStore.getState().messages[1]
+    expect(assistant).toMatchObject({ error: true })
+    expect(assistant.text).toContain('usage limit')
+
+    expect(toast.error).toHaveBeenCalledWith(
+      'AI usage limit reached. Please try again later.'
+    )
   })
 
   it('routes an attachment through askQuestion so the chat is persisted', async () => {

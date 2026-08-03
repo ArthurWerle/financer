@@ -165,6 +165,40 @@ describe('ChatPage', () => {
     expect(await screen.findByText('Chat not found')).toBeInTheDocument()
   })
 
+  it('shows the clear usage-limit message (not the raw code) when credits run out', async () => {
+    mockedUsePathname.mockReturnValue('/chat/chat-1')
+    server.use(
+      rest.post(`${BFF}/ai/ask`, (_req, res, ctx) =>
+        res(
+          ctx.status(402),
+          ctx.json({
+            success: false,
+            chatId: 'chat-1',
+            intent: 'agent',
+            error: 'insufficient_credits',
+            errorCode: 'insufficient_credits',
+            answer:
+              "The AI assistant has reached its usage limit and can't answer right now. Please try again later.",
+          })
+        )
+      )
+    )
+
+    const user = userEvent.setup()
+    renderPage()
+
+    await screen.findByText('How much on groceries?')
+
+    await user.type(
+      screen.getByPlaceholderText('Ask a question or attach a receipt…'),
+      'and this month?'
+    )
+    await user.click(screen.getByLabelText('Send message'))
+
+    expect(await screen.findByText(/usage limit/)).toBeInTheDocument()
+    expect(screen.queryByText('insufficient_credits')).not.toBeInTheDocument()
+  })
+
   it('renames a chat from the sidebar menu', async () => {
     let patchBody: Record<string, unknown> | undefined
     server.use(
