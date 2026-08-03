@@ -81,9 +81,15 @@ export const useSendChat = () => {
           // The conversation now exists server-side — surface it in the
           // chat page's sidebar.
           queryClient.invalidateQueries({ queryKey: [CHATS_KEY] })
-        } else if (!result.success) {
-          // Stale chat (deleted elsewhere / foreign): start fresh next send.
+        } else if (!result.chatId) {
+          // Only a missing chat id means the conversation is gone (deleted
+          // elsewhere / foreign 404) — start fresh next send. A failure that
+          // still returns a chatId (e.g. the credit limit) keeps the thread.
           useChatStore.getState().setChatId(null)
+        }
+
+        if (result.errorCode === "insufficient_credits") {
+          toast.error("AI usage limit reached. Please try again later.")
         }
 
         updateMessage(assistantId, {
