@@ -103,6 +103,20 @@ export const handlers = [
     }
   ),
 
+  // Mock monthly expenses by subcategory endpoint
+  rest.get(
+    `${BFF_BASE_URL}/monthly-expenses-by-subcategory`,
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          Groceries: 500.25,
+          'Dining out': 300.25,
+          '(none)': 200,
+        })
+      )
+    }
+  ),
+
   // Mock transactions list endpoint (used for the recurring expense total)
   rest.get(`${BFF_BASE_URL}/transactions`, (req, res, ctx) => {
     const transactions = [
