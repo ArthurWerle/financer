@@ -13,6 +13,7 @@ import { useMonthOverview } from '../queries/transactions/useMonthOverview'
 import { Skeleton } from '@/components/ui/skeleton'
 import { HistoricalData } from './historical-data'
 import { ExpenseCategories } from './expense-categories'
+import { SubcategoryExpenses } from './subcategory-expenses'
 import { LatestTransactions } from './latest-transactions'
 import { BiggestTransactions } from './biggest-transactions'
 import { StatTile } from './stat-tile'
@@ -144,7 +145,10 @@ export function Statistics() {
       <MonthlyOverview />
       <HistoricalData />
       <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-[5fr_7fr]">
-        <ExpenseCategories />
+        <div className="flex flex-col gap-3">
+          <ExpenseCategories />
+          <SubcategoryExpenses />
+        </div>
         <div className="flex flex-col gap-3">
           <LatestTransactions />
           <BiggestTransactions />
