@@ -4,16 +4,32 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { rest } from 'msw'
 import { server } from '@/tests/mocks/server'
 import { usePathname, useRouter } from 'next/navigation'
+import { streamChat, ChatStreamEvent } from '@/queries/chat/streamChat'
 import ChatPage from './chat-page'
 
 jest.mock('next/navigation', () => ({
   usePathname: jest.fn(),
   useRouter: jest.fn(),
 }))
+// The send path streams over fetch/SSE; mock only the network call so tests can
+// script the events the page reduces into the thread (the real reducer runs).
+jest.mock('@/queries/chat/streamChat', () => ({
+  ...jest.requireActual('@/queries/chat/streamChat'),
+  streamChat: jest.fn(),
+}))
 jest.mock('react-toastify', () => ({ toast: { error: jest.fn() } }))
 
 const mockedUsePathname = usePathname as jest.Mock
 const mockedUseRouter = useRouter as jest.Mock
+const mockedStream = streamChat as jest.Mock
+
+// Replays scripted SSE events into the page's onEvent handler, then resolves.
+const scriptStream = (events: ChatStreamEvent[]) =>
+  mockedStream.mockImplementation(
+    async (_messages, onEvent: (event: ChatStreamEvent) => void) => {
+      for (const event of events) onEvent(event)
+    }
+  )
 
 const BFF = 'http://localhost:8082/api/bff'
 
@@ -112,21 +128,13 @@ describe('ChatPage', () => {
     ).toBeInTheDocument()
   })
 
-  it('sends a message and renders the persisted answer', async () => {
+  it('streams a message and renders the persisted answer', async () => {
     mockedUsePathname.mockReturnValue('/chat/chat-1')
-    server.use(
-      rest.post(`${BFF}/ai/ask`, async (req, res, ctx) => {
-        const body = await req.json()
-        expect(body).toMatchObject({
-          chatId: 'chat-1',
-          userId: '1',
-          messages: [{ type: 'text', content: 'and this month?' }],
-        })
-        return res(
-          ctx.json({ success: true, chatId: 'chat-1', answer: 'R$ 120 so far.' })
-        )
-      })
-    )
+    scriptStream([
+      { type: 'token', value: 'R$ 120 ' },
+      { type: 'token', value: 'so far.' },
+      { type: 'done', success: true, chatId: 'chat-1', answer: 'R$ 120 so far.' },
+    ])
 
     const user = userEvent.setup()
     renderPage()
@@ -139,17 +147,50 @@ describe('ChatPage', () => {
     )
     await user.click(screen.getByLabelText('Send message'))
 
+    expect(mockedStream).toHaveBeenCalledWith(
+      [{ type: 'text', content: 'and this month?' }],
+      expect.any(Function),
+      'chat-1',
+      '1'
+    )
     expect(await screen.findByText('and this month?')).toBeInTheDocument()
+    expect(await screen.findByText('R$ 120 so far.')).toBeInTheDocument()
+  })
+
+  it('shows tool activity while the reply streams', async () => {
+    mockedUsePathname.mockReturnValue('/chat/chat-1')
+    scriptStream([
+      { type: 'tool_start', name: 'sum_transactions' },
+      { type: 'tool_end', name: 'sum_transactions' },
+      { type: 'token', value: 'R$ 120 so far.' },
+      {
+        type: 'done',
+        success: true,
+        chatId: 'chat-1',
+        answer: 'R$ 120 so far.',
+        toolsUsed: ['sum_transactions'],
+      },
+    ])
+
+    const user = userEvent.setup()
+    renderPage()
+
+    await screen.findByText('How much on groceries?')
+
+    await user.type(
+      screen.getByPlaceholderText('Ask a question or attach a receipt…'),
+      'and this month?'
+    )
+    await user.click(screen.getByLabelText('Send message'))
+
+    // The tool the agent called is surfaced in the bubble, then the answer.
+    expect(await screen.findByText('Sum transactions')).toBeInTheDocument()
     expect(await screen.findByText('R$ 120 so far.')).toBeInTheDocument()
   })
 
   it('shows the error bubble when the ask fails', async () => {
     mockedUsePathname.mockReturnValue('/chat/chat-1')
-    server.use(
-      rest.post(`${BFF}/ai/ask`, (_req, res, ctx) =>
-        res(ctx.status(404), ctx.json({ success: false, error: 'Chat not found' }))
-      )
-    )
+    scriptStream([{ type: 'done', success: false, error: 'Chat not found' }])
 
     const user = userEvent.setup()
     renderPage()
@@ -167,22 +208,17 @@ describe('ChatPage', () => {
 
   it('shows the clear usage-limit message (not the raw code) when credits run out', async () => {
     mockedUsePathname.mockReturnValue('/chat/chat-1')
-    server.use(
-      rest.post(`${BFF}/ai/ask`, (_req, res, ctx) =>
-        res(
-          ctx.status(402),
-          ctx.json({
-            success: false,
-            chatId: 'chat-1',
-            intent: 'agent',
-            error: 'insufficient_credits',
-            errorCode: 'insufficient_credits',
-            answer:
-              "The AI assistant has reached its usage limit and can't answer right now. Please try again later.",
-          })
-        )
-      )
-    )
+    scriptStream([
+      {
+        type: 'done',
+        success: false,
+        chatId: 'chat-1',
+        error: 'insufficient_credits',
+        errorCode: 'insufficient_credits',
+        answer:
+          "The AI assistant has reached its usage limit and can't answer right now. Please try again later.",
+      },
+    ])
 
     const user = userEvent.setup()
     renderPage()

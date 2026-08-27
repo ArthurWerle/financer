@@ -2,11 +2,12 @@ import { useCallback, useState } from "react"
 import { toast } from "react-toastify"
 import { useQueryClient } from "@tanstack/react-query"
 import { ChatMessage } from "@/stores/useChatStore"
+import { fileToBase64, MessagePart } from "@/queries/chat/sendChat"
 import {
-  askQuestion,
-  fileToBase64,
-  MessagePart,
-} from "@/queries/chat/sendChat"
+  applyStreamEvent,
+  streamChat,
+  ChatStreamEvent,
+} from "@/queries/chat/streamChat"
 import { KEY as CHATS_KEY } from "@/queries/chat/useChats"
 import { KEY as CHAT_KEY } from "@/queries/chat/useChat"
 import {
@@ -95,12 +96,39 @@ export const useSendChatPage = (activeChatId?: string) => {
 
         // Stamp the chat with its owner so it lands in the user's scoped list.
         const userId = user?.id != null ? String(user.id) : undefined
-        const result = await askQuestion(parts, activeChatId, userId)
 
-        if (!result.success || !result.chatId) {
-          // Prefer the human-readable answer (e.g. the credit-limit notice)
-          // over the raw error code so the bubble shows a clear message.
-          failLocally(result.answer ?? result.error)
+        // Stream the reply, reducing each SSE event into the in-flight
+        // assistant bubble so text and tool activity render as they arrive.
+        // The done event is kept on a holder object so its type survives the
+        // callback closure (a bare `let` would collapse to its initial value).
+        let assistant: ChatMessage = {
+          id: assistantId,
+          role: "assistant",
+          pending: true,
+        }
+        const stream: { done: Extract<ChatStreamEvent, { type: "done" }> | null } = {
+          done: null,
+        }
+
+        await streamChat(
+          parts,
+          (event) => {
+            if (event.type === "done") stream.done = event
+            assistant = applyStreamEvent(assistant, event)
+            setPending({ chatKey, messages: [userMessage, assistant] })
+          },
+          activeChatId,
+          userId
+        )
+
+        const done = stream.done
+        if (!done || !done.success || !done.chatId) {
+          // The reducer already rendered a clear error message (the credit-limit
+          // notice or a generic failure) into the assistant bubble; leave that
+          // bubble in place instead of overwriting it.
+          if (done?.errorCode === "insufficient_credits") {
+            toast.error("AI usage limit reached. Please try again later.")
+          }
           return
         }
 
@@ -122,7 +150,7 @@ export const useSendChatPage = (activeChatId?: string) => {
         // immediate refetch, so the thread isn't re-keyed mid-view).
         const userRow: ServerChatMessage = {
           id: userMessage.id,
-          chatId: result.chatId,
+          chatId: done.chatId,
           role: "user",
           content,
           metadata: null,
@@ -131,15 +159,17 @@ export const useSendChatPage = (activeChatId?: string) => {
         }
         const assistantRow: ServerChatMessage = {
           id: assistantId,
-          chatId: result.chatId,
+          chatId: done.chatId,
           role: "assistant",
-          content: result.answer ?? "",
-          metadata: null,
+          content: done.answer ?? "",
+          // Persist the tool names so the seeded bubble keeps its tool chips
+          // (toUiMessage reads metadata.toolsUsed) without waiting for a refetch.
+          metadata: done.toolsUsed?.length ? { toolsUsed: done.toolsUsed } : null,
           createdAt: now,
           attachments: [],
         }
 
-        const chatId = result.chatId
+        const chatId = done.chatId
         queryClient.setQueryData<ChatWithMessages>(
           [CHAT_KEY, chatId],
           (old) =>

@@ -1,8 +1,8 @@
 import { motion } from "framer-motion"
-import { AlertCircle, FileAudio, Sparkles } from "lucide-react"
+import { AlertCircle, FileAudio, Loader2, Sparkles, Wrench } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Markdown } from "@/components/markdown"
-import { ChatMessage, ScannedTransaction } from "@/stores/useChatStore"
+import { ChatMessage, ChatToolCall, ScannedTransaction } from "@/stores/useChatStore"
 
 const currency = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -24,6 +24,42 @@ const TypingDots = () => (
         animate={{ opacity: [0.3, 1, 0.3] }}
         transition={{ duration: 1, repeat: Infinity, delay: index * 0.15 }}
       />
+    ))}
+  </div>
+)
+
+// Human-friendly label for a tool/MCP name: "sum_transactions" -> "Sum
+// transactions", so the activity row reads naturally while still naming the
+// exact tool the agent called.
+const humanizeToolName = (name: string) =>
+  name
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^\w/, (c) => c.toUpperCase())
+
+// Shows the tools/MCPs the assistant called this turn — a running spinner while
+// a call is in flight, a wrench once it's done — the way Claude/ChatGPT surface
+// their tool activity.
+const ToolActivity = ({ tools }: { tools: ChatToolCall[] }) => (
+  <div className="mb-2 flex flex-col gap-1">
+    {tools.map((tool, index) => (
+      <div
+        key={`${tool.name}-${index}`}
+        className="flex items-center gap-1.5 text-xs text-muted-foreground"
+      >
+        {tool.status === "running" ? (
+          <Loader2 className="h-3 w-3 shrink-0 animate-spin" />
+        ) : (
+          <Wrench className="h-3 w-3 shrink-0" />
+        )}
+        <span className="truncate">
+          {tool.status === "running" ? "Using" : "Used"}{" "}
+          <span className="font-medium text-foreground/80">
+            {humanizeToolName(tool.name)}
+          </span>
+        </span>
+      </div>
     ))}
   </div>
 )
@@ -99,8 +135,14 @@ export const ChatMessageBubble = ({ message }: { message: ChatMessage }) => {
           </div>
         ) : null}
 
-        {message.pending ? (
-          <TypingDots />
+        {!isUser && message.tools && message.tools.length > 0 ? (
+          <ToolActivity tools={message.tools} />
+        ) : null}
+
+        {message.pending && !message.text ? (
+          // Still working with nothing to show yet: typing dots, unless tool
+          // activity above already signals that something is happening.
+          message.tools && message.tools.length > 0 ? null : <TypingDots />
         ) : (
           <>
             {message.error ? (
@@ -112,7 +154,17 @@ export const ChatMessageBubble = ({ message }: { message: ChatMessage }) => {
               isUser ? (
                 <span className="whitespace-pre-wrap break-words">{message.text}</span>
               ) : (
-                <Markdown>{message.text}</Markdown>
+                <span className="inline">
+                  <Markdown>{message.text}</Markdown>
+                  {message.streaming ? (
+                    <motion.span
+                      aria-hidden
+                      className="ml-0.5 inline-block h-3.5 w-[2px] translate-y-0.5 rounded-full bg-foreground/70 align-middle"
+                      animate={{ opacity: [1, 0.2, 1] }}
+                      transition={{ duration: 0.9, repeat: Infinity }}
+                    />
+                  ) : null}
+                </span>
               )
             ) : null}
           </>
