@@ -1,5 +1,19 @@
-import { ChatMessage } from "@/stores/useChatStore"
+import { ChatMessage, ChatToolCall } from "@/stores/useChatStore"
 import { ServerChatMessage } from "./types"
+
+// Pulls the tool names ai-internal persisted in the assistant message metadata
+// (metadata.toolsUsed) so a resumed conversation shows the same tool chips the
+// live stream did. All calls are already finished, hence status "done".
+const toolsFromMetadata = (
+  metadata: Record<string, unknown> | null
+): ChatToolCall[] | undefined => {
+  const used = metadata?.toolsUsed
+  if (!Array.isArray(used)) return undefined
+  const tools = used
+    .filter((name): name is string => typeof name === "string")
+    .map((name) => ({ name, status: "done" as const }))
+  return tools.length ? tools : undefined
+}
 
 // Maps a persisted ai-internal message to the shape ChatMessageBubble
 // renders. Server attachments store raw base64 (no "data:" prefix) and
@@ -19,5 +33,6 @@ export const toUiMessage = (message: ServerChatMessage): ChatMessage => {
       ? `data:${image.mimeType ?? "image/jpeg"};base64,${image.content}`
       : undefined,
     audioName: audio ? "Audio message" : undefined,
+    tools: message.role === "assistant" ? toolsFromMetadata(message.metadata) : undefined,
   }
 }

@@ -19,6 +19,34 @@ api.interceptors.request.use(config => {
 // concurrent 401s only triggers a single cleanup + redirect.
 let isHandlingSessionExpiry = false
 
+// Clears the dead session and redirects to /login exactly once, regardless of
+// how many 401s arrive at the same time. Exported so non-axios callers (the
+// streaming chat fetch, which the interceptor never sees) can reuse it.
+export const handleSessionExpiry = () => {
+  if (
+    typeof window === 'undefined' ||
+    window.location.pathname === '/login' ||
+    isHandlingSessionExpiry
+  ) {
+    return
+  }
+  isHandlingSessionExpiry = true
+
+  // The session_id cookie is HttpOnly, so JS cannot delete it directly.
+  // Hitting the BFF logout endpoint clears it (via Set-Cookie) so the
+  // middleware stops seeing a "logged in" user and the redirect loop ends.
+  // Use a bare axios call to avoid re-entering the interceptor. We redirect
+  // regardless of the outcome.
+  axios
+    .post(`${BFF_BASE_URL}/auth/logout`, {}, { withCredentials: true })
+    .catch(() => {
+      // ignore - we are leaving the page anyway
+    })
+    .finally(() => {
+      window.location.href = '/login'
+    })
+}
+
 api.interceptors.response.use(
   response => {
     console.log('Response:', response.status, response.config.url)
@@ -33,31 +61,8 @@ api.interceptors.response.use(
     const isAuthRequest =
       url.includes('/auth/login') || url.includes('/auth/logout')
 
-    if (
-      error.response?.status === 401 &&
-      !isAuthRequest &&
-      typeof window !== 'undefined' &&
-      window.location.pathname !== '/login' &&
-      !isHandlingSessionExpiry
-    ) {
-      isHandlingSessionExpiry = true
-
-      // The session_id cookie is HttpOnly, so JS cannot delete it directly.
-      // Hitting the BFF logout endpoint clears it (via Set-Cookie) so the
-      // middleware stops seeing a "logged in" user and the redirect loop ends.
-      // Use a bare axios call to avoid re-entering this interceptor. We redirect
-      // regardless of the outcome.
-      try {
-        await axios.post(
-          `${BFF_BASE_URL}/auth/logout`,
-          {},
-          { withCredentials: true }
-        )
-      } catch {
-        // ignore - we are leaving the page anyway
-      }
-
-      window.location.href = '/login'
+    if (error.response?.status === 401 && !isAuthRequest) {
+      handleSessionExpiry()
     }
 
     return Promise.reject(error)

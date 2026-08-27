@@ -1,12 +1,13 @@
 import { useCallback } from "react"
 import { toast } from "react-toastify"
 import { useQueryClient } from "@tanstack/react-query"
-import { useChatStore } from "@/stores/useChatStore"
+import { ChatMessage, useChatStore } from "@/stores/useChatStore"
+import { fileToBase64, MessagePart } from "@/queries/chat/sendChat"
 import {
-  askQuestion,
-  fileToBase64,
-  MessagePart,
-} from "@/queries/chat/sendChat"
+  applyStreamEvent,
+  streamChat,
+  ChatStreamEvent,
+} from "@/queries/chat/streamChat"
 import { compressImage } from "@/utils/compressImage"
 import { KEY as CHATS_KEY } from "@/queries/chat/useChats"
 import { useMe } from "@/queries/auth/useMe"
@@ -74,32 +75,47 @@ export const useSendChat = () => {
         const chatId = useChatStore.getState().chatId ?? undefined
         // Stamp the chat with its owner so it lands in the user's scoped list.
         const userId = user?.id != null ? String(user.id) : undefined
-        const result = await askQuestion(messages, chatId, userId)
 
-        if (result.success && result.chatId) {
-          useChatStore.getState().setChatId(result.chatId)
+        // Stream the reply into the assistant bubble, reducing each SSE event
+        // into the message so text and tool activity render as they arrive.
+        // The done event is kept on a holder object so its type survives the
+        // callback closure (a bare `let` would collapse to its initial value).
+        let assistant: ChatMessage = {
+          id: assistantId,
+          role: "assistant",
+          pending: true,
+        }
+        const stream: { done: Extract<ChatStreamEvent, { type: "done" }> | null } = {
+          done: null,
+        }
+
+        await streamChat(
+          messages,
+          (event) => {
+            if (event.type === "done") stream.done = event
+            assistant = applyStreamEvent(assistant, event)
+            updateMessage(assistantId, assistant)
+          },
+          chatId,
+          userId
+        )
+
+        const done = stream.done
+        if (done && done.success && done.chatId) {
+          useChatStore.getState().setChatId(done.chatId)
           // The conversation now exists server-side — surface it in the
           // chat page's sidebar.
           queryClient.invalidateQueries({ queryKey: [CHATS_KEY] })
-        } else if (!result.chatId) {
+        } else if (!done || !done.chatId) {
           // Only a missing chat id means the conversation is gone (deleted
           // elsewhere / foreign 404) — start fresh next send. A failure that
           // still returns a chatId (e.g. the credit limit) keeps the thread.
           useChatStore.getState().setChatId(null)
         }
 
-        if (result.errorCode === "insufficient_credits") {
+        if (done && done.errorCode === "insufficient_credits") {
           toast.error("AI usage limit reached. Please try again later.")
         }
-
-        updateMessage(assistantId, {
-          pending: false,
-          error: !result.success,
-          text:
-            result.answer ??
-            result.error ??
-            "Something went wrong. Please try again.",
-        })
       } catch (error) {
         console.error(error)
         toast.error("Couldn't reach the assistant. Please try again.")

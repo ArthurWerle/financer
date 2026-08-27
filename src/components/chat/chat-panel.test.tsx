@@ -2,16 +2,20 @@ import { render, screen, fireEvent, act } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ChatPanel } from './chat-panel'
 import { useChatStore } from '@/stores/useChatStore'
-import { askQuestion } from '@/queries/chat/sendChat'
+import { streamChat, ChatStreamEvent } from '@/queries/chat/streamChat'
 
 jest.mock('@/queries/chat/sendChat')
+jest.mock('@/queries/chat/streamChat', () => ({
+  ...jest.requireActual('@/queries/chat/streamChat'),
+  streamChat: jest.fn(),
+}))
 jest.mock('react-toastify', () => ({ toast: { error: jest.fn() } }))
 // Stable logged-in user so the widget stamps a deterministic owner id.
 jest.mock('@/queries/auth/useMe', () => ({
   useMe: () => ({ data: { id: 1 } }),
 }))
 
-const mockedAsk = askQuestion as jest.Mock
+const mockedStream = streamChat as jest.Mock
 
 const renderPanel = () =>
   render(
@@ -24,7 +28,11 @@ describe('ChatPanel', () => {
   beforeEach(() => {
     useChatStore.setState({ isOpen: true, messages: [], chatId: null })
     jest.clearAllMocks()
-    mockedAsk.mockResolvedValue({ success: true, chatId: 'chat-1', answer: 'ok' })
+    mockedStream.mockImplementation(
+      async (_messages, onEvent: (event: ChatStreamEvent) => void) => {
+        onEvent({ type: 'done', success: true, chatId: 'chat-1', answer: 'ok' })
+      }
+    )
   })
 
   it('shows the empty state with suggestions', () => {
@@ -68,8 +76,9 @@ describe('ChatPanel', () => {
       fireEvent.click(screen.getByLabelText('Send message'))
     })
 
-    expect(mockedAsk).toHaveBeenCalledWith(
+    expect(mockedStream).toHaveBeenCalledWith(
       [{ type: 'text', content: 'How much did I spend?' }],
+      expect.any(Function),
       undefined,
       '1'
     )

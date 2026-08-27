@@ -3,10 +3,17 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { useSendChat } from './useSendChat'
 import { useChatStore } from '@/stores/useChatStore'
-import { scanReceipt, askQuestion, fileToBase64 } from '@/queries/chat/sendChat'
+import { fileToBase64 } from '@/queries/chat/sendChat'
+import { streamChat, ChatStreamEvent } from '@/queries/chat/streamChat'
 import { compressImage } from '@/utils/compressImage'
 
 jest.mock('@/queries/chat/sendChat')
+// Keep the real reducer/parser; only the network call is mocked so tests can
+// script the SSE events the widget reduces into the assistant bubble.
+jest.mock('@/queries/chat/streamChat', () => ({
+  ...jest.requireActual('@/queries/chat/streamChat'),
+  streamChat: jest.fn(),
+}))
 jest.mock('@/utils/compressImage')
 jest.mock('react-toastify', () => ({ toast: { error: jest.fn() } }))
 // Stable logged-in user so the widget stamps a deterministic owner id.
@@ -14,10 +21,18 @@ jest.mock('@/queries/auth/useMe', () => ({
   useMe: () => ({ data: { id: 1 } }),
 }))
 
-const mockedScan = scanReceipt as jest.Mock
-const mockedAsk = askQuestion as jest.Mock
+const mockedStream = streamChat as jest.Mock
 const mockedToBase64 = fileToBase64 as jest.Mock
 const mockedCompress = compressImage as jest.Mock
+
+// Drives the mocked stream: replays a scripted list of SSE events into the
+// widget's onEvent handler, then resolves like the real streamChat.
+const scriptStream = (events: ChatStreamEvent[]) =>
+  mockedStream.mockImplementation(
+    async (_messages, onEvent: (event: ChatStreamEvent) => void) => {
+      for (const event of events) onEvent(event)
+    }
+  )
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={new QueryClient()}>
@@ -31,24 +46,24 @@ describe('useSendChat', () => {
     jest.clearAllMocks()
   })
 
-  it('routes a text-only message to askQuestion', async () => {
-    mockedAsk.mockResolvedValue({
-      success: true,
-      chatId: 'chat-1',
-      answer: 'You spent R$ 100',
-    })
+  it('streams a text-only message through streamChat', async () => {
+    scriptStream([
+      { type: 'token', value: 'You spent ' },
+      { type: 'token', value: 'R$ 100' },
+      { type: 'done', success: true, chatId: 'chat-1', answer: 'You spent R$ 100' },
+    ])
 
     const { result } = renderHook(() => useSendChat(), { wrapper })
     await act(async () => {
       await result.current('How much did I spend?', null)
     })
 
-    expect(mockedAsk).toHaveBeenCalledWith(
+    expect(mockedStream).toHaveBeenCalledWith(
       [{ type: 'text', content: 'How much did I spend?' }],
+      expect.any(Function),
       undefined,
       '1'
     )
-    expect(mockedScan).not.toHaveBeenCalled()
 
     const messages = useChatStore.getState().messages
     expect(messages).toHaveLength(2)
@@ -56,12 +71,31 @@ describe('useSendChat', () => {
     expect(messages[1]).toMatchObject({
       role: 'assistant',
       pending: false,
+      streaming: false,
       text: 'You spent R$ 100',
     })
   })
 
+  it('surfaces tool activity as it streams', async () => {
+    scriptStream([
+      { type: 'tool_start', name: 'sum_transactions' },
+      { type: 'tool_end', name: 'sum_transactions' },
+      { type: 'token', value: 'R$ 42' },
+      { type: 'done', success: true, chatId: 'chat-1', answer: 'R$ 42', toolsUsed: ['sum_transactions'] },
+    ])
+
+    const { result } = renderHook(() => useSendChat(), { wrapper })
+    await act(async () => {
+      await result.current('total?', null)
+    })
+
+    const assistant = useChatStore.getState().messages[1]
+    expect(assistant.tools).toEqual([{ name: 'sum_transactions', status: 'done' }])
+    expect(assistant.text).toBe('R$ 42')
+  })
+
   it('remembers the chatId and continues the same conversation', async () => {
-    mockedAsk.mockResolvedValue({ success: true, chatId: 'chat-1', answer: 'hi' })
+    scriptStream([{ type: 'done', success: true, chatId: 'chat-1', answer: 'hi' }])
 
     const { result } = renderHook(() => useSendChat(), { wrapper })
     await act(async () => {
@@ -74,8 +108,9 @@ describe('useSendChat', () => {
       await result.current('second message', null)
     })
 
-    expect(mockedAsk).toHaveBeenLastCalledWith(
+    expect(mockedStream).toHaveBeenLastCalledWith(
       [{ type: 'text', content: 'second message' }],
+      expect.any(Function),
       'chat-1',
       '1'
     )
@@ -83,7 +118,7 @@ describe('useSendChat', () => {
 
   it('clears a stale chatId when the server rejects it', async () => {
     useChatStore.setState({ chatId: 'deleted-chat' })
-    mockedAsk.mockResolvedValue({ success: false, error: 'Chat not found' })
+    scriptStream([{ type: 'done', success: false, error: 'Chat not found' }])
 
     const { result } = renderHook(() => useSendChat(), { wrapper })
     await act(async () => {
@@ -99,14 +134,17 @@ describe('useSendChat', () => {
 
   it('keeps the chat thread and surfaces the clear message when the AI usage limit is hit', async () => {
     useChatStore.setState({ chatId: 'chat-1' })
-    mockedAsk.mockResolvedValue({
-      success: false,
-      chatId: 'chat-1',
-      error: 'insufficient_credits',
-      errorCode: 'insufficient_credits',
-      answer:
-        "The AI assistant has reached its usage limit and can't answer right now. Please try again later.",
-    })
+    scriptStream([
+      {
+        type: 'done',
+        success: false,
+        chatId: 'chat-1',
+        error: 'insufficient_credits',
+        errorCode: 'insufficient_credits',
+        answer:
+          "The AI assistant has reached its usage limit and can't answer right now. Please try again later.",
+      },
+    ])
 
     const { result } = renderHook(() => useSendChat(), { wrapper })
     await act(async () => {
@@ -126,15 +164,13 @@ describe('useSendChat', () => {
     )
   })
 
-  it('routes an attachment through askQuestion so the chat is persisted', async () => {
+  it('routes an attachment through streamChat so the chat is persisted', async () => {
     const compressed = new Blob(['tiny'], { type: 'image/jpeg' })
     mockedCompress.mockResolvedValue(compressed)
     mockedToBase64.mockResolvedValue('BASE64')
-    mockedAsk.mockResolvedValue({
-      success: true,
-      chatId: 'chat-9',
-      answer: 'Added R$ 10',
-    })
+    scriptStream([
+      { type: 'done', success: true, chatId: 'chat-9', answer: 'Added R$ 10' },
+    ])
 
     const file = new File(['x'], 'receipt.jpg', { type: 'image/jpeg' })
     const { result } = renderHook(() => useSendChat(), { wrapper })
@@ -144,15 +180,15 @@ describe('useSendChat', () => {
 
     expect(mockedCompress).toHaveBeenCalledWith(file)
     expect(mockedToBase64).toHaveBeenCalledWith(compressed)
-    expect(mockedAsk).toHaveBeenCalledWith(
+    expect(mockedStream).toHaveBeenCalledWith(
       [
         { type: 'text', content: 'Please scan this receipt.' },
         { type: 'image', content: 'BASE64' },
       ],
+      expect.any(Function),
       undefined,
       '1'
     )
-    expect(mockedScan).not.toHaveBeenCalled()
     expect(useChatStore.getState().chatId).toBe('chat-9')
 
     const messages = useChatStore.getState().messages
@@ -162,7 +198,7 @@ describe('useSendChat', () => {
 
   it('sends audio attachments without compressing them', async () => {
     mockedToBase64.mockResolvedValue('AUDIO64')
-    mockedAsk.mockResolvedValue({ success: true, chatId: 'chat-1', answer: 'ok' })
+    scriptStream([{ type: 'done', success: true, chatId: 'chat-1', answer: 'ok' }])
 
     const file = new File(['x'], 'note.webm', { type: 'audio/webm' })
     const { result } = renderHook(() => useSendChat(), { wrapper })
@@ -177,7 +213,7 @@ describe('useSendChat', () => {
   it('marks the assistant message as an error when the scan fails', async () => {
     mockedCompress.mockImplementation(async (file: File) => file)
     mockedToBase64.mockResolvedValue('BASE64')
-    mockedAsk.mockResolvedValue({ success: false, error: 'no transactions found' })
+    scriptStream([{ type: 'done', success: false, error: 'no transactions found' }])
 
     const file = new File(['x'], 'receipt.jpg', { type: 'image/jpeg' })
     const { result } = renderHook(() => useSendChat(), { wrapper })
@@ -192,7 +228,7 @@ describe('useSendChat', () => {
   })
 
   it('shows an error message when the request throws', async () => {
-    mockedAsk.mockRejectedValue(new Error('network'))
+    mockedStream.mockRejectedValue(new Error('network'))
 
     const { result } = renderHook(() => useSendChat(), { wrapper })
     await act(async () => {
@@ -209,6 +245,6 @@ describe('useSendChat', () => {
     })
 
     expect(useChatStore.getState().messages).toHaveLength(0)
-    expect(mockedAsk).not.toHaveBeenCalled()
+    expect(mockedStream).not.toHaveBeenCalled()
   })
 })

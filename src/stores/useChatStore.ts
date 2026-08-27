@@ -13,6 +13,14 @@ export type ScannedTransaction = {
   error?: string
 }
 
+// A single tool/MCP call the assistant made while answering, surfaced in the
+// bubble so the user can see what the agent did (like Claude/ChatGPT).
+// 'running' while the call is in flight, 'done' once it returns.
+export type ChatToolCall = {
+  name: string
+  status: 'running' | 'done'
+}
+
 export type ChatMessage = {
   id: string
   role: 'user' | 'assistant'
@@ -22,6 +30,11 @@ export type ChatMessage = {
   transactions?: ScannedTransaction[]
   pending?: boolean
   error?: boolean
+  // Tool/MCP calls made during this turn (live while streaming, and restored
+  // from persisted metadata for past assistant messages).
+  tools?: ChatToolCall[]
+  // True while the answer is still streaming in, so the bubble can show a caret.
+  streaming?: boolean
 }
 
 type ChatState = {
