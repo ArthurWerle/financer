@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns'
 import { AddIncome } from '@/components/add-income'
-import { AddExpense } from '@/components/add-expense'
+import { NewExpenseMenu } from '@/components/new-expense-menu'
 
 type PageHeaderProps = {
   title: string
@@ -23,7 +23,7 @@ export const PageHeader = ({ title, subtitle }: PageHeaderProps) => {
           {monthChip}
         </span>
         <AddIncome />
-        <AddExpense />
+        <NewExpenseMenu />
       </div>
     </div>
   )
