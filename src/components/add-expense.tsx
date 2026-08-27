@@ -43,7 +43,20 @@ type FormData = {
   installments: number | undefined
 }
 
-export const AddExpense = () => {
+type AddExpenseProps = {
+  // When provided, the dialog is controlled by the parent (e.g. the New expense
+  // menu). Left undefined, AddExpense manages its own open state and renders its
+  // own trigger, as before.
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  hideTrigger?: boolean
+}
+
+export const AddExpense = ({
+  open,
+  onOpenChange,
+  hideTrigger,
+}: AddExpenseProps = {}) => {
   const today = new Date()
   const [formData, setFormData] = useState<FormData>({
     amount: undefined,
@@ -59,7 +72,13 @@ export const AddExpense = () => {
 
   const queryClient = useQueryClient()
   const [isLoading, setIsLoading] = useState(false)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = open !== undefined
+  const isDialogOpen = isControlled ? open : internalOpen
+  const setIsDialogOpen = (next: boolean) => {
+    if (!isControlled) setInternalOpen(next)
+    onOpenChange?.(next)
+  }
   const { data: categories, isLoading: isLoadingCategories } = useCategories()
   const { data: subcategories, isLoading: isLoadingSubcategories } = useSubcategories()
 
@@ -158,8 +177,8 @@ export const AddExpense = () => {
   return (
     <Dialog
       open={isDialogOpen}
-      onOpenChange={(open) => {
-        if (open) {
+      onOpenChange={(nextOpen) => {
+        if (nextOpen) {
           const now = new Date()
           setFormData({
             amount: undefined,
@@ -173,20 +192,22 @@ export const AddExpense = () => {
             installments: undefined,
           })
         }
-        setIsDialogOpen(open)
+        setIsDialogOpen(nextOpen)
       }}
     >
-      <DialogTrigger asChild>
-        <Button
-          variant="default"
-          id="add-expense-button"
-          onClick={() => setIsDialogOpen(true)}
-          className="h-8 rounded-[7px] px-3 text-[12.5px] font-semibold"
-        >
-          <Plus size={13} />
-          New expense
-        </Button>
-      </DialogTrigger>
+      {!hideTrigger && (
+        <DialogTrigger asChild>
+          <Button
+            variant="default"
+            id="add-expense-button"
+            onClick={() => setIsDialogOpen(true)}
+            className="h-8 rounded-[7px] px-3 text-[12.5px] font-semibold"
+          >
+            <Plus size={13} />
+            New expense
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>New expense</DialogTitle>
