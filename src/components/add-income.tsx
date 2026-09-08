@@ -22,6 +22,7 @@ import {
   addTransactionV2,
   PostTransactionTypeV2,
 } from '../queries/transactions/addTransaction'
+import { invalidateTransactionQueries } from '../queries/transactions/invalidateTransactionQueries'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { format } from 'date-fns'
@@ -122,7 +123,7 @@ export const AddIncome = () => {
         )
       })
       .finally(() => {
-        queryClient.invalidateQueries()
+        invalidateTransactionQueries(queryClient)
         setIsLoading(false)
         setIsDialogOpen(false)
       })

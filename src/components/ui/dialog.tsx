@@ -6,7 +6,56 @@ import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-const Dialog = DialogPrimitive.Root
+// Radix disables pointer events on <body> while a modal layer is open and, on
+// close, writes back whatever the body had when that layer mounted. A dialog
+// opened from a dropdown menu mounts while the menu layer is still up (the menu
+// has an exit animation), so it captures "none" and restores it on close,
+// leaving the whole app unclickable. Deduping the Radix layer packages fixes the
+// capture; this guard makes sure a stuck body always recovers.
+const OPEN_LAYER_SELECTOR = [
+  '[data-state="open"][role="dialog"]',
+  '[data-state="open"][role="alertdialog"]',
+  '[data-state="open"][role="menu"]',
+  '[data-state="open"][role="listbox"]',
+].join(",")
+
+const releaseBodyPointerEvents = () => {
+  if (typeof document === "undefined") return
+  // Two frames so Radix has finished swapping data-state on the closing layer.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (document.querySelector(OPEN_LAYER_SELECTOR)) return
+      if (document.body.style.pointerEvents !== "none") return
+      document.body.style.removeProperty("pointer-events")
+    })
+  })
+}
+
+// Most dialogs here are closed programmatically (the create handlers call
+// setOpen(false) after the request), and Root only fires onOpenChange for
+// user-driven dismissals, so watch the open prop too.
+const Dialog = ({ open, onOpenChange, ...props }: DialogPrimitive.DialogProps) => {
+  const handleOpenChange = React.useCallback(
+    (nextOpen: boolean) => {
+      onOpenChange?.(nextOpen)
+      if (!nextOpen) releaseBodyPointerEvents()
+    },
+    [onOpenChange]
+  )
+
+  React.useEffect(() => {
+    if (open === false) releaseBodyPointerEvents()
+  }, [open])
+
+  return (
+    <DialogPrimitive.Root
+      open={open}
+      onOpenChange={handleOpenChange}
+      {...props}
+    />
+  )
+}
+Dialog.displayName = "Dialog"
 
 const DialogTrigger = DialogPrimitive.Trigger
 
