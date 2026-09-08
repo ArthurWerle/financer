@@ -33,6 +33,7 @@ import {
   addTransactionV2,
   PostTransactionTypeV2,
 } from '@/queries/transactions/addTransaction'
+import { invalidateTransactionQueries } from '@/queries/transactions/invalidateTransactionQueries'
 
 type CreateFromReceiptProps = {
   open: boolean
@@ -192,7 +193,7 @@ export const CreateFromReceipt = ({
       const failed = results.filter((r) => r.status === 'rejected').length
       const created = results.length - failed
 
-      queryClient.invalidateQueries()
+      invalidateTransactionQueries(queryClient)
 
       if (failed === 0) {
         toast.success(
