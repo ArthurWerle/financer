@@ -32,7 +32,7 @@ const mockAdd = addTransactionV2 as jest.Mock
 
 const ITEM = {
   categoryId: 2,
-  datetime: '2026-05-12T16:00:00.000Z',
+  datetime: '2026-09-12T15:21:26',
   value: 10,
   description: 'Coffee',
 }
@@ -82,7 +82,7 @@ describe('CreateFromReceipt', () => {
         description: 'Coffee',
         type: 'expense',
         is_recurring: false,
-        date: '2026-05-12T16:00:00.000Z',
+        date: '2026-09-12T15:21:26-03:00',
       })
     )
     await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
