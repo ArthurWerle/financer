@@ -34,6 +34,7 @@ import {
   PostTransactionTypeV2,
 } from '@/queries/transactions/addTransaction'
 import { invalidateTransactionQueries } from '@/queries/transactions/invalidateTransactionQueries'
+import { toRFC3339 } from '@/utils/to-rfc3339'
 
 type CreateFromReceiptProps = {
   open: boolean
@@ -183,7 +184,9 @@ export const CreateFromReceipt = ({
         type: item.type ?? 'expense',
         is_recurring: false,
         location: item.location?.trim() || undefined,
-        date: item.datetime,
+        // The scanner returns the receipt's wall-clock time with no offset;
+        // the API only accepts RFC3339.
+        date: toRFC3339(item.datetime),
       }))
 
       const results = await Promise.allSettled(
