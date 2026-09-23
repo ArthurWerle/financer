@@ -8,6 +8,8 @@ export interface Category {
   name: string
   description: string
   color: string
+  // Left out of averages, reports and percentages (e.g. one-off purchases)
+  exclude_from_calculations?: boolean
 }
 
 export interface CategoryResponse {

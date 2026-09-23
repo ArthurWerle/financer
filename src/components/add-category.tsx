@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 import { KEY } from '@/queries/categories/useCategories'
 import { useQueryClient } from '@tanstack/react-query'
 import { addCategory } from '../queries/categories/addCategory'
@@ -11,12 +12,14 @@ import { addCategory } from '../queries/categories/addCategory'
 type FormData = {
   Name: string
   Description: string
+  ExcludeFromCalculations: boolean
 }
 
 export const AddCategory = () => {
   const [formData, setFormData] = useState<FormData>({
     Name: '',
     Description: '',
+    ExcludeFromCalculations: false,
   })
 
   const queryClient = useQueryClient()
@@ -28,6 +31,7 @@ export const AddCategory = () => {
     await addCategory({
       name: formData.Name,
       description: formData.Description,
+      exclude_from_calculations: formData.ExcludeFromCalculations,
     })
       .catch((error) => alert(error))
       .finally(() => {
@@ -68,6 +72,20 @@ export const AddCategory = () => {
                 value={formData.Description}
                 onChange={(e) => setFormData({ ...formData, Description: e.target.value })}
                 required
+              />
+            </div>
+
+            <div className="flex items-center justify-between gap-4 py-0.5">
+              <div className="grid gap-0.5">
+                <Label htmlFor="exclude-from-calculations">Exclude from calculations</Label>
+                <p className="text-[11.5px] text-faint">
+                  Leaves this category out of averages, totals and reports.
+                </p>
+              </div>
+              <Switch
+                id="exclude-from-calculations"
+                checked={formData.ExcludeFromCalculations}
+                onCheckedChange={(checked) => setFormData({ ...formData, ExcludeFromCalculations: checked })}
               />
             </div>
           </div>
