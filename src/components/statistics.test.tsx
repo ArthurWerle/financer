@@ -24,6 +24,29 @@ describe('Statistics', () => {
     })
   })
 
+  it('should leave categories excluded from calculations out of the recurring total', async () => {
+    server.use(
+      rest.get(`${BFF_BASE_URL}/categories`, (req, res, ctx) => {
+        return res(
+          ctx.json({
+            categories: [
+              { id: 1, name: 'Food' },
+              { id: 2, name: 'Compras Avulsas', exclude_from_calculations: true },
+              { id: 3, name: 'Transportation' },
+            ],
+          })
+        )
+      })
+    )
+
+    render(<Statistics />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/R\$ 300,00/)).toBeInTheDocument()
+      expect(screen.getByText(/20% of expenses/)).toBeInTheDocument()
+    })
+  })
+
   it('should render historical data chart', async () => {
     render(<Statistics />)
 

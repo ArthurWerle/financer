@@ -37,6 +37,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Switch } from '@/components/ui/switch'
 import { Category } from '@/types/category'
 import { Subcategory } from '@/types/subcategory'
 
@@ -50,6 +51,7 @@ function CategoryItem({ category, index }: { category: Category; index: number }
     name: category.name,
     description: category.description,
     color: category.color,
+    exclude_from_calculations: !!category.exclude_from_calculations,
   })
 
   const handleDelete = async () => {
@@ -75,6 +77,7 @@ function CategoryItem({ category, index }: { category: Category; index: number }
       name: editData.name,
       description: editData.description,
       color: editData.color,
+      exclude_from_calculations: editData.exclude_from_calculations,
     }
 
     await updateCategory(category.id, data)
@@ -96,6 +99,7 @@ function CategoryItem({ category, index }: { category: Category; index: number }
       name: category.name,
       description: category.description,
       color: category.color,
+      exclude_from_calculations: !!category.exclude_from_calculations,
     })
     setIsEditOpen(true)
   }
@@ -115,7 +119,14 @@ function CategoryItem({ category, index }: { category: Category; index: number }
             style={{ backgroundColor: category.color || 'var(--c3)' }}
           />
           <div className="flex flex-col gap-px">
-            <p className="text-[13px] font-medium">{category.name}</p>
+            <p className="text-[13px] font-medium">
+              {category.name}
+              {category.exclude_from_calculations && (
+                <span className="ml-2 rounded-[4px] bg-panel2 px-1.5 py-px text-[10.5px] font-normal text-muted-foreground">
+                  Excluded from calculations
+                </span>
+              )}
+            </p>
             <p className="text-[11.5px] text-faint">
               {category.description}
             </p>
@@ -193,6 +204,27 @@ function CategoryItem({ category, index }: { category: Category; index: number }
                     setEditData({
                       ...editData,
                       color: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between gap-4 py-0.5">
+                <div className="grid gap-0.5">
+                  <Label htmlFor={`exclude-${category.id}`}>
+                    Exclude from calculations
+                  </Label>
+                  <p className="text-[11.5px] text-faint">
+                    Leaves this category out of averages, totals and reports.
+                  </p>
+                </div>
+                <Switch
+                  id={`exclude-${category.id}`}
+                  checked={editData.exclude_from_calculations}
+                  onCheckedChange={(checked) =>
+                    setEditData({
+                      ...editData,
+                      exclude_from_calculations: checked,
                     })
                   }
                 />
