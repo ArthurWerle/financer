@@ -9,11 +9,15 @@ type MonthOverviewResponse = {
     currentMonth: number
     lastMonth: number
     percentageVariation: number
+    // Includes categories excluded from calculations
+    fullCurrentMonth?: number
   }
   expense: {
     currentMonth: number
     lastMonth: number
     percentageVariation: number
+    // Includes categories excluded from calculations
+    fullCurrentMonth?: number
   }
 }
 

@@ -20,6 +20,25 @@ import { StatTile } from './stat-tile'
 import { numberToCurrency } from '@/utils/number-to-currency'
 import { useAverage } from '@/queries/types/useAverage'
 import { useRecurringExpenseTotal } from '../queries/transactions/useRecurringExpenseTotal'
+
+// Adds a line with the full amount under the footnote when categories
+// excluded from calculations make it differ from the comparable one.
+function withFullAmount(
+  footnote: React.ReactNode,
+  amount: number,
+  full: number
+) {
+  if (Math.abs(full - amount) < 0.005) return footnote
+  return (
+    <>
+      {footnote && <span className="block">{footnote}</span>}
+      <span className="block text-muted-foreground">
+        {numberToCurrency(full)} incl. excluded categories
+      </span>
+    </>
+  )
+}
+
 export function MonthlyOverview() {
   const {
     data: averageByType,
@@ -64,6 +83,9 @@ export function MonthlyOverview() {
   const income = monthOverview?.income?.currentMonth ?? 0
   const expense = monthOverview?.expense?.currentMonth ?? 0
   const balance = income - expense
+  const fullIncome = monthOverview?.income?.fullCurrentMonth ?? income
+  const fullExpense = monthOverview?.expense?.fullCurrentMonth ?? expense
+  const fullBalance = fullIncome - fullExpense
   const incomeAverage = averageByType?.income?.average ?? 0
   const expenseAverage = averageByType?.expense?.average ?? 0
   const incomeSavedPercent = income > 0 ? (balance / income) * 100 : 0
@@ -84,7 +106,7 @@ export function MonthlyOverview() {
         label="Income"
         icon={<ArrowDownLeft size={14} className="text-green" />}
         value={numberToCurrency(income)}
-        footnote={
+        footnote={withFullAmount(
           !!income && !!incomeAverage ? (
             <span className={incomeAboveAverage ? 'text-green' : 'text-red'}>
               {incomeAboveAverage ? (
@@ -94,14 +116,16 @@ export function MonthlyOverview() {
               )}
               {incomePercentDelta}% from 6-month average
             </span>
-          ) : undefined
-        }
+          ) : undefined,
+          income,
+          fullIncome
+        )}
       />
       <StatTile
         label="Expenses"
         icon={<ArrowUpRight size={14} className="text-red" />}
         value={numberToCurrency(expense)}
-        footnote={
+        footnote={withFullAmount(
           !!expense && !!expenseAverage ? (
             <span className={expenseAboveAverage ? 'text-red' : 'text-green'}>
               {expenseAboveAverage ? (
@@ -111,19 +135,23 @@ export function MonthlyOverview() {
               )}
               {expensePercentDelta}% from 6-month average
             </span>
-          ) : undefined
-        }
+          ) : undefined,
+          expense,
+          fullExpense
+        )}
       />
       <StatTile
         label="Balance"
         icon={<TrendingUp size={14} className="text-muted-foreground" />}
         value={numberToCurrency(balance)}
         valueClassName={balance >= 0 ? 'text-green' : 'text-red'}
-        footnote={
+        footnote={withFullAmount(
           income > 0
             ? `${incomeSavedPercent.toFixed(0)}% of income saved`
-            : undefined
-        }
+            : undefined,
+          balance,
+          fullBalance
+        )}
       />
       <StatTile
         label="Recurring"

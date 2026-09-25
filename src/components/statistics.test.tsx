@@ -47,6 +47,43 @@ describe('Statistics', () => {
     })
   })
 
+  it('should show the full amounts when categories are excluded from calculations', async () => {
+    server.use(
+      rest.get(`${BFF_BASE_URL}/overview/by-month`, (req, res, ctx) => {
+        return res(
+          ctx.json({
+            income: {
+              currentMonth: 5000.0,
+              lastMonth: 4500.0,
+              percentageVariation: 11.11,
+              fullCurrentMonth: 5000.0,
+            },
+            expense: {
+              currentMonth: 1500.75,
+              lastMonth: 1800.5,
+              percentageVariation: -16.67,
+              fullCurrentMonth: 3500.75,
+            },
+          })
+        )
+      })
+    )
+
+    render(<Statistics />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/R\$ 1\.500,75/)).toBeInTheDocument()
+      expect(
+        screen.getByText(/R\$ 3\.500,75 incl\. excluded categories/)
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText(/R\$ 1\.499,25 incl\. excluded categories/)
+      ).toBeInTheDocument()
+    })
+    // Income is unaffected, so it gets no extra line.
+    expect(screen.getAllByText(/incl\. excluded categories/)).toHaveLength(2)
+  })
+
   it('should render historical data chart', async () => {
     render(<Statistics />)
 
