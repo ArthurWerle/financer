@@ -11,6 +11,7 @@ import {
   Pencil,
   Trash2,
   CircleCheck,
+  Replace,
 } from 'lucide-react'
 import { getLeftPayments } from '../utils/get-left-payments'
 import { humanReadableDate } from '../utils/format-date'
@@ -23,6 +24,8 @@ import {
   UpdateTransactionData,
 } from '@/queries/transactions/updateTransaction'
 import { endTransaction } from '@/queries/transactions/endTransaction'
+import { ChangeAmountDialog } from '@/components/change-amount-dialog'
+import { canChangeRecurringAmount } from '@/utils/can-change-recurring-amount'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import {
@@ -73,6 +76,7 @@ export function Transaction({
 }) {
   const queryClient = useQueryClient()
   const [isPrepaying, setIsPrepaying] = useState(false)
+  const [isChangeAmountOpen, setIsChangeAmountOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -169,6 +173,8 @@ export function Transaction({
     const end = new Date(transaction.end_date)
     return now.getFullYear() === end.getFullYear() && now.getMonth() === end.getMonth()
   })()
+
+  const canChangeAmount = canChangeRecurringAmount(transaction)
 
   const shouldShowMarkFinished = (() => {
     if (!transaction.is_recurring) return false
@@ -294,6 +300,12 @@ export function Transaction({
                     </Tooltip>
                   </TooltipProvider>
                 )}
+                {canChangeAmount && (
+                  <DropdownMenuItem onClick={() => setIsChangeAmountOpen(true)}>
+                    <Replace className="h-4 w-4" />
+                    Change amount
+                  </DropdownMenuItem>
+                )}
                 {shouldShowMarkFinished && (
                   <DropdownMenuItem onClick={() => {
                     setFinishedDate(new Date())
@@ -315,6 +327,12 @@ export function Transaction({
           </div>
         </div>
       </motion.div>
+
+      <ChangeAmountDialog
+        transaction={transaction}
+        open={isChangeAmountOpen}
+        onOpenChange={setIsChangeAmountOpen}
+      />
 
       <Dialog open={isMarkFinishedOpen} onOpenChange={setIsMarkFinishedOpen}>
         <DialogContent>

@@ -15,6 +15,7 @@ import {
   Trash2,
   CreditCard,
   CircleCheck,
+  Replace,
 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -58,6 +59,8 @@ import {
   UpdateTransactionData,
 } from '@/queries/transactions/updateTransaction'
 import { endTransaction } from '@/queries/transactions/endTransaction'
+import { ChangeAmountDialog } from '@/components/change-amount-dialog'
+import { canChangeRecurringAmount } from '@/utils/can-change-recurring-amount'
 import { humanReadableDate } from '@/utils/format-date'
 import { getLeftPayments } from '@/utils/get-left-payments'
 import { numberToCurrency } from '@/utils/number-to-currency'
@@ -80,6 +83,7 @@ export default function TransactionDetailPage({
   const [isMarkingFinished, setIsMarkingFinished] = useState(false)
   const [finishedDatePickerOpen, setFinishedDatePickerOpen] = useState(false)
   const [finishedDate, setFinishedDate] = useState<Date>(new Date())
+  const [isChangeAmountOpen, setIsChangeAmountOpen] = useState(false)
 
   const { data: transaction, isLoading, isError } = useTransaction(id)
   const { data: categories = [] } = useCategories()
@@ -94,6 +98,8 @@ export default function TransactionDetailPage({
       now.getMonth() === end.getMonth()
     )
   })()
+
+  const canChangeAmount = !!transaction && canChangeRecurringAmount(transaction)
 
   const shouldShowMarkFinished = (() => {
     if (!transaction?.is_recurring) return false
@@ -282,6 +288,13 @@ export default function TransactionDetailPage({
                   </Badge>
                 </Link>
               )}
+              {transaction.previous_id && (
+                <Link href={`/transactions/${transaction.previous_id}`}>
+                  <Badge className="bg-panel2 text-foreground border-border hover:bg-panel2/80 cursor-pointer">
+                    Previous amount
+                  </Badge>
+                </Link>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -436,6 +449,15 @@ export default function TransactionDetailPage({
               </Tooltip>
             </TooltipProvider>
           )}
+          {canChangeAmount && (
+            <Button
+              variant="outline"
+              onClick={() => setIsChangeAmountOpen(true)}
+            >
+              <Replace className="h-4 w-4 mr-2" />
+              Change amount
+            </Button>
+          )}
           {shouldShowMarkFinished && (
             <Button
               variant="outline"
@@ -458,6 +480,17 @@ export default function TransactionDetailPage({
           </Button>
         </div>
       </Card>
+
+      <ChangeAmountDialog
+        transaction={transaction}
+        open={isChangeAmountOpen}
+        onOpenChange={setIsChangeAmountOpen}
+        onChanged={({ previous, current }) => {
+          // This page shows the schedule that was just closed; follow the
+          // new one so the next edit lands on it.
+          if (previous) router.push(`/transactions/${current.id}`)
+        }}
+      />
 
       <Dialog open={isMarkFinishedOpen} onOpenChange={setIsMarkFinishedOpen}>
         <DialogContent>

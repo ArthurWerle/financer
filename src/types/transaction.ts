@@ -24,6 +24,8 @@ export interface Transaction {
   date: string
   start_date?: string
   prepaid_from_id?: number
+  /** The recurring schedule this one replaced after an amount change. */
+  previous_id?: number
   end_date?: string
   total_paid?: number
   total_left?: number
