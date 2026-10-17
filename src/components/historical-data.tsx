@@ -5,6 +5,14 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { useState } from 'react'
+import {
   CartesianGrid,
   Legend,
   Line,
@@ -15,7 +23,17 @@ import {
 } from 'recharts'
 import { useIncomeAndExpenseComparsionHistory } from '../queries/transactions/useExpenseComparsionHistory'
 
+type Range = 'last-12' | 'all'
+
+export const LAST_MONTHS = 12
+
+export function limitToRange<T>(data: T[] | undefined, range: Range) {
+  if (!data) return data
+  return range === 'last-12' ? data.slice(-LAST_MONTHS) : data
+}
+
 export function HistoricalData() {
+  const [range, setRange] = useState<Range>('last-12')
   const {
     data: incomeAndExpenseComparsion,
     isLoading,
@@ -52,7 +70,21 @@ export function HistoricalData() {
 
   return (
     <Card className="rounded-[10px] border-border p-5 shadow-none">
-      <h3 className="mb-4 text-[14px] font-semibold">Income vs expenses</h3>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-[14px] font-semibold">Income vs expenses</h3>
+        <Select value={range} onValueChange={(v) => setRange(v as Range)}>
+          <SelectTrigger
+            className="h-8 w-[150px] text-[12.5px]"
+            aria-label="Range"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="last-12">Last 12 months</SelectItem>
+            <SelectItem value="all">All time</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <ChartContainer
         config={{
           income: {
@@ -71,7 +103,7 @@ export function HistoricalData() {
         className="h-[300px] w-full"
       >
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={incomeAndExpenseComparsion} responsive>
+          <LineChart data={limitToRange(incomeAndExpenseComparsion, range)} responsive>
             <XAxis
               dataKey="month"
               stroke="var(--faint)"
