@@ -1,5 +1,7 @@
 # Client-side of my personal finance app
 
+Hello, world!
+
 ## Agent workflow
 
 Labeling an issue with `agent:todo` runs the Claude agent on it (`.github/workflows/agent-trigger.yml`; the logic lives in [ArthurWerle/ai-internal](https://github.com/ArthurWerle/ai-internal)).
